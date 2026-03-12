@@ -11,6 +11,7 @@ export function HeroSection() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [mouseTrail, setMouseTrail] = useState<{ x: number; y: number }[]>([])
   const [mounted, setMounted] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
 
   // Hydration fix: only render after mount
@@ -19,6 +20,30 @@ export function HeroSection() {
     const timer = setTimeout(() => setIsVisible(true), 200)
     return () => clearTimeout(timer)
   }, [])
+
+  // Cinematic scroll-linked animation
+  useEffect(() => {
+    if (!mounted) return
+
+    const handleScroll = () => {
+      // Calculate scroll progress: 0 at top, 1 after 600px
+      const progress = Math.min(window.scrollY / 600, 1)
+      setScrollProgress(progress)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [mounted])
+
+  // Cinematic easing function for smooth Apple-style animation
+  const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+  const easedProgress = easeOutCubic(scrollProgress)
+
+  // Text animation values - starts large/blurred, ends small/sharp
+  const textScale = 1.15 - easedProgress * 0.15 // 1.15 -> 1.0
+  const textBlur = (1 - easedProgress) * 4 // 4px -> 0px blur
+  const textTranslateY = easedProgress * -30 // 0 -> -30px (moves up)
+  const textOpacity = 0.7 + easedProgress * 0.3 // 0.7 -> 1.0
 
   useEffect(() => {
     if (!mounted) return
@@ -102,11 +127,18 @@ export function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pt-20">
-        {/* Title with animated gradient */}
+        {/* Title with cinematic scroll-linked animation */}
         <h1
-          className={`text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-balance transition-all duration-1000 delay-200 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          className={`text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-balance transition-opacity duration-1000 delay-200 ${
+            isVisible ? "opacity-100" : "opacity-0"
           }`}
+          style={{
+            transform: `scale(${textScale}) translateY(${textTranslateY}px)`,
+            filter: `blur(${textBlur}px)`,
+            opacity: mounted ? textOpacity : 0,
+            willChange: "transform, filter, opacity",
+            transition: "opacity 1s ease",
+          }}
         >
           <span 
             className="inline-block animate-gradient-text"
