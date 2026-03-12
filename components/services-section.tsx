@@ -5,6 +5,37 @@ import { Check, Sparkles } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { prices } from "@/lib/translations"
 
+// Animated counter hook
+function useAnimatedCounter(target: number, duration: number = 1500, isVisible: boolean) {
+  const [count, setCount] = useState(0)
+  
+  useEffect(() => {
+    if (!isVisible) return
+    
+    let startTime: number
+    let animationId: number
+    
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      
+      // Easing function
+      const easeOut = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.floor(target * easeOut))
+      
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animate)
+      }
+    }
+    
+    animationId = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(animationId)
+  }, [target, duration, isVisible])
+  
+  return count
+}
+
 interface PricingCardProps {
   titleKey: string
   descKey: string
@@ -18,6 +49,7 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay 
   const { country, t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -34,50 +66,70 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay 
   function handleMouseMove(e: React.MouseEvent) {
     if (!cardRef.current) return
     const rect = cardRef.current.getBoundingClientRect()
-    const x = (e.clientX - rect.left - rect.width / 2) / 20
-    const y = (e.clientY - rect.top - rect.height / 2) / 20
+    // Magnetic cursor attract - card follows mouse slightly
+    const x = (e.clientX - rect.left - rect.width / 2) / 15
+    const y = (e.clientY - rect.top - rect.height / 2) / 15
     setMousePos({ x, y })
   }
 
   function handleMouseLeave() {
     setMousePos({ x: 0, y: 0 })
+    setIsHovered(false)
   }
 
-  const price = prices[priceKey][country]
+  const priceString = prices[priceKey][country]
+  const priceNum = parseInt(priceString.replace(/[^\d]/g, ""))
+  const animatedPrice = useAnimatedCounter(priceNum, 1500, isVisible)
+  const currency = priceString.includes("CHF") ? " CHF" : priceString.includes("€") ? "€" : " ₺"
+  const formattedPrice = currency === "€" 
+    ? `${animatedPrice.toLocaleString("de-DE")}${currency}`
+    : `${animatedPrice.toLocaleString("de-DE")}${currency}`
 
   return (
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       className={`relative rounded-3xl p-px transition-all duration-700 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
       } ${popular ? "md:-mt-4 md:mb-4" : ""}`}
       style={{
         transitionDelay: `${delay}ms`,
-        transform: `perspective(1000px) rotateX(${-mousePos.y}deg) rotateY(${mousePos.x}deg) ${
+        transform: `perspective(1000px) rotateX(${-mousePos.y}deg) rotateY(${mousePos.x}deg) translateX(${mousePos.x * 2}px) translateY(${mousePos.y * 2}px) ${
           isVisible ? "translateY(0)" : "translateY(48px)"
         }`,
         background: popular
-          ? "linear-gradient(135deg, #A020F0, #3B82F6)"
-          : "linear-gradient(135deg, rgba(160,32,240,0.3), rgba(59,130,246,0.3))",
+          ? "linear-gradient(135deg, #A020F0, #00D4FF)"
+          : "linear-gradient(135deg, rgba(160,32,240,0.4), rgba(0,212,255,0.3))",
       }}
     >
       <div 
-        className="rounded-3xl p-8 h-full flex flex-col relative overflow-hidden"
+        className="rounded-3xl p-8 h-full flex flex-col relative overflow-hidden transition-all duration-300"
         style={{
           backdropFilter: "blur(32px)",
           WebkitBackdropFilter: "blur(32px)",
-          background: "linear-gradient(135deg, rgba(160, 32, 240, 0.12), rgba(59, 130, 246, 0.08))",
-          border: "1px solid rgba(255, 255, 255, 0.15)",
-          boxShadow: "0 12px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(160, 32, 240, 0.1)",
+          background: "linear-gradient(135deg, rgba(160, 32, 240, 0.15), rgba(0, 212, 255, 0.08))",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          boxShadow: isHovered 
+            ? "0 20px 60px rgba(0, 0, 0, 0.5), 0 0 50px rgba(160, 32, 240, 0.3), 0 0 80px rgba(0, 212, 255, 0.2)"
+            : "0 12px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(160, 32, 240, 0.1)",
         }}
       >
+        {/* Neon glow pulse on hover */}
+        <div 
+          className="absolute inset-0 rounded-3xl pointer-events-none transition-opacity duration-500"
+          style={{
+            opacity: isHovered ? 1 : 0,
+            boxShadow: "inset 0 0 30px rgba(160, 32, 240, 0.15), inset 0 0 60px rgba(0, 212, 255, 0.1)",
+          }}
+        />
+
         {/* Popular badge */}
         {popular && (
-          <div className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
+          <div className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold animate-pulse-glow"
             style={{
-              background: "linear-gradient(135deg, #A020F0, #3B82F6)",
+              background: "linear-gradient(135deg, #A020F0, #00D4FF)",
               color: "#fff",
             }}
           >
@@ -90,43 +142,61 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay 
         <h3 className="text-xl font-bold text-foreground mb-2">{t(titleKey)}</h3>
         <p className="text-sm text-foreground/50 mb-6">{t(descKey)}</p>
 
-        {/* Price */}
+        {/* Animated Price */}
         <div className="mb-8">
-          <span className="text-4xl font-bold text-foreground">{price}</span>
+          <span 
+            className="text-4xl font-bold animate-gradient-text"
+            style={{
+              background: "linear-gradient(90deg, #fff, #A020F0, #00D4FF, #fff)",
+              backgroundSize: "300% 100%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              animation: isVisible ? "gradient-shift 3s ease infinite" : "none",
+            }}
+          >
+            {formattedPrice}
+          </span>
         </div>
 
-        {/* Features */}
+        {/* Features with stagger animation */}
         <ul className="flex flex-col gap-3 mb-8 flex-1">
-          {featureKeys.map((key) => (
-            <li key={key} className="flex items-start gap-3 text-sm text-foreground/70">
-              <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#A020F0" }} />
+          {featureKeys.map((key, i) => (
+            <li 
+              key={key} 
+              className={`flex items-start gap-3 text-sm text-foreground/70 transition-all duration-500 ${
+                isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+              }`}
+              style={{ transitionDelay: `${delay + 100 + i * 80}ms` }}
+            >
+              <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#00D4FF" }} />
               {t(key)}
             </li>
           ))}
         </ul>
 
-        {/* CTA */}
+        {/* CTA with liquid effect */}
         <a
           href="#contact"
-          className="block text-center py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-[1.02]"
+          className="group block text-center py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
           style={
             popular
               ? {
-                  background: "linear-gradient(135deg, #A020F0, #3B82F6)",
+                  background: "linear-gradient(135deg, #A020F0, #00D4FF)",
                   color: "#fff",
-                  boxShadow: "0 4px 20px rgba(160,32,240,0.3)",
+                  boxShadow: "0 4px 20px rgba(160,32,240,0.4)",
                 }
               : {
-                  background: "rgba(160,32,240,0.1)",
+                  background: "rgba(160,32,240,0.15)",
                   color: "#fff",
-                  border: "1px solid rgba(160,32,240,0.3)",
+                  border: "1px solid rgba(160,32,240,0.4)",
                 }
           }
         >
-          {t("hero_cta")}
+          <span className="relative z-10">{t("hero_cta")}</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#00D4FF] to-[#A020F0] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </a>
 
-        {/* Shimmer */}
+        {/* Shimmer scanline */}
         <div className="absolute inset-0 animate-shimmer rounded-3xl pointer-events-none" />
       </div>
     </div>
@@ -151,23 +221,34 @@ export function ServicesSection() {
 
   return (
     <section id="services" ref={sectionRef} className="relative py-24 md:py-32 overflow-hidden">
-      {/* Background */}
+      {/* Background with more purple/cyan */}
       <div
         className="absolute inset-0"
         style={{
-          background:
-            "radial-gradient(ellipse at 50% 0%, rgba(160,32,240,0.06) 0%, transparent 50%)",
+          background: `
+            radial-gradient(ellipse at 30% 30%, rgba(160,32,240,0.1) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 70%, rgba(0,212,255,0.08) 0%, transparent 50%)
+          `,
         }}
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4">
-        {/* Header */}
+        {/* Header with glitch reveal */}
         <div
           className={`text-center mb-16 transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4 text-balance neon-text">
+          <h2 
+            className="text-3xl md:text-5xl font-bold mb-4 text-balance"
+            style={{
+              background: "linear-gradient(90deg, #fff, #A020F0, #00D4FF)",
+              backgroundSize: "200% 100%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              animation: "gradient-shift 4s ease infinite",
+            }}
+          >
             {t("services_title")}
           </h2>
           <p className="text-foreground/50 text-lg max-w-xl mx-auto">{t("services_subtitle")}</p>

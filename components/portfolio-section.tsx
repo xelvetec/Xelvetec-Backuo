@@ -8,32 +8,32 @@ const projects = [
   {
     title: "Alpine Luxus Hotel",
     category: "E-Commerce",
-    gradient: "from-[#A020F0]/30 to-[#1E3A8A]/30",
+    gradient: "from-[#A020F0]/40 to-[#1E3A8A]/40",
   },
   {
     title: "Istanbul Fashion Co.",
     category: "Business",
-    gradient: "from-[#3B82F6]/30 to-[#7C3AED]/30",
+    gradient: "from-[#00D4FF]/40 to-[#7C3AED]/40",
   },
   {
     title: "Swiss FinTech App",
     category: "E-Commerce",
-    gradient: "from-[#1E3A8A]/30 to-[#A020F0]/30",
+    gradient: "from-[#1E3A8A]/40 to-[#A020F0]/40",
   },
   {
     title: "Berlin Creative Studio",
     category: "Basic",
-    gradient: "from-[#7C3AED]/30 to-[#3B82F6]/30",
+    gradient: "from-[#7C3AED]/40 to-[#00D4FF]/40",
   },
   {
     title: "Vienna Coffee House",
     category: "Business",
-    gradient: "from-[#A020F0]/30 to-[#3B82F6]/30",
+    gradient: "from-[#A020F0]/40 to-[#00D4FF]/40",
   },
   {
     title: "Antalya Travel Agency",
     category: "E-Commerce",
-    gradient: "from-[#3B82F6]/30 to-[#1E3A8A]/30",
+    gradient: "from-[#00D4FF]/40 to-[#1E3A8A]/40",
   },
 ]
 
@@ -46,6 +46,7 @@ function PortfolioCard({
 }) {
   const [isVisible, setIsVisible] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -63,8 +64,8 @@ function PortfolioCard({
     if (!cardRef.current) return
     const rect = cardRef.current.getBoundingClientRect()
     setMousePos({
-      x: (e.clientX - rect.left - rect.width / 2) / 25,
-      y: (e.clientY - rect.top - rect.height / 2) / 25,
+      x: (e.clientX - rect.left - rect.width / 2) / 20,
+      y: (e.clientY - rect.top - rect.height / 2) / 20,
     })
   }
 
@@ -72,34 +73,64 @@ function PortfolioCard({
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      onMouseLeave={() => setMousePos({ x: 0, y: 0 })}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => { setMousePos({ x: 0, y: 0 }); setIsHovered(false) }}
       className={`group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-700 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
       }`}
       style={{
         transitionDelay: `${index * 100}ms`,
-        transform: `perspective(800px) rotateX(${-mousePos.y}deg) rotateY(${mousePos.x}deg) ${
+        transform: `perspective(800px) rotateX(${-mousePos.y}deg) rotateY(${mousePos.x}deg) scale(${isHovered ? 1.05 : 1}) ${
           isVisible ? "translateY(0)" : "translateY(48px)"
         }`,
+        boxShadow: isHovered 
+          ? "0 25px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(160, 32, 240, 0.3)"
+          : "0 10px 30px rgba(0, 0, 0, 0.3)",
       }}
     >
       {/* Background */}
       <div
-        className={`aspect-[4/3] bg-gradient-to-br ${project.gradient} flex items-center justify-center`}
+        className={`aspect-[4/3] bg-gradient-to-br ${project.gradient} flex items-center justify-center relative`}
       >
-        <div className="text-6xl font-bold text-foreground/5">{project.title[0]}</div>
+        <div className="text-7xl font-bold text-foreground/10">{project.title[0]}</div>
+        
+        {/* Shimmer scanline effect */}
+        <div 
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+            backgroundSize: "200% 100%",
+            animation: isHovered ? "shimmer 1.5s infinite" : "none",
+          }}
+        />
+        
+        {/* Rainbow ring on hover */}
+        <div 
+          className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{
+            boxShadow: "inset 0 0 20px rgba(160, 32, 240, 0.3), inset 0 0 40px rgba(0, 212, 255, 0.2)",
+          }}
+        />
       </div>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 glass opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center gap-3">
-        <ExternalLink className="w-6 h-6 text-foreground" />
-        <h4 className="text-lg font-bold text-foreground">{project.title}</h4>
+      {/* Glass overlay with zoom */}
+      <div 
+        className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500"
+        style={{
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          background: "linear-gradient(135deg, rgba(160, 32, 240, 0.2), rgba(0, 212, 255, 0.15))",
+        }}
+      >
+        <ExternalLink className="w-8 h-8 text-white transform group-hover:scale-110 transition-transform duration-300" />
+        <h4 className="text-lg font-bold text-white text-center px-4">{project.title}</h4>
         <span
-          className="text-xs px-3 py-1 rounded-full font-medium"
+          className="text-xs px-4 py-1.5 rounded-full font-medium"
           style={{
-            background: "rgba(160,32,240,0.2)",
-            color: "#d4a5ff",
-            border: "1px solid rgba(160,32,240,0.3)",
+            background: "linear-gradient(135deg, rgba(160,32,240,0.4), rgba(0,212,255,0.3))",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.3)",
+            boxShadow: "0 0 15px rgba(160, 32, 240, 0.4)",
           }}
         >
           {project.category}
@@ -130,8 +161,10 @@ export function PortfolioSection() {
       <div
         className="absolute inset-0"
         style={{
-          background:
-            "radial-gradient(ellipse at 30% 80%, rgba(160,32,240,0.05) 0%, transparent 50%)",
+          background: `
+            radial-gradient(ellipse at 20% 50%, rgba(160,32,240,0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 50%, rgba(0,212,255,0.06) 0%, transparent 50%)
+          `,
         }}
       />
 
@@ -141,7 +174,16 @@ export function PortfolioSection() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4 neon-text text-balance">
+          <h2 
+            className="text-3xl md:text-5xl font-bold mb-4 text-balance"
+            style={{
+              background: "linear-gradient(90deg, #fff, #A020F0, #00D4FF)",
+              backgroundSize: "200% 100%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              animation: "gradient-shift 4s ease infinite",
+            }}
+          >
             {t("portfolio_title")}
           </h2>
           <p className="text-foreground/50 text-lg max-w-xl mx-auto">{t("portfolio_subtitle")}</p>
