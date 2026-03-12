@@ -39,6 +39,12 @@ export function HeroSection() {
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
   const easedProgress = easeOutCubic(scrollProgress)
 
+  // Dramatic cinematic zoom-in animation
+  const textScale = 0.6 + easedProgress * 1.2 // 0.6 -> 1.8 (massive zoom)
+  const textMotionBlur = (1 - easedProgress) * 2 // 2px -> 0px blur during scroll
+  const textLetterSpacing = easedProgress * 4 // 0 -> 4px (expands as zooms)
+  const textOpacity = 0.5 + easedProgress * 0.5 // 0.5 -> 1.0
+
   // Background animation values based on scroll
   const bgPurpleIntensity = 0.2 + easedProgress * 0.3 // 0.2 -> 0.5 (intensiver)
   const bgCyanIntensity = 0.15 + easedProgress * 0.25 // 0.15 -> 0.4 (intensiver)
