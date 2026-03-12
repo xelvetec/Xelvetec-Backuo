@@ -27,8 +27,8 @@ export function Navbar() {
   const logoScale = mounted ? 1 + easedProgress * 0.4 : 1
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 animate-float-subtle pt-4 px-4">
-      {/* Logo only - minimal and clean */}
+    <nav className="fixed top-0 left-0 right-0 z-50 animate-float-subtle pt-4 px-4 flex justify-center">
+      {/* Logo only - minimal and clean - centered */}
       <a href="#home" className="inline-flex items-center group">
         <div 
           className="relative animate-breathing transition-transform duration-75 ease-out"

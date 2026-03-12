@@ -181,11 +181,14 @@ export function HeroSection() {
           </span>
         </h1>
 
-        {/* Subtitle with glitch effect */}
+        {/* Subtitle - NO zoom, stays fixed size */}
         <p
           className={`text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto mb-10 text-pretty leading-relaxed transition-all duration-1000 delay-500 ${
             isVisible ? "opacity-100 translate-y-0 animate-text-reveal" : "opacity-0 translate-y-8"
           }`}
+          style={{
+            willChange: "opacity, transform",
+          }}
         >
           {t("hero_subtitle")}
         </p>
