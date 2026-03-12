@@ -7,17 +7,16 @@ import { useLanguage } from "@/lib/language-context"
 import type { Country } from "@/lib/translations"
 
 const countries: { code: Country; flag: string; label: string }[] = [
-  { code: "de", flag: "\uD83C\uDDE9\uD83C\uDDEA", label: "DE" },
-  { code: "tr", flag: "\uD83C\uDDF9\uD83C\uDDF7", label: "TR" },
-  { code: "ch", flag: "\uD83C\uDDE8\uD83C\uDDED", label: "CH" },
-  { code: "at", flag: "\uD83C\uDDE6\uD83C\uDDF9", label: "AT" },
-  { code: "en", flag: "\uD83C\uDDEC\uD83C\uDDE7", label: "EN" },
+  { code: "de", flag: "🇩🇪", label: "DE" },
+  { code: "tr", flag: "🇹🇷", label: "TR" },
+  { code: "ch", flag: "🇨🇭", label: "CH" },
+  { code: "at", flag: "🇦🇹", label: "AT" },
+  { code: "en", flag: "🇬🇧", label: "EN" },
 ]
 
 const navLinks = [
   { key: "nav_home", href: "#home" },
   { key: "nav_services", href: "#services" },
-  { key: "nav_about", href: "#about" },
   { key: "nav_portfolio", href: "#portfolio" },
   { key: "nav_contact", href: "#contact" },
 ]
@@ -39,20 +38,20 @@ export function Navbar() {
         }}
       >
         <div className="mx-auto flex items-center justify-between px-4 py-3 md:px-8">
-          {/* Logo in navbar - static 40x40 with smooth hover glow */}
+          {/* Logo 48px desktop, 40px mobile with hover glow */}
           <a href="#home" className="flex items-center gap-3 group">
             <Image
               src="/images/xelvetec-logo.png"
               alt="XelveTec"
-              width={40}
-              height={40}
-              className="transition-all duration-300 group-hover:scale-110"
+              width={48}
+              height={48}
+              className="w-10 h-10 md:w-12 md:h-12 transition-all duration-300 group-hover:scale-110"
               style={{
-                filter: "drop-shadow(0 0 10px rgba(160, 32, 240, 0.5))",
+                filter: "drop-shadow(0 0 12px rgba(160, 32, 240, 0.6))",
               }}
             />
             <span
-              className="text-lg font-bold tracking-wider"
+              className="text-lg font-bold tracking-wider hidden sm:block"
               style={{
                 background: "linear-gradient(135deg, #A020F0, #3B82F6)",
                 WebkitBackgroundClip: "text",
@@ -65,7 +64,7 @@ export function Navbar() {
           </a>
 
           {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <a
                 key={link.key}
@@ -78,28 +77,42 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Language switcher */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Desktop language flags - LARGE 32x32px with GLOW */}
+          <div className="hidden md:flex items-center gap-2">
             {countries.map((c) => (
               <button
                 key={c.code}
                 onClick={() => setCountry(c.code)}
-                className={`px-2 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
+                className={`relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 ${
                   country === c.code
-                    ? "bg-[#A020F0]/20 text-foreground ring-1 ring-[#A020F0]/50"
-                    : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
+                    ? "bg-[#A020F0]/25 ring-2 ring-[#A020F0]/60"
+                    : "bg-white/5 hover:bg-white/15"
                 }`}
+                style={{
+                  boxShadow: country === c.code 
+                    ? "0 0 20px rgba(160, 32, 240, 0.4), 0 0 40px rgba(59, 130, 246, 0.2)"
+                    : "none",
+                }}
               >
-                <span className="mr-1">{c.flag}</span>
-                {c.label}
+                <span 
+                  className="text-2xl"
+                  style={{
+                    filter: country === c.code 
+                      ? "drop-shadow(0 0 8px rgba(255,255,255,0.8))" 
+                      : "drop-shadow(0 0 2px rgba(255,255,255,0.3))",
+                    transition: "filter 0.3s ease",
+                  }}
+                >
+                  {c.flag}
+                </span>
               </button>
             ))}
           </div>
 
-          {/* Mobile toggle */}
+          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-foreground p-1"
+            className="md:hidden text-foreground p-2 rounded-lg hover:bg-white/10 transition-colors"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -108,18 +121,23 @@ export function Navbar() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden px-4 pb-4 flex flex-col gap-3">
-            {navLinks.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="text-sm font-medium text-foreground/80 hover:text-foreground py-2 border-b border-foreground/10"
-              >
-                {t(link.key)}
-              </a>
-            ))}
-            <div className="flex items-center gap-1 pt-2">
+          <div className="md:hidden px-4 pb-4">
+            {/* Mobile nav links */}
+            <div className="flex flex-wrap gap-2 pb-4 border-b border-white/10">
+              {navLinks.map((link) => (
+                <a
+                  key={link.key}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-white/10 rounded-lg transition-all"
+                >
+                  {t(link.key)}
+                </a>
+              ))}
+            </div>
+            
+            {/* Mobile language flags - below navbar */}
+            <div className="flex items-center justify-center gap-2 pt-4">
               {countries.map((c) => (
                 <button
                   key={c.code}
@@ -127,14 +145,14 @@ export function Navbar() {
                     setCountry(c.code)
                     setMobileOpen(false)
                   }}
-                  className={`px-2 py-1 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     country === c.code
-                      ? "bg-[#A020F0]/20 text-foreground ring-1 ring-[#A020F0]/50"
-                      : "text-foreground/60 hover:text-foreground"
+                      ? "bg-[#A020F0]/25 ring-2 ring-[#A020F0]/50"
+                      : "bg-white/5 hover:bg-white/15"
                   }`}
                 >
-                  <span className="mr-1">{c.flag}</span>
-                  {c.label}
+                  <span className="text-lg">{c.flag}</span>
+                  <span className="text-foreground/80">{c.label}</span>
                 </button>
               ))}
             </div>
