@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import Image from "next/image"
 import { Menu, X } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
@@ -25,6 +25,18 @@ const navLinks = [
 export function Navbar() {
   const { country, setCountry, t } = useLanguage()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [logoTilt, setLogoTilt] = useState({ x: 0, y: 0 })
+
+  const handleLogoMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 20
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -20
+    setLogoTilt({ x, y })
+  }, [])
+
+  const handleLogoMouseLeave = useCallback(() => {
+    setLogoTilt({ x: 0, y: 0 })
+  }, [])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
@@ -39,18 +51,32 @@ export function Navbar() {
         }}
       >
         <div className="mx-auto flex items-center justify-between px-4 py-3 md:px-8">
-          {/* Logo in navbar - small version */}
-          <a href="#home" className="flex items-center gap-3 group">
-            <Image
-              src="/images/xelvetec-logo.png"
-              alt="XelveTec"
-              width={36}
-              height={36}
-              className="transition-transform duration-300 group-hover:scale-110"
+          {/* Logo in navbar - smooth 3D tilt on hover */}
+          <a 
+            href="#home" 
+            className="flex items-center gap-3 group"
+            onMouseMove={handleLogoMouseMove}
+            onMouseLeave={handleLogoMouseLeave}
+            style={{ perspective: "500px" }}
+          >
+            <div
+              className="transition-transform duration-300 ease-out"
               style={{
-                filter: "drop-shadow(0 0 8px rgba(160, 32, 240, 0.5))",
+                transform: `rotateX(${logoTilt.y}deg) rotateY(${logoTilt.x}deg) scale(${logoTilt.x !== 0 || logoTilt.y !== 0 ? 1.1 : 1})`,
+                transformStyle: "preserve-3d",
+                willChange: "transform",
               }}
-            />
+            >
+              <Image
+                src="/images/xelvetec-logo.png"
+                alt="XelveTec"
+                width={40}
+                height={40}
+                style={{
+                  filter: "drop-shadow(0 0 10px rgba(160, 32, 240, 0.6))",
+                }}
+              />
+            </div>
             <span
               className="text-lg font-bold tracking-wider"
               style={{

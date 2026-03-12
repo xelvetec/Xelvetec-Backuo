@@ -8,12 +8,15 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.4,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
+      smoothTouch: false, // Better mobile performance
       touchMultiplier: 2,
+      infinite: false,
+      autoResize: true,
     })
 
     lenisRef.current = lenis
@@ -33,7 +36,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
         e.preventDefault()
         const id = anchor.getAttribute("href")
         if (id) {
-          lenis.scrollTo(id, { offset: -80 })
+          lenis.scrollTo(id, { offset: -80, duration: 1.2 })
         }
       }
     }
