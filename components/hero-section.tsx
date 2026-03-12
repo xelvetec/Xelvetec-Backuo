@@ -9,16 +9,20 @@ export function HeroSection() {
   const { t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [mouseTrail, setMouseTrail] = useState<{ x: number; y: number; id: number }[]>([])
+  const [mouseTrail, setMouseTrail] = useState<{ x: number; y: number }[]>([])
+  const [mounted, setMounted] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
-  const trailIdRef = useRef(0)
 
+  // Hydration fix: only render after mount
   useEffect(() => {
+    setMounted(true)
     const timer = setTimeout(() => setIsVisible(true), 200)
     return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
+    if (!mounted) return
+    
     function handleMouseMove(e: MouseEvent) {
       if (!sectionRef.current) return
       const rect = sectionRef.current.getBoundingClientRect()
@@ -26,21 +30,23 @@ export function HeroSection() {
       const y = e.clientY - rect.top
       setMousePos({ x, y })
       
-      // Add to trail
-      trailIdRef.current++
-      setMouseTrail(prev => [...prev.slice(-15), { x, y, id: trailIdRef.current }])
+      // Add to trail - keep last 15 points
+      setMouseTrail(prev => [...prev.slice(-14), { x, y }])
     }
+    
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [])
+  }, [mounted])
 
   // Clean old trail particles
   useEffect(() => {
+    if (!mounted) return
+    
     const interval = setInterval(() => {
       setMouseTrail(prev => prev.slice(1))
     }, 100)
     return () => clearInterval(interval)
-  }, [])
+  }, [mounted])
 
   return (
     <section
@@ -60,43 +66,56 @@ export function HeroSection() {
         }}
       />
 
-      {/* Matrix rain effect */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute text-[#A020F0] text-xs font-mono animate-matrix-rain"
-            style={{
-              left: `${i * 5}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${10 + Math.random() * 10}s`,
-            }}
-          >
-            {Array.from({ length: 30 }).map((_, j) => (
-              <div key={j} style={{ opacity: Math.random() }}>
-                {String.fromCharCode(0x30A0 + Math.random() * 96)}
+      {/* Matrix rain effect - server-safe with pre-generated data */}
+      {mounted && (
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden">
+          {Array.from({ length: 20 }).map((_, i) => {
+            // Pre-generate random values on first render
+            const animDelay = Math.sin(i * 137.5) * 2.5 + 2.5
+            const animDuration = 10 + (Math.cos(i * 73) * 5 + 5)
+            const chars = Array.from({ length: 30 }).map((_, j) => ({
+              id: j,
+              opacity: Math.sin(j * 12.7) * 0.5 + 0.5,
+              char: String.fromCharCode(0x30A0 + ((i * 13 + j * 17) % 96)),
+            }))
+            
+            return (
+              <div
+                key={i}
+                className="absolute text-[#A020F0] text-xs font-mono animate-matrix-rain"
+                style={{
+                  left: `${i * 5}%`,
+                  animationDelay: `${animDelay}s`,
+                  animationDuration: `${animDuration}s`,
+                }}
+              >
+                {chars.map((item) => (
+                  <div key={item.id} style={{ opacity: item.opacity }}>
+                    {item.char}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ))}
-      </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* Particles */}
       <ParticleField />
 
-      {/* Mouse trail */}
-      {mouseTrail.map((point, index) => (
+      {/* Mouse trail - index-based key instead of ID */}
+      {mounted && mouseTrail.map((point, index) => (
         <div
-          key={point.id}
+          key={index}
           className="absolute pointer-events-none hidden md:block rounded-full"
           style={{
             left: point.x - 4,
             top: point.y - 4,
             width: 8,
             height: 8,
-            background: `rgba(160, 32, 240, ${0.1 + (index / mouseTrail.length) * 0.4})`,
-            boxShadow: `0 0 ${8 + index * 2}px rgba(160, 32, 240, ${0.2 + (index / mouseTrail.length) * 0.3})`,
-            transform: `scale(${0.5 + (index / mouseTrail.length) * 0.5})`,
+            background: `rgba(160, 32, 240, ${0.1 + (index / Math.max(mouseTrail.length, 1)) * 0.4})`,
+            boxShadow: `0 0 ${8 + index * 2}px rgba(160, 32, 240, ${0.2 + (index / Math.max(mouseTrail.length, 1)) * 0.3})`,
+            transform: `scale(${0.5 + (index / Math.max(mouseTrail.length, 1)) * 0.5})`,
           }}
         />
       ))}
