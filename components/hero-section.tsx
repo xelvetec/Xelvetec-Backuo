@@ -26,8 +26,8 @@ export function HeroSection() {
     if (!mounted) return
 
     const handleScroll = () => {
-      // Calculate scroll progress: 0 at top, 1 after 600px
-      const progress = Math.min(window.scrollY / 600, 1)
+      // Calculate scroll progress: 0 at top, 1 after 1200px for dramatic zoom
+      const progress = Math.min(window.scrollY / 1200, 1)
       setScrollProgress(progress)
     }
 
@@ -39,11 +39,12 @@ export function HeroSection() {
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
   const easedProgress = easeOutCubic(scrollProgress)
 
-  // Text animation values - starts large/blurred, ends small/sharp
-  const textScale = 1.15 - easedProgress * 0.15 // 1.15 -> 1.0
-  const textBlur = (1 - easedProgress) * 4 // 4px -> 0px blur
-  const textTranslateY = easedProgress * -30 // 0 -> -30px (moves up)
-  const textOpacity = 0.7 + easedProgress * 0.3 // 0.7 -> 1.0
+  // Dramatic cinematic zoom-in animation
+  const textScale = 0.6 + easedProgress * 1.2 // 0.6 -> 1.8 (massive zoom)
+  const textMotionBlur = (1 - easedProgress) * 2 // 2px -> 0px blur during scroll
+  const textLetterSpacing = easedProgress * 4 // 0 -> 4px (expands as zooms)
+  const textOpacity = 0.5 + easedProgress * 0.5 // 0.5 -> 1.0
+  const bgOpacity = 0.3 - easedProgress * 0.15 // background fades slightly
 
   useEffect(() => {
     if (!mounted) return
@@ -79,15 +80,16 @@ export function HeroSection() {
       ref={sectionRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Background - seamless gradient flow */}
+      {/* Background - seamless gradient flow with cinematic fade */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 transition-opacity duration-700"
         style={{
           background: `
-            radial-gradient(ellipse at 30% 20%, rgba(160,32,240,0.2) 0%, transparent 50%),
-            radial-gradient(ellipse at 70% 80%, rgba(0,212,255,0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 30% 20%, rgba(160,32,240,${0.2 * (1 - bgOpacity)}) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 80%, rgba(0,212,255,${0.15 * (1 - bgOpacity)}) 0%, transparent 50%),
             radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%)
           `,
+          opacity: 1,
         }}
       />
 
@@ -127,17 +129,20 @@ export function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pt-20">
-        {/* Title with cinematic scroll-linked animation */}
+        {/* Title with dramatic cinematic zoom-in animation */}
         <h1
-          className={`text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-balance transition-opacity duration-1000 delay-200 ${
+          className={`font-bold mb-6 text-balance transition-opacity duration-1000 delay-200 ${
             isVisible ? "opacity-100" : "opacity-0"
           }`}
           style={{
-            transform: `scale(${textScale}) translateY(${textTranslateY}px)`,
-            filter: `blur(${textBlur}px)`,
+            fontSize: `clamp(2rem, ${3 + textScale * 4}rem, 15rem)`,
+            transform: `scale(${textScale})`,
+            filter: `blur(${textMotionBlur}px)`,
+            letterSpacing: `${textLetterSpacing}px`,
             opacity: mounted ? textOpacity : 0,
-            willChange: "transform, filter, opacity",
-            transition: "opacity 1s ease",
+            willChange: "transform, filter, letter-spacing, opacity",
+            transformOrigin: "center center",
+            backfaceVisibility: "hidden",
           }}
         >
           <span 
