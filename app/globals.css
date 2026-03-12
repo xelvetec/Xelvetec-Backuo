@@ -234,6 +234,17 @@
   }
 }
 
+@keyframes particle-fly {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--end-x), var(--end-y), 0) scale(0);
+    opacity: 0;
+  }
+}
+
 @keyframes float {
   0%, 100% {
     transform: translateY(0px);
