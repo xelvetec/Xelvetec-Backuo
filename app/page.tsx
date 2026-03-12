@@ -9,7 +9,6 @@ import { AboutSection } from "@/components/about-section"
 import { PortfolioSection } from "@/components/portfolio-section"
 import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
-import { ScrollLogo } from "@/components/scroll-logo"
 import { LanguageProvider } from "@/lib/language-context"
 import { SmoothScroll } from "@/components/smooth-scroll"
 
@@ -23,19 +22,20 @@ export default function Home() {
   return (
     <LanguageProvider>
       <SmoothScroll>
-        {/* Intro animation overlay */}
+        {/* Intro animation overlay - fullscreen, no edges */}
         {!introComplete && <IntroAnimation onComplete={handleIntroComplete} />}
 
-        {/* Main site - seamless transition, no container/box */}
+        {/* Main site - smooth slide up transition from intro */}
         <div
+          className="min-h-screen"
           style={{
+            transform: introComplete ? "translateY(0)" : "translateY(30px)",
             opacity: introComplete ? 1 : 0,
-            transition: "opacity 0.8s ease-out",
+            transition: "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-out",
           }}
         >
           <Navbar />
-          <ScrollLogo />
-          <main className="overflow-hidden">
+          <main>
             <HeroSection />
             <ServicesSection />
             <AboutSection />
