@@ -136,8 +136,8 @@ export function Navbar() {
               ))}
             </div>
             
-            {/* Mobile language flags - below navbar */}
-            <div className="flex items-center justify-center gap-2 pt-4">
+            {/* Mobile language flags - below navbar, flags only */}
+            <div className="flex items-center justify-center gap-3 pt-4">
               {countries.map((c) => (
                 <button
                   key={c.code}
@@ -145,14 +145,27 @@ export function Navbar() {
                     setCountry(c.code)
                     setMobileOpen(false)
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-300 ${
                     country === c.code
-                      ? "bg-[#A020F0]/25 ring-2 ring-[#A020F0]/50"
+                      ? "bg-[#A020F0]/25 ring-2 ring-[#A020F0]/60 scale-110"
                       : "bg-white/5 hover:bg-white/15"
                   }`}
+                  style={{
+                    boxShadow: country === c.code 
+                      ? "0 0 16px rgba(160, 32, 240, 0.5)"
+                      : "none",
+                  }}
                 >
-                  <span className="text-lg">{c.flag}</span>
-                  <span className="text-foreground/80">{c.label}</span>
+                  <span 
+                    className="text-2xl"
+                    style={{
+                      filter: country === c.code 
+                        ? "drop-shadow(0 0 6px rgba(255,255,255,0.8))" 
+                        : "none",
+                    }}
+                  >
+                    {c.flag}
+                  </span>
                 </button>
               ))}
             </div>
