@@ -51,8 +51,8 @@ export function Navbar() {
         style={{
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          background: "rgba(0, 0, 0, 0.15)",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
+          background: "rgba(0, 0, 0, 0.05)",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
         }}
       >
         {/* Desktop and Mobile unified navbar - Logo left + flags right */}
@@ -108,9 +108,9 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Right side: Language FLAGS (mobile only) */}
+          {/* Right side: Language FLAGS (hidden on all devices, but auto-detect still works) */}
           <div 
-            className="flex md:hidden items-center gap-1.5 px-2 py-1.5 rounded-full"
+            className="hidden"
             style={{
               background: "rgba(0, 0, 0, 0.4)",
               backdropFilter: "blur(10px)",
