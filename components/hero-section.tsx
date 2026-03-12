@@ -39,12 +39,14 @@ export function HeroSection() {
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
   const easedProgress = easeOutCubic(scrollProgress)
 
-  // Dramatic cinematic zoom-in animation
-  const textScale = 0.6 + easedProgress * 1.2 // 0.6 -> 1.8 (massive zoom)
-  const textMotionBlur = (1 - easedProgress) * 2 // 2px -> 0px blur during scroll
-  const textLetterSpacing = easedProgress * 4 // 0 -> 4px (expands as zooms)
-  const textOpacity = 0.5 + easedProgress * 0.5 // 0.5 -> 1.0
-  const bgOpacity = 0.3 - easedProgress * 0.15 // background fades slightly
+  // Background animation values based on scroll
+  const bgPurpleIntensity = 0.2 + easedProgress * 0.3 // 0.2 -> 0.5 (intensiver)
+  const bgCyanIntensity = 0.15 + easedProgress * 0.25 // 0.15 -> 0.4 (intensiver)
+  const bgRotation = easedProgress * 45 // 0 -> 45deg rotation
+  const bgPurpleX = 30 + easedProgress * 20 // 30% -> 50% horizontal shift
+  const bgCyanX = 70 - easedProgress * 20 // 70% -> 50% horizontal shift
+  const bgPurpleY = 20 + easedProgress * 30 // 20% -> 50% vertical shift
+  const bgCyanY = 80 - easedProgress * 30 // 80% -> 50% vertical shift
 
   useEffect(() => {
     if (!mounted) return
@@ -80,16 +82,17 @@ export function HeroSection() {
       ref={sectionRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Background - seamless gradient flow with cinematic fade */}
+      {/* Background - seamless gradient flow with cinematic animation */}
       <div
-        className="absolute inset-0 transition-opacity duration-700"
+        className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(ellipse at 30% 20%, rgba(160,32,240,${0.2 * (1 - bgOpacity)}) 0%, transparent 50%),
-            radial-gradient(ellipse at 70% 80%, rgba(0,212,255,${0.15 * (1 - bgOpacity)}) 0%, transparent 50%),
+            radial-gradient(ellipse 800px 600px at ${bgPurpleX}% ${bgPurpleY}%, rgba(160,32,240,${bgPurpleIntensity}) 0%, transparent 50%),
+            radial-gradient(ellipse 900px 700px at ${bgCyanX}% ${bgCyanY}%, rgba(0,212,255,${bgCyanIntensity}) 0%, transparent 50%),
             radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%)
           `,
           opacity: 1,
+          transition: "background 0.05s cubic-bezier(0.23, 1, 0.32, 1)",
         }}
       />
 
