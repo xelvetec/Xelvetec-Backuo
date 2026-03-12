@@ -66,40 +66,6 @@ export function HeroSection() {
         }}
       />
 
-      {/* Matrix rain effect - server-safe with pre-generated data */}
-      {mounted && (
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden">
-          {Array.from({ length: 20 }).map((_, i) => {
-            // Pre-generate random values on first render
-            const animDelay = Math.sin(i * 137.5) * 2.5 + 2.5
-            const animDuration = 10 + (Math.cos(i * 73) * 5 + 5)
-            const chars = Array.from({ length: 30 }).map((_, j) => ({
-              id: j,
-              opacity: Math.sin(j * 12.7) * 0.5 + 0.5,
-              char: String.fromCharCode(0x30A0 + ((i * 13 + j * 17) % 96)),
-            }))
-            
-            return (
-              <div
-                key={i}
-                className="absolute text-[#A020F0] text-xs font-mono animate-matrix-rain"
-                style={{
-                  left: `${i * 5}%`,
-                  animationDelay: `${animDelay}s`,
-                  animationDuration: `${animDuration}s`,
-                }}
-              >
-                {chars.map((item) => (
-                  <div key={item.id} style={{ opacity: item.opacity }}>
-                    {item.char}
-                  </div>
-                ))}
-              </div>
-            )
-          })}
-        </div>
-      )}
-
       {/* Particles */}
       <ParticleField />
 
