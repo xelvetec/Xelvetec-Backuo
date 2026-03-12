@@ -81,9 +81,9 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Right side: Language FLAGS (both desktop and mobile) */}
+          {/* Right side: Language FLAGS (mobile only) */}
           <div 
-            className="flex items-center gap-1.5 px-2 py-1.5 rounded-full md:gap-2 md:px-3"
+            className="flex md:hidden items-center gap-1.5 px-2 py-1.5 rounded-full"
             style={{
               background: "rgba(0, 0, 0, 0.4)",
               backdropFilter: "blur(10px)",

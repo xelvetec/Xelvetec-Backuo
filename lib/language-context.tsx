@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { translations, countryToLanguage, type Country, type Language } from "./translations"
 
 interface LanguageContextType {
@@ -12,12 +12,80 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | null>(null)
 
+// Map common country codes to our supported countries
+const countryCodeMap: Record<string, Country> = {
+  "DE": "de",
+  "AT": "at",
+  "CH": "ch",
+  "TR": "tr",
+  "GB": "en",
+  "US": "en",
+  "IE": "en",
+  "AU": "en",
+  "NZ": "en",
+  "CA": "en",
+  "FR": "en",
+  "IT": "en",
+  "ES": "en",
+  "NL": "en",
+  "BE": "en",
+  "SE": "en",
+  "NO": "en",
+  "DK": "en",
+  "PL": "en",
+  "CZ": "en",
+  "SK": "en",
+  "HU": "en",
+  "RO": "en",
+  "BG": "en",
+  "GR": "en",
+  "PT": "en",
+  "JP": "en",
+  "KR": "en",
+  "CN": "en",
+  "IN": "en",
+  "BR": "en",
+  "MX": "en",
+  "RU": "en",
+  "UA": "en",
+}
+
+async function detectCountry(): Promise<Country> {
+  try {
+    const response = await fetch("https://ipapi.co/json/")
+    const data = await response.json()
+    const countryCode = data.country_code?.toUpperCase()
+    
+    if (countryCode && countryCode in countryCodeMap) {
+      return countryCodeMap[countryCode]
+    }
+  } catch (error) {
+    console.log("[v0] Country detection failed, using default")
+  }
+  
+  return "de" // Default fallback
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [country, setCountry] = useState<Country>("de")
+  const [country, setCountryState] = useState<Country>("de")
+  const [mounted, setMounted] = useState(false)
+
+  // Auto-detect country on mount
+  useEffect(() => {
+    detectCountry().then((detectedCountry) => {
+      setCountryState(detectedCountry)
+      setMounted(true)
+    })
+  }, [])
+
   const language = countryToLanguage[country]
 
   const t = (key: string) => {
     return translations[language]?.[key] ?? key
+  }
+
+  const setCountry = (c: Country) => {
+    setCountryState(c)
   }
 
   return (
