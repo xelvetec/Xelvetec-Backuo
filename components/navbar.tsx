@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { useEffect, useState } from "react"
 import { useLanguage } from "@/lib/language-context"
 import type { Country } from "@/lib/translations"
 
@@ -21,6 +22,24 @@ const navLinks = [
 
 export function Navbar() {
   const { country, setCountry, t } = useLanguage()
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    
+    const handleScroll = () => {
+      // Calculate scroll progress: 0 at top, 1 after 800px
+      const progress = Math.min(window.scrollY / 800, 1)
+      setScrollProgress(progress)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Logo slide animation: slides right on scroll
+  const logoTranslateX = mounted ? scrollProgress * 100 : 0 // 0 to 100px
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 animate-float-subtle">
@@ -35,9 +54,14 @@ export function Navbar() {
       >
         {/* Desktop and Mobile unified navbar - Logo left + flags right */}
         <div className="flex items-center justify-between px-4 py-3 md:px-6">
-          {/* Left side: Logo */}
+          {/* Left side: Logo with scroll animation */}
           <a href="#home" className="flex items-center gap-3 group">
-            <div className="relative animate-breathing">
+            <div 
+              className="relative animate-breathing transition-transform duration-75 ease-out"
+              style={{
+                transform: `translateX(${logoTranslateX}px)`,
+              }}
+            >
               <Image
                 src="/images/xelvetec-logo.png"
                 alt="XelveTec"
