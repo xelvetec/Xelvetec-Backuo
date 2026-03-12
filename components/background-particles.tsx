@@ -36,7 +36,7 @@ export function BackgroundParticles() {
       y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 1.5,
       vy: (Math.random() - 0.5) * 1.5,
-      size: Math.random() * 2 + 0.5,
+      size: Math.random() * 4 + 2,
       opacity: Math.random() * 0.5 + 0.3,
     }))
 
@@ -93,8 +93,8 @@ export function BackgroundParticles() {
           const dist = Math.sqrt(dx * dx + dy * dy)
 
           if (dist < 150) {
-            ctx.strokeStyle = `rgba(160, 32, 240, ${(1 - dist / 150) * 0.2})`
-            ctx.lineWidth = 0.5
+            ctx.strokeStyle = `rgba(160, 32, 240, ${(1 - dist / 150) * 0.3})`
+            ctx.lineWidth = 1.5
             ctx.beginPath()
             ctx.moveTo(p1.x, p1.y)
             ctx.lineTo(p2.x, p2.y)
