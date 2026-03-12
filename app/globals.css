@@ -250,6 +250,26 @@
   animation: shimmer 3s infinite;
 }
 
+/* Cinematic logo scroll effect */
+.cinematic-logo {
+  transition: 
+    transform 0.15s cubic-bezier(0.33, 1, 0.68, 1),
+    filter 0.1s ease-out;
+  transform-origin: center center;
+  backface-visibility: hidden;
+}
+
+.cinematic-logo-glow {
+  transition: opacity 0.2s ease-out;
+}
+
+/* Motion blur simulation for high velocity scrolling */
+@supports (filter: blur(1px)) {
+  .motion-blur-active {
+    will-change: transform, filter;
+  }
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
