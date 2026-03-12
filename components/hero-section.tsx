@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { ArrowRight } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
-import { ParticleField } from "./particles"
+import { BackgroundParticles } from "./background-particles"
 
 export function HeroSection() {
   const { t } = useLanguage()
@@ -41,7 +41,7 @@ export function HeroSection() {
 
   // Dramatic cinematic zoom-in animation
   const textScale = 0.6 + easedProgress * 1.2 // 0.6 -> 1.8 (massive zoom)
-  const textMotionBlur = (1 - easedProgress) * 2 // 2px -> 0px blur during scroll
+  const textMotionBlur = easedProgress * 3 // 0px -> 3px blur (REVERSED: sharp at start, blurs on scroll)
   const textLetterSpacing = easedProgress * 4 // 0 -> 4px (expands as zooms)
   const textOpacity = 0.5 + easedProgress * 0.5 // 0.5 -> 1.0
 
@@ -102,8 +102,8 @@ export function HeroSection() {
         }}
       />
 
-      {/* Particles */}
-      <ParticleField />
+      {/* Animated background particles - scroll reactive */}
+      <BackgroundParticles />
 
       {/* Mouse trail - index-based key instead of ID */}
       {mounted && mouseTrail.map((point, index) => (
