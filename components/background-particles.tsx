@@ -58,8 +58,8 @@ export function BackgroundParticles() {
     const animate = () => {
       if (!canvas || !ctx) return
 
-      ctx.fillStyle = "rgba(10, 10, 26, 0.1)"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      // Clear canvas completely - no blur effect
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       particlesRef.current.forEach((particle) => {
         particle.vy += scrollVelocity * 0.3
