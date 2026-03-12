@@ -38,8 +38,11 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Logo slide animation: slides right on scroll
-  const logoTranslateX = mounted ? scrollProgress * 100 : 0 // 0 to 100px
+  // Logo cinematic zoom animation: scales from 1 to 1.4 based on scroll
+  // Uses easing function for smooth, film-like feel
+  const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+  const easedProgress = easeInOutCubic(scrollProgress)
+  const logoScale = mounted ? 1 + easedProgress * 0.4 : 1 // scales from 1 to 1.4
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 animate-float-subtle">
@@ -59,7 +62,7 @@ export function Navbar() {
             <div 
               className="relative animate-breathing transition-transform duration-75 ease-out"
               style={{
-                transform: `translateX(${logoTranslateX}px)`,
+                transform: `scale(${logoScale})`,
               }}
             >
               <Image
