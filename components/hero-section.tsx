@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { ParticleField } from "./particles"
@@ -36,12 +35,15 @@ export function HeroSection() {
       ref={sectionRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Background gradient */}
+      {/* Background - seamless gradient flow */}
       <div
         className="absolute inset-0"
         style={{
-          background:
-            "radial-gradient(ellipse at 30% 20%, rgba(160,32,240,0.12) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(59,130,246,0.1) 0%, transparent 50%), radial-gradient(ellipse at center, rgba(10,10,26,1) 0%, rgba(0,0,0,1) 100%)",
+          background: `
+            radial-gradient(ellipse at 30% 20%, rgba(160,32,240,0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 80%, rgba(59,130,246,0.12) 0%, transparent 50%),
+            radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%)
+          `,
         }}
       />
 
@@ -52,44 +54,18 @@ export function HeroSection() {
       <div
         className="absolute pointer-events-none hidden md:block"
         style={{
-          left: mousePos.x - 150,
-          top: mousePos.y - 150,
-          width: 300,
-          height: 300,
-          background: "radial-gradient(circle, rgba(160,32,240,0.1) 0%, transparent 70%)",
+          left: mousePos.x - 200,
+          top: mousePos.y - 200,
+          width: 400,
+          height: 400,
+          background: "radial-gradient(circle, rgba(160,32,240,0.12) 0%, transparent 70%)",
           borderRadius: "50%",
           transition: "left 0.3s ease-out, top 0.3s ease-out",
         }}
       />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        {/* Logo */}
-        <div
-          className={`mb-8 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          <div className="relative inline-block animate-float">
-            <Image
-              src="/images/xelvetec-logo.png"
-              alt="XelveTec Logo"
-              width={140}
-              height={140}
-              className="mx-auto drop-shadow-2xl"
-              priority
-            />
-            <div
-              className="absolute inset-0 -z-10 blur-3xl rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(160,32,240,0.3) 0%, rgba(59,130,246,0.2) 50%, transparent 70%)",
-                transform: "scale(2)",
-              }}
-            />
-          </div>
-        </div>
-
+      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pt-20">
         {/* Title */}
         <h1
           className={`text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-balance transition-all duration-1000 delay-200 ${
@@ -128,10 +104,11 @@ export function HeroSection() {
         >
           <a
             href="#contact"
-            className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-lg overflow-hidden transition-all duration-300 hover:scale-105 neon-glow"
+            className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-lg overflow-hidden transition-all duration-300 hover:scale-105"
             style={{
               background: "linear-gradient(135deg, #A020F0, #1E3A8A)",
               color: "#fff",
+              boxShadow: "0 0 30px rgba(160, 32, 240, 0.4), 0 0 60px rgba(59, 130, 246, 0.2)",
             }}
           >
             <span className="relative z-10">{t("hero_cta")}</span>
@@ -142,8 +119,13 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      {/* Bottom gradient fade - seamless transition to services */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-48"
+        style={{
+          background: "linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%)",
+        }}
+      />
     </section>
   )
 }

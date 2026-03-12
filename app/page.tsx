@@ -9,6 +9,7 @@ import { AboutSection } from "@/components/about-section"
 import { PortfolioSection } from "@/components/portfolio-section"
 import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
+import { ScrollLogo } from "@/components/scroll-logo"
 import { LanguageProvider } from "@/lib/language-context"
 import { SmoothScroll } from "@/components/smooth-scroll"
 
@@ -25,14 +26,16 @@ export default function Home() {
         {/* Intro animation overlay */}
         {!introComplete && <IntroAnimation onComplete={handleIntroComplete} />}
 
-        {/* Main site */}
+        {/* Main site - seamless transition, no container/box */}
         <div
-          className={`transition-opacity duration-1000 ${
-            introComplete ? "opacity-100" : "opacity-0"
-          }`}
+          style={{
+            opacity: introComplete ? 1 : 0,
+            transition: "opacity 0.8s ease-out",
+          }}
         >
           <Navbar />
-          <main>
+          <ScrollLogo />
+          <main className="overflow-hidden">
             <HeroSection />
             <ServicesSection />
             <AboutSection />

@@ -15,7 +15,7 @@ interface Particle {
 }
 
 export function IntroAnimation({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<"logo" | "explode" | "done">("logo")
+  const [phase, setPhase] = useState<"logo" | "explode" | "fade" | "done">("logo")
   const [particles, setParticles] = useState<Particle[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -40,14 +40,16 @@ export function IntroAnimation({ onComplete }: { onComplete: () => void }) {
     setParticles(newParticles)
 
     const timer1 = setTimeout(() => setPhase("explode"), 1800)
-    const timer2 = setTimeout(() => {
+    const timer2 = setTimeout(() => setPhase("fade"), 2800)
+    const timer3 = setTimeout(() => {
       setPhase("done")
       onComplete()
-    }, 3200)
+    }, 3400)
 
     return () => {
       clearTimeout(timer1)
       clearTimeout(timer2)
+      clearTimeout(timer3)
     }
   }, [onComplete])
 
@@ -57,10 +59,15 @@ export function IntroAnimation({ onComplete }: { onComplete: () => void }) {
     <div
       ref={containerRef}
       className="fixed inset-0 z-[100] flex items-center justify-center"
-      style={{ background: "radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%)" }}
+      style={{ 
+        background: "radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%)",
+        opacity: phase === "fade" ? 0 : 1,
+        transition: "opacity 0.6s ease-out",
+        pointerEvents: phase === "fade" ? "none" : "auto",
+      }}
     >
       {/* Particle burst */}
-      {phase === "explode" && particles.map((p) => (
+      {(phase === "explode" || phase === "fade") && particles.map((p) => (
         <div
           key={p.id}
           className="absolute rounded-full"
@@ -83,11 +90,12 @@ export function IntroAnimation({ onComplete }: { onComplete: () => void }) {
       <div
         className={`relative ${phase === "logo" ? "animate-logo-fly-in" : ""}`}
         style={{
-          ...(phase === "explode"
+          ...(phase === "explode" || phase === "fade"
             ? {
                 animation: "glow-explosion 1.2s ease-out forwards",
                 transform: "scale(1)",
-                opacity: 1,
+                opacity: phase === "fade" ? 0 : 1,
+                transition: "opacity 0.4s ease-out",
               }
             : {}),
         }}
@@ -109,18 +117,6 @@ export function IntroAnimation({ onComplete }: { onComplete: () => void }) {
           }}
         />
       </div>
-
-      {/* Fade out overlay */}
-      {phase === "explode" && (
-        <div
-          className="absolute inset-0 z-50"
-          style={{
-            background: "#000",
-            animation: "fade-in-up 0.8s 0.8s ease-in reverse forwards",
-            opacity: 0,
-          }}
-        />
-      )}
     </div>
   )
 }

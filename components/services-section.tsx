@@ -63,7 +63,16 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay 
           : "linear-gradient(135deg, rgba(160,32,240,0.3), rgba(59,130,246,0.3))",
       }}
     >
-      <div className="glass-strong rounded-3xl p-8 h-full flex flex-col relative overflow-hidden">
+      <div 
+        className="rounded-3xl p-8 h-full flex flex-col relative overflow-hidden"
+        style={{
+          backdropFilter: "blur(32px)",
+          WebkitBackdropFilter: "blur(32px)",
+          background: "linear-gradient(135deg, rgba(160, 32, 240, 0.12), rgba(59, 130, 246, 0.08))",
+          border: "1px solid rgba(255, 255, 255, 0.15)",
+          boxShadow: "0 12px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(160, 32, 240, 0.1)",
+        }}
+      >
         {/* Popular badge */}
         {popular && (
           <div className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
