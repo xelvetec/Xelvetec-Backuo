@@ -67,12 +67,13 @@ export function BackgroundParticles() {
         particle.x += particle.vx
         particle.y += particle.vy
 
-        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1
-        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1
+        // Wrap particles around edges - no bouncing
+        if (particle.x > canvas.width + 50) particle.x = -50
+        if (particle.x < -50) particle.x = canvas.width + 50
+        if (particle.y > canvas.height + 50) particle.y = -50
+        if (particle.y < -50) particle.y = canvas.height + 50
 
-        particle.x = (particle.x + canvas.width) % canvas.width
-        particle.y = (particle.y + canvas.height) % canvas.height
-
+        // Draw particle
         const gradient = ctx.createRadialGradient(particle.x, particle.y, 0, particle.x, particle.y, particle.size * 2)
         gradient.addColorStop(0, `rgba(160, 32, 240, ${particle.opacity})`)
         gradient.addColorStop(1, `rgba(0, 212, 255, ${particle.opacity * 0.3})`)
