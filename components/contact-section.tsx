@@ -34,12 +34,12 @@ export function ContactSection() {
       
       await window.emailjs.sendForm('service_wzudoxa', 'template_mopajh7', formRef.current!)
       
-      setBanner({ message: 'Wir melden uns bei Ihnen!', type: 'success' })
+      setBanner({ message: t('contact_banner_success'), type: 'success' })
       formRef.current?.reset()
       
       setTimeout(() => setBanner(null), 3000)
     } catch (error) {
-      setBanner({ message: 'Fehler beim Senden. Bitte versuchen Sie es erneut.', type: 'error' })
+      setBanner({ message: t('contact_banner_error'), type: 'error' })
       setTimeout(() => setBanner(null), 5000)
     } finally {
       setIsLoading(false)
@@ -167,7 +167,7 @@ export function ContactSection() {
                 }}
               >
                 <Send className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                {isLoading ? 'Nachricht wird gesendet...' : t("contact_send")}
+                {isLoading ? t('contact_sending') : t("contact_send")}
               </button>
             </form>
           </div>
