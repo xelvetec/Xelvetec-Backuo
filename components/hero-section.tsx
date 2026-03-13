@@ -137,23 +137,29 @@ export function HeroSection() {
       />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pt-20">
+      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pt-20 w-full">
         {/* Title with dramatic cinematic zoom-in animation */}
-        <h1
-          className={`font-bold mb-6 text-balance transition-opacity duration-1000 delay-200 ${
-            isVisible ? "opacity-100" : "opacity-0"
-          }`}
+        <div 
+          className="w-full flex justify-center mb-6"
           style={{
-            fontSize: `clamp(2rem, ${3 + textScale * 4}rem, 15rem)`,
-            transform: `scale(${textScale})`,
-            filter: `blur(${textMotionBlur}px)`,
-            letterSpacing: `${textLetterSpacing}px`,
-            opacity: mounted ? textOpacity : 0,
-            willChange: "transform, filter, letter-spacing, opacity",
-            transformOrigin: "center center",
-            backfaceVisibility: "hidden",
+            overflow: "visible",
           }}
         >
+          <h1
+            className={`font-bold text-balance transition-opacity duration-1000 delay-200 ${
+              isVisible ? "opacity-100" : "opacity-0"
+            }`}
+            style={{
+              fontSize: `clamp(2rem, ${3 + textScale * 4}rem, 15rem)`,
+              transform: `scale(${textScale})`,
+              filter: `blur(${textMotionBlur}px)`,
+              opacity: mounted ? textOpacity : 0,
+              willChange: "transform, filter, opacity",
+              transformOrigin: "center center",
+              backfaceVisibility: "hidden",
+              whiteSpace: "nowrap",
+            }}
+          >
           <span 
             className="inline-block animate-gradient-text"
             style={{
@@ -180,6 +186,7 @@ export function HeroSection() {
             {t("hero_title")}
           </span>
         </h1>
+        </div>
 
         {/* Subtitle - NO zoom, stays fixed size */}
         <p
