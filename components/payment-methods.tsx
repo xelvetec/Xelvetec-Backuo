@@ -49,7 +49,7 @@ export function PaymentMethods() {
             {t("payment_methods")}
           </h3>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {paymentGroups.map((group) => {
               const IconComponent = group.icon
               return (
