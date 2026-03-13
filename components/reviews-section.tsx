@@ -98,10 +98,10 @@ export function ReviewsSection() {
           }`}
         >
           <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4 neon-text text-balance">
-            Geschätzt von Kunden
+            {t("reviews_title")}
           </h2>
           <p className="text-foreground/50 text-lg max-w-xl mx-auto">
-            Bewertungen unserer Kunden auf führenden Bewertungsplattformen
+            {t("reviews_subtitle")}
           </p>
         </div>
 
