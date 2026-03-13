@@ -36,45 +36,21 @@ export function ContactSection() {
     setIsLoading(true)
     
     try {
-      // Wait for EmailJS to load (max 5 seconds)
-      let attempts = 0
-      while (!window.emailjs && attempts < 50) {
-        await new Promise(r => setTimeout(r, 100))
-        attempts++
-      }
-
-      if (!window.emailjs) {
-        console.error('[v0] EmailJS not loaded')
+      if (typeof window !== 'undefined' && window.emailjs) {
+        await window.emailjs.sendForm(
+          'service_wzudoxa',
+          'template_mopajh7',
+          formRef.current
+        )
+        
+        alert(t('contact_success'))
+        formRef.current.reset()
+      } else {
+        console.error('[v0] EmailJS not initialized')
         alert(t('contact_error'))
-        setIsLoading(false)
-        return
       }
-
-      // Get form data
-      const formData = new FormData(formRef.current)
-      const name = formData.get('name') as string
-      const email = formData.get('email') as string
-      const message = formData.get('message') as string
-
-      // Send via EmailJS
-      const result = await window.emailjs.send(
-        'service_wzudoxa',
-        'template_mopajh7',
-        {
-          to_email: 'info@xelvetec.ch',
-          from_name: name,
-          from_email: email,
-          message: message,
-          reply_to: email,
-        },
-        'eIsW61NVlqzcGHV4w'
-      )
-
-      console.log('[v0] Email sent:', result)
-      alert(t('contact_success'))
-      formRef.current.reset()
     } catch (error) {
-      console.error('[v0] Error:', error)
+      console.error('[v0] EmailJS Error:', error)
       alert(t('contact_error'))
     } finally {
       setIsLoading(false)
@@ -188,7 +164,7 @@ export function ContactSection() {
                 className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: "linear-gradient(135deg, #A020F0, #3B82F6)" }}
               >
-                <Mail className="w-5 h-5" style={{ color: "#fff" }} />
+                <Mail className="w-5 h-5 text-foreground" style={{ color: "#fff" }} />
               </div>
               <div>
                 <h4 className="font-semibold text-foreground mb-1">{t("contact_email")}</h4>
@@ -222,7 +198,7 @@ export function ContactSection() {
               </div>
             </div>
 
-            {/* Google Maps */}
+            {/* Google Maps Embedded */}
             <iframe
               width="100%"
               height="220"
