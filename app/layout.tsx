@@ -335,9 +335,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="format-detection" content="telephone=no" />
       </head>
-      <body className={`${_inter.variable} ${_geistMono.variable} font-sans antialiased`}>
+      <body className={`${_inter.variable} ${_geistMono.variable} font-sans antialiased relative`}>
         <AnimatedBackground />
-        {children}
+        <div className="relative z-10">
+          {children}
+        </div>
         <Analytics />
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
         <script
