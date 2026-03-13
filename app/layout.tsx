@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { BackgroundParticles } from '@/components/background-particles'
+import { LiquidRibbonBg } from '@/components/liquid-ribbon-bg'
 import './globals.css'
 
 const _inter = Inter({ 
@@ -336,8 +336,8 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
       </head>
       <body className={`${_inter.variable} ${_geistMono.variable} font-sans antialiased`}>
-        {/* Global background particles for entire website */}
-        <BackgroundParticles />
+        {/* Epic liquid ribbon WebGL background */}
+        <LiquidRibbonBg />
         {children}
         <Analytics />
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
