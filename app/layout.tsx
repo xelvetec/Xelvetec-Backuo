@@ -99,6 +99,31 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Home',
+        'item': 'https://xelvetec.ch'
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': 'Portfolio',
+        'item': 'https://xelvetec.ch#portfolio'
+      },
+      {
+        '@type': 'ListItem',
+        'position': 3,
+        'name': 'Kontakt',
+        'item': 'https://xelvetec.ch#kontakt'
+      }
+    ]
+  }
+
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -290,7 +315,9 @@ export default function RootLayout({
     <html lang="de" className="dark">
       <head>
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
         <script
           type="text/javascript"
           src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.0.0/dist/build/email.min.js"
@@ -304,6 +331,10 @@ export default function RootLayout({
               }
             })();`,
           }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
         <script
           type="application/ld+json"

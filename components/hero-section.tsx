@@ -20,14 +20,21 @@ export function HeroSection() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Cinematic scroll-linked animation
+  // Cinematic scroll-linked animation - Throttled for performance
   useEffect(() => {
     if (!mounted) return
 
+    let ticking = false
     const handleScroll = () => {
-      // Calculate scroll progress: 0 at top, 1 after 1200px for dramatic zoom
-      const progress = Math.min(window.scrollY / 1200, 1)
-      setScrollProgress(progress)
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          // Calculate scroll progress: 0 at top, 1 after 1200px for dramatic zoom
+          const progress = Math.min(window.scrollY / 1200, 1)
+          setScrollProgress(progress)
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
