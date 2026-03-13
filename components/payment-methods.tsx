@@ -41,7 +41,7 @@ export function PaymentMethods() {
       style={{
         background: "linear-gradient(135deg, rgba(160,32,240,0.08) 0%, rgba(59,130,246,0.05) 100%)",
       }}>
-      <div className="grid md:grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-1 gap-12">
         {/* Payment Methods */}
         <div>
           <h3 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3">
@@ -76,50 +76,6 @@ export function PaymentMethods() {
                 </div>
               )
             })}
-          </div>
-        </div>
-
-        {/* Currencies */}
-        <div className="flex flex-col justify-between">
-          <div>
-            <h3 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3">
-              <DollarSign className="w-6 h-6" style={{ color: "#A020F0" }} />
-              {t("currencies")}
-            </h3>
-
-            <div className="flex items-center gap-4">
-              {currencies.map((currency, idx) => {
-                const symbols = { CHF: "CHF", EUR: "€", "₺ (Lira)": "₺" }
-                return (
-                  <div
-                    key={currency}
-                    className="flex items-center justify-center w-14 h-14 rounded-lg transition-all hover:scale-105"
-                    style={{
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      animation: `float 3s ease-in-out infinite`,
-                      animationDelay: `${idx * 0.3}s`,
-                    }}
-                    title={currency}
-                  >
-                    <span className="font-bold text-lg text-foreground/70">
-                      {symbols[currency] || currency.charAt(0)}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Security Badge */}
-          <div
-            className="mt-8 p-3 rounded-lg text-center text-sm font-semibold text-foreground/60"
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            💳 Sichere & schnelle Zahlungsabwicklung
           </div>
         </div>
       </div>
