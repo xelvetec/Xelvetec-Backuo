@@ -39,11 +39,10 @@ export function HeroSection() {
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
   const easedProgress = easeOutCubic(scrollProgress)
 
-  // Dramatic cinematic zoom-in animation
-  const textScale = 0.6 + easedProgress * 1.2 // 0.6 -> 1.8 (massive zoom)
-  const textMotionBlur = easedProgress * 3 // 0px -> 3px blur (REVERSED: sharp at start, blurs on scroll)
-  const textLetterSpacing = easedProgress * 4 // 0 -> 4px (expands as zooms)
-  const textOpacity = 0.5 + easedProgress * 0.5 // 0.5 -> 1.0
+  // Dramatic cinematic zoom-in animation - optimized for smooth, sharp transitions
+  const textScale = 0.8 + easedProgress * 0.8 // 0.8 -> 1.6 (reduced zoom range for stability)
+  const textMotionBlur = easedProgress * 1.5 // 0px -> 1.5px (subtle blur, only on scroll down)
+  const textOpacity = 0.85 + easedProgress * 0.15 // 0.85 -> 1.0
 
   // Background animation values based on scroll
   const bgPurpleIntensity = 0.2 + easedProgress * 0.3 // 0.2 -> 0.5 (intensiver)
@@ -150,7 +149,7 @@ export function HeroSection() {
               isVisible ? "opacity-100" : "opacity-0"
             }`}
             style={{
-              fontSize: `clamp(2rem, ${3 + textScale * 4}rem, 15rem)`,
+              fontSize: `clamp(2rem, ${3 + textScale * 2.5}rem, 12rem)`,
               transform: `scale(${textScale})`,
               filter: `blur(${textMotionBlur}px)`,
               opacity: mounted ? textOpacity : 0,
