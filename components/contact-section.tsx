@@ -32,23 +32,39 @@ export function ContactSection() {
     e.preventDefault()
     
     if (!formRef.current) return
-    
     setIsLoading(true)
     
     try {
-      if (typeof window !== 'undefined' && window.emailjs) {
-        await window.emailjs.sendForm(
-          'service_wzudoxa',
-          'template_mopajh7',
-          formRef.current
-        )
-        
-        alert(t('contact_success'))
-        formRef.current.reset()
-      } else {
-        console.error('[v0] EmailJS not initialized')
-        alert(t('contact_error'))
+      // Warten bis EmailJS verfügbar ist (max 10 Sekunden)
+      let attempts = 0
+      while (!window.emailjs && attempts < 100) {
+        await new Promise(r => setTimeout(r, 100))
+        attempts++
       }
+
+      if (!window.emailjs) {
+        console.error('[v0] EmailJS failed to load')
+        alert(t('contact_error'))
+        setIsLoading(false)
+        return
+      }
+
+      // Direktes Senden mit window.emailjs.send()
+      const response = await window.emailjs.send(
+        'service_wzudoxa',
+        'template_mopajh7',
+        {
+          name: formRef.current.elements.namedItem('name')?.value || '',
+          email: formRef.current.elements.namedItem('email')?.value || '',
+          message: formRef.current.elements.namedItem('message')?.value || '',
+          to_email: 'info@xelvetec.ch',
+        },
+        'eIsW61NVlqzcGHV4w'
+      )
+
+      console.log('[v0] Email sent successfully:', response)
+      alert(t('contact_success'))
+      formRef.current.reset()
     } catch (error) {
       console.error('[v0] EmailJS Error:', error)
       alert(t('contact_error'))
