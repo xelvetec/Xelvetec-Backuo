@@ -7,6 +7,9 @@ import { useLanguage } from "@/lib/language-context"
 export function ContactSection() {
   const { t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [banner, setBanner] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -20,6 +23,29 @@ export function ContactSection() {
     return () => observer.disconnect()
   }, [])
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    try {
+      if (!window.emailjs) {
+        throw new Error('EmailJS not loaded')
+      }
+      
+      await window.emailjs.sendForm('service_wzudoxa', 'template_mopajh7', formRef.current!)
+      
+      setBanner({ message: 'Wir melden uns bei Ihnen!', type: 'success' })
+      formRef.current?.reset()
+      
+      setTimeout(() => setBanner(null), 3000)
+    } catch (error) {
+      setBanner({ message: 'Fehler beim Senden. Bitte versuchen Sie es erneut.', type: 'error' })
+      setTimeout(() => setBanner(null), 5000)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <section id="contact" ref={sectionRef} className="relative py-24 md:py-32 overflow-hidden">
       <div
@@ -29,6 +55,20 @@ export function ContactSection() {
             "radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.06) 0%, transparent 50%)",
         }}
       />
+
+      {banner && (
+        <div
+          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl font-semibold text-white animate-fade-in"
+          style={{
+            background: banner.type === 'success' 
+              ? 'linear-gradient(135deg, #10B981, #059669)' 
+              : 'linear-gradient(135deg, #EF4444, #DC2626)',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+          }}
+        >
+          {banner.message}
+        </div>
+      )}
 
       <div className="relative z-10 max-w-6xl mx-auto px-4">
         <div
@@ -49,7 +89,7 @@ export function ContactSection() {
               isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
             }`}
           >
-            <form className="flex flex-col gap-5">
+            <form ref={formRef} className="flex flex-col gap-5" onSubmit={handleSubmit}>
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="text-sm font-medium text-foreground/70">
                   {t("contact_name")}
@@ -119,14 +159,15 @@ export function ContactSection() {
               </div>
               <button
                 type="submit"
-                className="group flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-[1.02] neon-glow"
+                disabled={isLoading}
+                className="group flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-[1.02] neon-glow disabled:opacity-70 disabled:cursor-not-allowed"
                 style={{
                   background: "linear-gradient(135deg, #A020F0, #1E3A8A)",
                   color: "#fff",
                 }}
               >
                 <Send className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                {t("contact_send")}
+                {isLoading ? 'Nachricht wird gesendet...' : t("contact_send")}
               </button>
             </form>
           </div>
