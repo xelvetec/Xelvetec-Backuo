@@ -41,17 +41,20 @@ export function Navbar() {
             alt="XelveTec"
             width={48}
             height={48}
-            className="w-12 h-12 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-110"
-          />
-          {/* Glow effect on hover - no box */}
-          <div 
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+            className="w-12 h-12 md:w-14 md:h-14 transition-all duration-300 group-hover:scale-110"
             style={{
-              boxShadow: "0 0 20px rgba(160, 32, 240, 0.6), 0 0 40px rgba(0, 212, 255, 0.3), inset 0 0 15px rgba(160, 32, 240, 0.2)",
+              filter: "drop-shadow(0 0 0px rgba(160, 32, 240, 0)) drop-shadow(0 0 0px rgba(0, 212, 255, 0))",
+              transition: "filter 0.3s ease",
             }}
           />
         </div>
       </a>
+      {/* Hidden glow element that applies only on group hover */}
+      <style>{`
+        .group:hover > div > img {
+          filter: drop-shadow(0 0 20px rgba(160, 32, 240, 0.8)) drop-shadow(0 0 10px rgba(0, 212, 255, 0.6)) !important;
+        }
+      `}</style>
     </nav>
   )
 }
