@@ -18,6 +18,27 @@ export function ReviewsSection() {
     )
     if (sectionRef.current) observer.observe(sectionRef.current)
     return () => observer.disconnect()
+
+    // Add Schema.org markup
+    const script = document.createElement("script")
+    script.type = "application/ld+json"
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "AggregateRating",
+      "itemReviewed": {
+        "@type": "LocalBusiness",
+        "name": "XelveTec",
+        "url": "https://xelvetec.ch"
+      },
+      "ratingValue": 5,
+      "bestRating": 5,
+      "worstRating": 1,
+      "ratingCount": 15
+    })
+    document.head.appendChild(script)
+    return () => {
+      document.head.removeChild(script)
+    }
   }, [])
 
   const reviews = [
