@@ -44,7 +44,7 @@ export function Footer() {
             <a href="/impressum" className="hover:text-foreground transition-colors">
               {t("footer_impressum")}
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a href="/datenschutz" className="hover:text-foreground transition-colors">
               {t("footer_privacy")}
             </a>
           </div>
