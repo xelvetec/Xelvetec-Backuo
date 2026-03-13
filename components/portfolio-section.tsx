@@ -68,106 +68,59 @@ function PortfolioCard({
   project: (typeof projects)[0]
   index: number
 }) {
-  const [isVisible, setIsVisible] = useState(false)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [isHovered, setIsHovered] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true)
-      },
-      { threshold: 0.2 }
-    )
-    if (cardRef.current) observer.observe(cardRef.current)
-    return () => observer.disconnect()
-  }, [])
-
-  function handleMouseMove(e: React.MouseEvent) {
-    if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
-    setMousePos({
-      x: (e.clientX - rect.left - rect.width / 2) / 20,
-      y: (e.clientY - rect.top - rect.height / 2) / 20,
-    })
-  }
 
   const CardContent = () => (
     <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => { setMousePos({ x: 0, y: 0 }); setIsHovered(false) }}
-      className={`group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-700 ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+      onMouseLeave={() => setIsHovered(false)}
+      className={`group relative rounded-2xl overflow-hidden aspect-video cursor-pointer transition-all duration-300 ${
+        isHovered ? "scale-105" : "scale-100"
       }`}
       style={{
-        transitionDelay: `${index * 100}ms`,
-        transform: `perspective(800px) rotateX(${-mousePos.y}deg) rotateY(${mousePos.x}deg) scale(${isHovered ? 1.05 : 1}) ${
-          isVisible ? "translateY(0)" : "translateY(48px)"
-        }`,
         boxShadow: isHovered 
-          ? "0 25px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(160, 32, 240, 0.3)"
-          : "0 10px 30px rgba(0, 0, 0, 0.3)",
+          ? "0 20px 40px rgba(160, 32, 240, 0.3)"
+          : "0 10px 20px rgba(0, 0, 0, 0.3)",
       }}
     >
       {/* Image or gradient background */}
       {project.image ? (
-        <div className="w-full h-full aspect-[4/3] bg-gradient-to-br from-black/20 to-black/40 flex items-center justify-center overflow-hidden">
-          <Image
-            src={project.image}
-            alt={project.title}
-            width={800}
-            height={600}
-            className="w-full h-full object-contain object-center"
-          />
-        </div>
+        <Image
+          src={project.image}
+          alt={project.title}
+          width={800}
+          height={600}
+          className="w-full h-full object-contain object-center bg-black/20"
+          loading="lazy"
+        />
       ) : (
         <div
-          className={`aspect-[4/3] bg-gradient-to-br ${project.gradient} flex items-center justify-center relative`}
+          className={`w-full h-full bg-gradient-to-br ${project.gradient} flex items-center justify-center`}
         >
-          <div className="text-7xl font-bold text-foreground/10">{project.title[0]}</div>
+          <div className="text-6xl font-bold text-white/10">{project.title[0]}</div>
         </div>
       )}
-      
-      {/* Shimmer scanline effect */}
-      <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{
-          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
-          backgroundSize: "200% 100%",
-          animation: isHovered ? "shimmer 1.5s infinite" : "none",
-        }}
-      />
-      
-      {/* Rainbow ring on hover */}
-      <div 
-        className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-          boxShadow: "inset 0 0 20px rgba(160, 32, 240, 0.3), inset 0 0 40px rgba(0, 212, 255, 0.2)",
-        }}
-      />
 
-      {/* Glass overlay with zoom */}
+      {/* Overlay on hover */}
       <div 
-        className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500"
+        className={`absolute inset-0 flex flex-col items-center justify-center gap-3 transition-all duration-300 ${
+          isHovered ? "opacity-100" : "opacity-0"
+        }`}
         style={{
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
           background: "linear-gradient(135deg, rgba(160, 32, 240, 0.2), rgba(0, 212, 255, 0.15))",
         }}
       >
-        <ExternalLink className="w-8 h-8 text-white transform group-hover:scale-110 transition-transform duration-300" />
+        <ExternalLink className="w-8 h-8 text-white" />
         <h4 className="text-lg font-bold text-white text-center px-4">{project.title}</h4>
-        <div className="flex items-center gap-2 justify-center">
+        <div className="flex items-center gap-2 justify-center flex-wrap px-4">
           <span
             className="text-xs px-4 py-1.5 rounded-full font-medium"
             style={{
               background: "linear-gradient(135deg, rgba(160,32,240,0.4), rgba(0,212,255,0.3))",
               color: "#fff",
               border: "1px solid rgba(255,255,255,0.3)",
-              boxShadow: "0 0 15px rgba(160, 32, 240, 0.4)",
             }}
           >
             {project.category}
@@ -179,7 +132,6 @@ function PortfolioCard({
                 background: "rgba(255,215,0,0.2)",
                 color: "#FFD700",
                 border: "1px solid rgba(255,215,0,0.4)",
-                boxShadow: "0 0 10px rgba(255,215,0,0.3)",
               }}
             >
               {project.badge}
@@ -248,9 +200,9 @@ export function PortfolioSection() {
           <p className="text-foreground/50 text-lg max-w-xl mx-auto">{t("portfolio_subtitle")}</p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, i) => (
-            <PortfolioCard key={project.title} project={project} index={i} />
+            <PortfolioCard key={project.id} project={project} index={i} />
           ))}
         </div>
       </div>
