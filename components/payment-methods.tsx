@@ -88,24 +88,19 @@ export function PaymentMethods() {
             </h3>
 
             <div className="flex items-center gap-4">
-              {currencies.map((currency, idx) => {
-                const colors = ["#3B82F6", "#A020F0", "#F59E0B"]
-                const bgColor = colors[idx]
+              {currencies.map((currency) => {
                 const symbols = { CHF: "CHF", EUR: "€", "₺ (Lira)": "₺" }
                 return (
                   <div
                     key={currency}
-                    className="flex items-center justify-center w-16 h-16 rounded-xl transition-all hover:scale-110"
+                    className="flex items-center justify-center w-14 h-14 rounded-lg transition-all hover:scale-105"
                     style={{
-                      background: `linear-gradient(135deg, ${bgColor}20, ${bgColor}10)`,
-                      border: `2px solid ${bgColor}40`,
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.1)",
                     }}
                     title={currency}
                   >
-                    <span
-                      className="font-bold text-2xl"
-                      style={{ color: bgColor }}
-                    >
+                    <span className="font-bold text-lg text-foreground/70">
                       {symbols[currency] || currency.charAt(0)}
                     </span>
                   </div>
@@ -116,11 +111,10 @@ export function PaymentMethods() {
 
           {/* Security Badge */}
           <div
-            className="mt-8 p-6 rounded-2xl text-center border-2 font-bold text-lg"
+            className="mt-8 p-3 rounded-lg text-center text-sm font-semibold text-foreground/60"
             style={{
-              background: "linear-gradient(135deg, #A020F0, #3B82F6)",
-              borderColor: "#A020F0",
-              color: "#fff",
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
             💳 Sichere & schnelle Zahlungsabwicklung
