@@ -21,94 +21,119 @@ export function NeonBackground() {
 
     resizeCanvas()
 
+    // Grid parameters for holographic mesh
+    const gridSize = 80
+    const gridOffsetX = useRef(0)
+    const gridOffsetY = useRef(0)
+
     const animate = () => {
       timeRef.current += 0.016
 
-      // Clear with subtle trail
+      // Dark background with subtle fade
       ctx.fillStyle = "rgba(10, 10, 26, 0.08)"
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      const centerX = canvas.width / 2
-      const centerY = canvas.height / 2
-      const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY) * 1.2
+      // Update grid offsets for flowing motion
+      gridOffsetX.current += 0.5
+      gridOffsetY.current += 0.2
 
-      // Draw 3 neon waves
-      for (let wave = 0; wave < 3; wave++) {
-        const waveOffset = (wave * Math.PI * 2) / 3
-        const time = timeRef.current * (0.5 - wave * 0.1)
+      // Draw holographic grid mesh
+      ctx.strokeStyle = "rgba(0, 212, 255, 0.1)"
+      ctx.lineWidth = 1
 
-        // Pulsing radius
-        const radius = maxRadius * 0.3 + Math.sin(time + waveOffset) * maxRadius * 0.25
-
-        // Neon glow effect
-        const gradient = ctx.createRadialGradient(
-          centerX,
-          centerY,
-          radius * 0.8,
-          centerX,
-          centerY,
-          radius * 1.3
-        )
-
-        const hue = (time * 50 + wave * 120) % 360
-        gradient.addColorStop(0, `hsla(${hue}, 100%, 60%, 0.8)`)
-        gradient.addColorStop(0.5, `hsla(${hue}, 100%, 50%, 0.4)`)
-        gradient.addColorStop(1, `hsla(${hue}, 100%, 40%, 0)`)
-
-        ctx.fillStyle = gradient
+      // Horizontal lines
+      for (let y = -canvas.height; y < canvas.height * 2; y += gridSize) {
+        const wave = Math.sin((y + gridOffsetY.current) * 0.01 + timeRef.current * 2) * 15
         ctx.beginPath()
-        ctx.arc(centerX, centerY, radius * 1.3, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Draw neon ring
-        ctx.strokeStyle = `hsla(${hue}, 100%, 60%, 0.6)`
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
+        ctx.moveTo(-canvas.width, y + wave)
+        ctx.lineTo(canvas.width * 2, y + wave)
         ctx.stroke()
       }
 
-      // Draw rotating orbiting particles
-      for (let i = 0; i < 12; i++) {
-        const angle = (timeRef.current * 0.3 + (i / 12) * Math.PI * 2)
-        const dist = maxRadius * 0.4
-        const x = centerX + Math.cos(angle) * dist
-        const y = centerY + Math.sin(angle) * dist
-
-        const hue = (angle * 57.3 + timeRef.current * 50) % 360
-        const pulse = Math.sin(timeRef.current * 2 + i) * 0.5 + 0.7
-
-        // Particle core
-        ctx.fillStyle = `hsla(${hue}, 100%, 60%, ${pulse * 0.8})`
+      // Vertical lines
+      for (let x = -canvas.width; x < canvas.width * 2; x += gridSize) {
+        const wave = Math.sin((x + gridOffsetX.current) * 0.01 + timeRef.current * 2) * 15
         ctx.beginPath()
-        ctx.arc(x, y, 4 * pulse, 0, Math.PI * 2)
-        ctx.fill()
+        ctx.moveTo(x + wave, -canvas.height)
+        ctx.lineTo(x + wave, canvas.height * 2)
+        ctx.stroke()
+      }
 
-        // Particle glow
-        const particleGradient = ctx.createRadialGradient(x, y, 0, x, y, 15 * pulse)
-        particleGradient.addColorStop(0, `hsla(${hue}, 100%, 60%, ${pulse * 0.4})`)
-        particleGradient.addColorStop(1, `hsla(${hue}, 100%, 60%, 0)`)
-        ctx.fillStyle = particleGradient
+      // Draw intersections with glow
+      for (let y = 0; y < canvas.height; y += gridSize) {
+        for (let x = 0; x < canvas.width; x += gridSize) {
+          const wave = Math.sin((x + y + gridOffsetX.current) * 0.01 + timeRef.current * 2) * 15
+          const distance = Math.sqrt(
+            Math.pow(x + wave - canvas.width / 2, 2) + 
+            Math.pow(y - canvas.height / 2, 2)
+          )
+          const maxDistance = Math.sqrt(Math.pow(canvas.width / 2, 2) + Math.pow(canvas.height / 2, 2))
+          const brightness = (1 - distance / maxDistance) * 0.8 + 0.2
+
+          // Glow effect
+          const gradient = ctx.createRadialGradient(x + wave, y, 0, x + wave, y, 30)
+          gradient.addColorStop(0, `rgba(0, 212, 255, ${brightness * 0.5})`)
+          gradient.addColorStop(0.5, `rgba(160, 32, 240, ${brightness * 0.2})`)
+          gradient.addColorStop(1, `rgba(0, 212, 255, 0)`)
+
+          ctx.fillStyle = gradient
+          ctx.fillRect(x + wave - 30, y - 30, 60, 60)
+
+          // Core point
+          ctx.fillStyle = `rgba(0, 255, 200, ${brightness})`
+          ctx.beginPath()
+          ctx.arc(x + wave, y, 2, 0, Math.PI * 2)
+          ctx.fill()
+        }
+      }
+
+      // Central vortex effect
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
+      const rotationAngle = timeRef.current * 0.5
+
+      for (let i = 0; i < 8; i++) {
+        const angle = (rotationAngle + (i / 8) * Math.PI * 2)
+        const radius = 150 + Math.sin(timeRef.current * 2 + i) * 50
+        const x = centerX + Math.cos(angle) * radius
+        const y = centerY + Math.sin(angle) * radius
+
+        // Pulsing orbs
+        const pulse = Math.sin(timeRef.current * 3 + i) * 0.5 + 0.7
+        const orbGradient = ctx.createRadialGradient(x, y, 0, x, y, 40 * pulse)
+        orbGradient.addColorStop(0, `rgba(0, 255, 200, ${pulse * 0.8})`)
+        orbGradient.addColorStop(0.5, `rgba(160, 32, 240, ${pulse * 0.4})`)
+        orbGradient.addColorStop(1, `rgba(0, 212, 255, 0)`)
+
+        ctx.fillStyle = orbGradient
+        ctx.fillRect(x - 40 * pulse, y - 40 * pulse, 80 * pulse, 80 * pulse)
+
+        ctx.fillStyle = `rgba(0, 255, 200, ${pulse})`
         ctx.beginPath()
-        ctx.arc(x, y, 15 * pulse, 0, Math.PI * 2)
+        ctx.arc(x, y, 5 * pulse, 0, Math.PI * 2)
         ctx.fill()
       }
 
-      // Draw connecting lines between orbiting particles
-      for (let i = 0; i < 12; i++) {
-        const angle1 = (timeRef.current * 0.3 + (i / 12) * Math.PI * 2)
-        const angle2 = (timeRef.current * 0.3 + ((i + 1) / 12) * Math.PI * 2)
-        const dist = maxRadius * 0.4
+      // Connecting lines between orbs
+      for (let i = 0; i < 8; i++) {
+        const angle1 = (rotationAngle + (i / 8) * Math.PI * 2)
+        const radius1 = 150 + Math.sin(timeRef.current * 2 + i) * 50
+        const x1 = centerX + Math.cos(angle1) * radius1
+        const y1 = centerY + Math.sin(angle1) * radius1
 
-        const x1 = centerX + Math.cos(angle1) * dist
-        const y1 = centerY + Math.sin(angle1) * dist
-        const x2 = centerX + Math.cos(angle2) * dist
-        const y2 = centerY + Math.sin(angle2) * dist
+        const angle2 = (rotationAngle + ((i + 1) / 8) * Math.PI * 2)
+        const radius2 = 150 + Math.sin(timeRef.current * 2 + i + 1) * 50
+        const x2 = centerX + Math.cos(angle2) * radius2
+        const y2 = centerY + Math.sin(angle2) * radius2
 
-        const hue = (angle1 * 57.3 + timeRef.current * 50) % 360
+        const lineGradient = ctx.createLinearGradient(x1, y1, x2, y2)
+        lineGradient.addColorStop(0, "rgba(0, 212, 255, 0.4)")
+        lineGradient.addColorStop(0.5, "rgba(160, 32, 240, 0.6)")
+        lineGradient.addColorStop(1, "rgba(0, 255, 200, 0.4)")
 
-        ctx.strokeStyle = `hsla(${hue}, 100%, 50%, 0.3)`
-        ctx.lineWidth = 1
+        ctx.strokeStyle = lineGradient
+        ctx.lineWidth = 2
+        ctx.lineCap = "round"
         ctx.beginPath()
         ctx.moveTo(x1, y1)
         ctx.lineTo(x2, y2)
