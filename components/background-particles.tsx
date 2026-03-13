@@ -124,8 +124,8 @@ export function BackgroundParticles() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
-      style={{ background: "transparent" }}
+      className="fixed inset-0 pointer-events-none top-0 left-0"
+      style={{ background: "transparent", zIndex: 1 }}
     />
   )
 }

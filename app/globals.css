@@ -82,14 +82,11 @@
 }
 
 @layer base {
-  html {
-    @apply relative;
-  }
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground relative min-h-screen;
+    @apply bg-background text-foreground;
   }
   html.lenis, html.lenis body {
     height: auto;

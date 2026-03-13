@@ -10,16 +10,7 @@ export function ReviewsSection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true)
-      },
-      { threshold: 0.15 }
-    )
-    if (sectionRef.current) observer.observe(sectionRef.current)
-    return () => observer.disconnect()
-
-    // Add Schema.org markup
+    // Add Schema.org markup for Google Rich Results
     const script = document.createElement("script")
     script.type = "application/ld+json"
     script.textContent = JSON.stringify({
@@ -36,7 +27,18 @@ export function ReviewsSection() {
       "ratingCount": 15
     })
     document.head.appendChild(script)
+
+    // Intersection Observer for animation
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true)
+      },
+      { threshold: 0.15 }
+    )
+    if (sectionRef.current) observer.observe(sectionRef.current)
+
     return () => {
+      observer.disconnect()
       document.head.removeChild(script)
     }
   }, [])
