@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
-import { Instagram, Facebook, MessageCircle } from "lucide-react"
+import { Instagram, Facebook, MessageCircle, Linkedin } from "lucide-react"
 
 export function Footer() {
   const { t } = useLanguage()
@@ -18,6 +18,11 @@ export function Footer() {
       name: "Facebook",
       url: "https://www.facebook.com/share/18RJcnouEu/?mibextid=wwXIfr",
       icon: Facebook,
+    },
+    {
+      name: "LinkedIn",
+      url: "https://www.linkedin.com/company/xelvetec/",
+      icon: Linkedin,
     },
     {
       name: "WhatsApp",
