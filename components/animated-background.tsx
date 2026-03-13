@@ -6,6 +6,16 @@ export function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const timeRef = useRef(0)
   const animationIdRef = useRef<number>()
+  const mouseRef = useRef({ x: 0, y: 0, active: false })
+  const particlesRef = useRef<Array<{
+    x: number
+    y: number
+    vx: number
+    vy: number
+    angle: number
+    size: number
+    hue: number
+  }>>([])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -19,6 +29,30 @@ export function AnimatedBackground() {
       canvas.height = window.innerHeight
     }
     resizeCanvas()
+
+    // Initialize particles
+    for (let i = 0; i < 60; i++) {
+      particlesRef.current.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        angle: Math.random() * Math.PI * 2,
+        size: Math.random() * 3 + 1.5,
+        hue: Math.random() * 360,
+      })
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY, active: true }
+    }
+
+    const handleMouseLeave = () => {
+      mouseRef.current.active = false
+    }
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true })
+    window.addEventListener("mouseleave", handleMouseLeave, { passive: true })
 
     const animate = () => {
       timeRef.current += 0.0008
@@ -145,32 +179,87 @@ export function AnimatedBackground() {
         ctx.globalAlpha = 1
       }
 
-      // Add subtle floating particles
-      for (let i = 0; i < 20; i++) {
-        const angle = (time * 0.15 + (i / 20) * Math.PI * 2) + Math.sin(time * 0.01 + i * 0.2) * 0.3
-        const radius = 450 + Math.sin(time * 0.02 + i * 0.5) * 100
-        const px = centerX + Math.cos(angle) * radius
-        const py = centerY + Math.sin(angle) * radius
+      // Update and draw particles with mouse interaction
+      for (let i = 0; i < particlesRef.current.length; i++) {
+        const particle = particlesRef.current[i]
 
-        const particleHue = (hue + i * 18) % 360
-        const opacity = (0.3 + Math.sin(time * 0.08 + i * 0.3) * 0.2)
-        const size = 2 + Math.sin(time * 0.05 + i * 0.15) * 1
+        // Apply slight drift
+        particle.vx *= 0.99
+        particle.vy *= 0.99
+        particle.vx += (Math.random() - 0.5) * 0.1
+        particle.vy += (Math.random() - 0.5) * 0.1
 
-        // Particle glow
-        const particleGlow = ctx.createRadialGradient(px, py, 0, px, py, size * 3)
-        particleGlow.addColorStop(0, `hsla(${particleHue}, 80%, 60%, ${opacity * 0.6})`)
-        particleGlow.addColorStop(1, `hsla(${particleHue}, 80%, 50%, 0)`)
+        // Mouse repulsion
+        if (mouseRef.current.active) {
+          const dx = particle.x - mouseRef.current.x
+          const dy = particle.y - mouseRef.current.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          const repulsionRadius = 200
+
+          if (distance < repulsionRadius) {
+            const force = (1 - distance / repulsionRadius) * 0.15
+            const angle = Math.atan2(dy, dx)
+            particle.vx += Math.cos(angle) * force
+            particle.vy += Math.sin(angle) * force
+          }
+        }
+
+        particle.x += particle.vx
+        particle.y += particle.vy
+        particle.angle += 0.02
+
+        // Wrap around edges
+        if (particle.x > canvas.width + 10) particle.x = -10
+        if (particle.x < -10) particle.x = canvas.width + 10
+        if (particle.y > canvas.height + 10) particle.y = -10
+        if (particle.y < -10) particle.y = canvas.height + 10
+
+        // Update hue slightly over time
+        particle.hue = (particle.hue + 0.1) % 360
+
+        // Draw particle with glow
+        const particleGlow = ctx.createRadialGradient(
+          particle.x, 
+          particle.y, 
+          0, 
+          particle.x, 
+          particle.y, 
+          particle.size * 4
+        )
+        particleGlow.addColorStop(0, `hsla(${particle.hue}, 80%, 60%, 0.15)`)
+        particleGlow.addColorStop(1, `hsla(${particle.hue}, 80%, 50%, 0)`)
 
         ctx.fillStyle = particleGlow
         ctx.beginPath()
-        ctx.arc(px, py, size * 3, 0, Math.PI * 2)
+        ctx.arc(particle.x, particle.y, particle.size * 4, 0, Math.PI * 2)
         ctx.fill()
 
         // Particle core
-        ctx.fillStyle = `hsla(${particleHue}, 85%, 70%, ${opacity})`
+        ctx.fillStyle = `hsla(${particle.hue}, 85%, 70%, 0.6)`
         ctx.beginPath()
-        ctx.arc(px, py, size, 0, Math.PI * 2)
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
         ctx.fill()
+      }
+
+      // Draw particle connections
+      for (let i = 0; i < particlesRef.current.length; i++) {
+        for (let j = i + 1; j < Math.min(i + 5, particlesRef.current.length); j++) {
+          const p1 = particlesRef.current[i]
+          const p2 = particlesRef.current[j]
+          const dx = p1.x - p2.x
+          const dy = p1.y - p2.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+
+          if (distance < 150) {
+            const alpha = (1 - distance / 150) * 0.08
+            ctx.strokeStyle = `hsla(${(p1.hue + p2.hue) / 2}, 75%, 55%, ${alpha})`
+            ctx.lineWidth = 0.8
+            ctx.beginPath()
+            ctx.moveTo(p1.x, p1.y)
+            ctx.lineTo(p2.x, p2.y)
+            ctx.stroke()
+          }
+        }
       }
 
       animationIdRef.current = requestAnimationFrame(animate)
@@ -185,6 +274,8 @@ export function AnimatedBackground() {
     window.addEventListener("resize", handleResize)
 
     return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseleave", handleMouseLeave)
       window.removeEventListener("resize", handleResize)
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current)
