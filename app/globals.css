@@ -82,11 +82,20 @@
 }
 
 @layer base {
+  html {
+    @apply relative;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   * {
     @apply border-border outline-ring/50;
+    box-sizing: border-box;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground relative min-h-screen;
+    line-height: 1.6;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
   html.lenis, html.lenis body {
     height: auto;

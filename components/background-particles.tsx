@@ -38,12 +38,14 @@ export function BackgroundParticles() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
-    // Responsive particle count based on screen size
+    // Responsive particle count based on screen size - MORE aggressive for mobile
     let particleCount = 80
-    if (window.innerWidth < 768) {
-      particleCount = 30 // Mobile: weniger Partikel
+    if (window.innerWidth < 640) {
+      particleCount = 15 // Mobile: drastisch reduziert für 100 PageSpeed
+    } else if (window.innerWidth < 768) {
+      particleCount = 20
     } else if (window.innerWidth < 1024) {
-      particleCount = 50 // Tablet: mittelmäßig
+      particleCount = 50 // Tablet
     }
 
     const initialParticles: Particle[] = Array.from({ length: particleCount }).map(() => {
@@ -123,13 +125,16 @@ export function BackgroundParticles() {
         particle.vx += scrollInfluence * 0.1
         particle.vy += scrollInfluence * 0.05
 
-        // Store trail position
-        particle.trailX.push(particle.x)
-        particle.trailY.push(particle.y)
-        if (particle.trailX.length > 8) {
-          particle.trailX.shift()
-          particle.trailY.shift()
-        }
+    // Skip trail rendering on mobile for performance
+    if (window.innerWidth >= 768) {
+      // Store trail position - desktop only
+      particle.trailX.push(particle.x)
+      particle.trailY.push(particle.y)
+      if (particle.trailX.length > 8) {
+        particle.trailX.shift()
+        particle.trailY.shift()
+      }
+    }
 
         particle.x += particle.vx
         particle.y += particle.vy
@@ -141,14 +146,16 @@ export function BackgroundParticles() {
         if (particle.y > canvas.height + 50) particle.y = -50
         if (particle.y < -50) particle.y = canvas.height + 50
 
-        // Draw particle trail
-        for (let i = 0; i < particle.trailX.length - 1; i++) {
-          const trailAlpha = (i / particle.trailX.length) * 0.15
-          const trailSize = (particle.size * i) / particle.trailX.length
-          ctx.fillStyle = `rgba(160, 32, 240, ${trailAlpha})`
-          ctx.beginPath()
-          ctx.arc(particle.trailX[i], particle.trailY[i], trailSize, 0, Math.PI * 2)
-          ctx.fill()
+        // Draw particle trail - desktop only
+        if (window.innerWidth >= 768) {
+          for (let i = 0; i < particle.trailX.length - 1; i++) {
+            const trailAlpha = (i / particle.trailX.length) * 0.15
+            const trailSize = (particle.size * i) / particle.trailX.length
+            ctx.fillStyle = `rgba(160, 32, 240, ${trailAlpha})`
+            ctx.beginPath()
+            ctx.arc(particle.trailX[i], particle.trailY[i], trailSize, 0, Math.PI * 2)
+            ctx.fill()
+          }
         }
 
         // Pulsing glow effect
