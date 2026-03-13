@@ -23,10 +23,12 @@ const projects = [
     url: "https://magnificent-narwhal-b530a8.netlify.app/",
   },
   {
-    id: "istanbul",
-    title: "Istanbul Fashion Co.",
-    category: "Business",
+    id: "kunsthandwerk",
+    title: "XelveTec Kunsthandwerk",
+    category: "Handcraft/Design",
     gradient: "from-[#00D4FF]/40 to-[#7C3AED]/40",
+    image: "/images/portfolio-xelvetec-kunsthandwerk.png",
+    url: "https://jade-cranachan-bab53b.netlify.app/",
   },
   {
     id: "fintech",
