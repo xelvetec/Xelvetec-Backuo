@@ -4,8 +4,19 @@ import { useEffect, useRef } from "react"
 
 export function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const scrollProgressRef = useRef(0)
   const timeRef = useRef(0)
   const animationIdRef = useRef<number>()
+  const fragmentsRef = useRef<Array<{
+    x: number
+    y: number
+    vx: number
+    vy: number
+    angle: number
+    angularVel: number
+    size: number
+    life: number
+  }>>([])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -20,144 +31,165 @@ export function AnimatedBackground() {
     }
     resizeCanvas()
 
-    const centerX = canvas.width / 2
-    const centerY = canvas.height / 2
+    // Handle scroll
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight
+      scrollProgressRef.current = totalScroll > 0 ? window.scrollY / totalScroll : 0
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
 
     const animate = () => {
-      timeRef.current += 0.012
+      timeRef.current += 0.016
 
-      // Ultra-dark animated gradient background
+      // Aggressive dark background with red/yellow tints at scroll
+      const scrollIntensity = scrollProgressRef.current
       const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
-      const hue1 = (timeRef.current * 10) % 360
-      const hue2 = (timeRef.current * 15 + 120) % 360
-      bgGradient.addColorStop(0, `hsl(${hue1}, 100%, 3%)`)
-      bgGradient.addColorStop(0.5, `hsl(${hue2}, 95%, 5%)`)
-      bgGradient.addColorStop(1, `hsl(${hue1 + 180}, 100%, 4%)`)
+      bgGradient.addColorStop(0, `hsl(${scrollIntensity * 20}, 100%, ${2 + scrollIntensity * 3}%)`)
+      bgGradient.addColorStop(0.5, `hsl(0, 100%, ${1 + scrollIntensity * 2}%)`)
+      bgGradient.addColorStop(1, `hsl(${scrollIntensity * 30}, 100%, ${2 + scrollIntensity * 2}%)`)
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Draw 8 ultra-massive morphing glass blobs with insane glows
-      for (let i = 0; i < 8; i++) {
-        const angle = (timeRef.current * 0.15 + (i / 8) * Math.PI * 2)
-        const waveOffset = Math.sin(timeRef.current * 0.3 + i * 0.7) * 200
-        const radius = 500 + waveOffset
-        
-        const blobX = centerX + Math.cos(angle) * radius
-        const blobY = centerY + Math.sin(angle) * radius
-        const blobSize = 150 + Math.sin(timeRef.current * 0.4 + i * 0.5) * 80
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
 
-        const blobHue = (timeRef.current * 20 + i * 45) % 360
-
-        // Ultra-mega glow layer 1 - insanely bright and large
-        const megaGlow1 = ctx.createRadialGradient(blobX, blobY, 0, blobX, blobY, blobSize * 6)
-        megaGlow1.addColorStop(0, `hsla(${blobHue}, 100%, 70%, 0.6)`)
-        megaGlow1.addColorStop(0.2, `hsla(${blobHue + 60}, 100%, 55%, 0.3)`)
-        megaGlow1.addColorStop(0.5, `hsla(${blobHue + 120}, 100%, 40%, 0.1)`)
-        megaGlow1.addColorStop(1, `hsla(${blobHue}, 100%, 20%, 0)`)
-        ctx.fillStyle = megaGlow1
-        ctx.beginPath()
-        ctx.arc(blobX, blobY, blobSize * 6, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Ultra-mega glow layer 2 - multiple glows stacked
-        const megaGlow2 = ctx.createRadialGradient(blobX, blobY, blobSize * 0.5, blobX, blobY, blobSize * 4)
-        megaGlow2.addColorStop(0, `hsla(${blobHue + 120}, 100%, 65%, 0.7)`)
-        megaGlow2.addColorStop(0.3, `hsla(${blobHue}, 100%, 50%, 0.4)`)
-        megaGlow2.addColorStop(0.7, `hsla(${blobHue - 60}, 100%, 35%, 0.1)`)
-        megaGlow2.addColorStop(1, `hsla(${blobHue}, 100%, 20%, 0)`)
-        ctx.fillStyle = megaGlow2
-        ctx.beginPath()
-        ctx.arc(blobX, blobY, blobSize * 4, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Mid glow - ultra bright core
-        const midGlow = ctx.createRadialGradient(blobX, blobY, 0, blobX, blobY, blobSize * 2.5)
-        midGlow.addColorStop(0, `hsla(${blobHue}, 100%, 75%, 0.8)`)
-        midGlow.addColorStop(0.4, `hsla(${blobHue - 60}, 100%, 55%, 0.5)`)
-        midGlow.addColorStop(1, `hsla(${blobHue}, 100%, 25%, 0)`)
-        ctx.fillStyle = midGlow
-        ctx.beginPath()
-        ctx.arc(blobX, blobY, blobSize * 2.5, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Core blob with glass effect
-        const coreGradient = ctx.createRadialGradient(blobX - blobSize * 0.3, blobY - blobSize * 0.3, 0, blobX, blobY, blobSize)
-        coreGradient.addColorStop(0, `hsla(${blobHue}, 100%, 85%, 0.9)`)
-        coreGradient.addColorStop(0.5, `hsla(${blobHue}, 100%, 55%, 0.7)`)
-        coreGradient.addColorStop(1, `hsla(${blobHue}, 100%, 25%, 0.3)`)
-        ctx.fillStyle = coreGradient
-        ctx.beginPath()
-        ctx.arc(blobX, blobY, blobSize, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Ultra-vibrant rim light
-        const rimPulse = Math.sin(timeRef.current * 2 + i * 0.3) * 0.3 + 0.7
-        ctx.strokeStyle = `hsla(${blobHue + 180}, 100%, 75%, ${rimPulse * 0.8})`
-        ctx.lineWidth = 4 + rimPulse * 2
-        ctx.lineCap = "round"
-        ctx.beginPath()
-        ctx.arc(blobX, blobY, blobSize + 15, 0, Math.PI * 2)
-        ctx.stroke()
+      // Generate shattered crystal fragments that explode outward
+      if (Math.random() < 0.3 + scrollIntensity * 0.4) {
+        for (let i = 0; i < 3 + scrollIntensity * 5; i++) {
+          const angle = Math.random() * Math.PI * 2
+          const speed = 4 + Math.random() * 6 + scrollIntensity * 3
+          fragmentsRef.current.push({
+            x: centerX,
+            y: centerY,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            angle: Math.random() * Math.PI * 2,
+            angularVel: (Math.random() - 0.5) * 0.3,
+            size: 8 + Math.random() * 16 + scrollIntensity * 8,
+            life: 1,
+          })
+        }
       }
 
-      // Draw ultra-vibrant connecting beam lines
-      for (let i = 0; i < 8; i++) {
-        const angle1 = (timeRef.current * 0.15 + (i / 8) * Math.PI * 2)
-        const waveOffset1 = Math.sin(timeRef.current * 0.3 + i * 0.7) * 200
-        const radius1 = 500 + waveOffset1
-        const blobX1 = centerX + Math.cos(angle1) * radius1
-        const blobY1 = centerY + Math.sin(angle1) * radius1
+      // Update and draw fragments
+      for (let i = fragmentsRef.current.length - 1; i >= 0; i--) {
+        const frag = fragmentsRef.current[i]
+        frag.x += frag.vx
+        frag.y += frag.vy
+        frag.angle += frag.angularVel
+        frag.vx *= 0.98
+        frag.vy *= 0.98
+        frag.life -= 0.02
 
-        const angle2 = (timeRef.current * 0.15 + ((i + 1) / 8) * Math.PI * 2)
-        const waveOffset2 = Math.sin(timeRef.current * 0.3 + (i + 1) * 0.7) * 200
-        const radius2 = 500 + waveOffset2
-        const blobX2 = centerX + Math.cos(angle2) * radius2
-        const blobY2 = centerY + Math.sin(angle2) * radius2
+        if (frag.life <= 0) {
+          fragmentsRef.current.splice(i, 1)
+          continue
+        }
 
-        const hue1 = (timeRef.current * 20 + i * 45) % 360
-        const hue2 = (timeRef.current * 20 + (i + 1) * 45) % 360
+        // Draw rotating crystal shard with electric glow
+        ctx.save()
+        ctx.translate(frag.x, frag.y)
+        ctx.rotate(frag.angle)
 
-        const beamGradient = ctx.createLinearGradient(blobX1, blobY1, blobX2, blobY2)
-        beamGradient.addColorStop(0, `hsla(${hue1}, 100%, 60%, 0.5)`)
-        beamGradient.addColorStop(0.5, `hsla(${(hue1 + hue2) / 2}, 100%, 70%, 0.7)`)
-        beamGradient.addColorStop(1, `hsla(${hue2}, 100%, 60%, 0.5)`)
+        // Electric glow around fragment
+        const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, frag.size * 1.5)
+        glowGradient.addColorStop(0, `hsla(${timeRef.current * 50}, 100%, 60%, ${frag.life * 0.6})`)
+        glowGradient.addColorStop(1, `hsla(0, 100%, 40%, 0)`)
+        ctx.fillStyle = glowGradient
+        ctx.beginPath()
+        ctx.arc(0, 0, frag.size * 1.5, 0, Math.PI * 2)
+        ctx.fill()
 
-        // Draw glow around beam
-        ctx.shadowColor = `hsl(${(hue1 + hue2) / 2}, 100%, 50%)`
-        ctx.shadowBlur = 30
-        ctx.strokeStyle = beamGradient
-        ctx.lineWidth = 5
+        // Crystal shard geometry
+        ctx.fillStyle = `hsla(${60 + scrollIntensity * 20}, 100%, ${50 + frag.life * 30}%, ${frag.life * 0.8})`
+        ctx.strokeStyle = `hsla(0, 100%, 70%, ${frag.life * 0.9})`
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.moveTo(-frag.size * 0.5, -frag.size * 0.3)
+        ctx.lineTo(frag.size * 0.5, -frag.size * 0.2)
+        ctx.lineTo(frag.size * 0.3, frag.size * 0.5)
+        ctx.lineTo(-frag.size * 0.4, frag.size * 0.4)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.restore()
+      }
+
+      // Draw aggressive electric lightning bolts
+      const boltCount = 4 + Math.floor(scrollIntensity * 8)
+      for (let i = 0; i < boltCount; i++) {
+        const startAngle = (timeRef.current * 0.3 + (i / boltCount) * Math.PI * 2) + Math.sin(timeRef.current * 0.5 + i) * 0.3
+        const boltRadius = 200 + Math.sin(timeRef.current * 0.4 + i * 0.5) * 150 + scrollIntensity * 200
+        const boltX = centerX + Math.cos(startAngle) * boltRadius
+        const boltY = centerY + Math.sin(startAngle) * boltRadius
+
+        const endAngle = startAngle + Math.PI
+        const endX = centerX + Math.cos(endAngle) * (boltRadius * 0.5)
+        const endY = centerY + Math.sin(endAngle) * (boltRadius * 0.5)
+
+        // Draw jagged lightning bolt
+        const points = []
+        points.push({ x: boltX, y: boltY })
+        for (let j = 0; j < 5; j++) {
+          const t = (j + 1) / 6
+          const baseX = boltX + (endX - boltX) * t
+          const baseY = boltY + (endY - boltY) * t
+          const jag = (Math.random() - 0.5) * 40 * (1 + scrollIntensity)
+          const jagAngle = Math.atan2(endY - boltY, endX - boltX) + Math.PI / 2
+          points.push({
+            x: baseX + Math.cos(jagAngle) * jag,
+            y: baseY + Math.sin(jagAngle) * jag,
+          })
+        }
+        points.push({ x: endX, y: endY })
+
+        // Electric glow outer
+        ctx.strokeStyle = `hsla(${200 + scrollIntensity * 100}, 100%, 50%, ${0.3 + scrollIntensity * 0.3})`
+        ctx.lineWidth = 8 + scrollIntensity * 4
         ctx.lineCap = "round"
         ctx.lineJoin = "round"
         ctx.beginPath()
-        ctx.moveTo(blobX1, blobY1)
-        ctx.lineTo(blobX2, blobY2)
+        ctx.moveTo(points[0].x, points[0].y)
+        for (let j = 1; j < points.length; j++) {
+          ctx.lineTo(points[j].x, points[j].y)
+        }
         ctx.stroke()
-        ctx.shadowBlur = 0
+
+        // Electric glow middle
+        ctx.strokeStyle = `hsla(${220 + scrollIntensity * 80}, 100%, 65%, ${0.6 + scrollIntensity * 0.3})`
+        ctx.lineWidth = 4 + scrollIntensity * 2
+        ctx.beginPath()
+        ctx.moveTo(points[0].x, points[0].y)
+        for (let j = 1; j < points.length; j++) {
+          ctx.lineTo(points[j].x, points[j].y)
+        }
+        ctx.stroke()
+
+        // Core bright white
+        ctx.strokeStyle = `hsla(0, 100%, 95%, ${0.8 + scrollIntensity * 0.2})`
+        ctx.lineWidth = 1.5 + scrollIntensity * 0.5
+        ctx.beginPath()
+        ctx.moveTo(points[0].x, points[0].y)
+        for (let j = 1; j < points.length; j++) {
+          ctx.lineTo(points[j].x, points[j].y)
+        }
+        ctx.stroke()
       }
 
-      // Draw 100+ ultra-fast flowing particles in streams
-      for (let i = 0; i < 100; i++) {
-        const particleAngle = (timeRef.current * 0.8 + (i / 100) * Math.PI * 2) + Math.sin(timeRef.current * 0.4 + i * 0.1) * 0.5
-        const particleRadius = 600 + Math.sin(timeRef.current * 0.5 + i * 0.05) * 300
-        const px = centerX + Math.cos(particleAngle) * particleRadius
-        const py = centerY + Math.sin(particleAngle) * particleRadius
+      // Draw chaotic particle storm at high scroll
+      const stormIntensity = Math.max(0, scrollIntensity - 0.3) * 2
+      for (let i = 0; i < 50 + stormIntensity * 100; i++) {
+        const angle = (timeRef.current * 1 + (i / 100) * Math.PI * 2) + Math.sin(timeRef.current * 0.8 + i * 0.1) * 0.8
+        const radius = 300 + Math.sin(timeRef.current * 0.6 + i * 0.05) * 200 + stormIntensity * 150
+        const px = centerX + Math.cos(angle) * radius
+        const py = centerY + Math.sin(angle) * radius
 
-        const particleHue = (timeRef.current * 30 + i * 3.6) % 360
-        const particleOpacity = (0.6 + Math.sin(timeRef.current + i * 0.1) * 0.3) * 0.8
-        const particleSize = 3 + Math.sin(timeRef.current * 0.6 + i * 0.15) * 2
+        const opacity = (0.4 + Math.sin(timeRef.current * 2 + i * 0.2) * 0.3) * stormIntensity * 1.5
+        const particleSize = 1.5 + Math.sin(timeRef.current + i * 0.15) * 1
 
-        // Particle with soft glow
-        const particleGlow = ctx.createRadialGradient(px, py, 0, px, py, particleSize * 3)
-        particleGlow.addColorStop(0, `hsla(${particleHue}, 100%, 65%, ${particleOpacity})`)
-        particleGlow.addColorStop(1, `hsla(${particleHue}, 100%, 45%, 0)`)
-        ctx.fillStyle = particleGlow
-        ctx.beginPath()
-        ctx.arc(px, py, particleSize * 3, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Particle core
-        ctx.fillStyle = `hsla(${particleHue}, 100%, 80%, ${particleOpacity})`
+        ctx.fillStyle = `hsla(${i * 3.6}, 100%, 60%, ${opacity})`
         ctx.beginPath()
         ctx.arc(px, py, particleSize, 0, Math.PI * 2)
         ctx.fill()
@@ -175,6 +207,7 @@ export function AnimatedBackground() {
     window.addEventListener("resize", handleResize)
 
     return () => {
+      window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("resize", handleResize)
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current)
