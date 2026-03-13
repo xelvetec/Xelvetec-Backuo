@@ -366,11 +366,9 @@ export default function RootLayout({
                   try {
                     const result = await emailjs.sendForm('service_wzudoxa', 'template_mopajh7', form);
                     console.log('🎉 SUCCESS!', result);
-                    alert('Nachricht erfolgreich gesendet!');
                     form.reset();
                   } catch (error) {
                     console.error('💥 DETAILED ERROR:', error);
-                    alert('Fehler: ' + (error.text || error.message || JSON.stringify(error)));
                   }
                 });
                 console.log('✅ Listener attached');

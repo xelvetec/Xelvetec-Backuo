@@ -37,7 +37,7 @@ export function ContactSection() {
       setBanner({ message: t('contact_banner_success'), type: 'success' })
       formRef.current?.reset()
       
-      setTimeout(() => setBanner(null), 3000)
+      setTimeout(() => setBanner(null), 5000)
     } catch (error) {
       setBanner({ message: t('contact_banner_error'), type: 'error' })
       setTimeout(() => setBanner(null), 5000)
