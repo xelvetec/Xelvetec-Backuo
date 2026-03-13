@@ -57,14 +57,12 @@ function PortfolioCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`group relative rounded-2xl overflow-hidden aspect-video cursor-pointer transition-all duration-300 ${
-        isHovered ? "scale-110" : "scale-100"
+        isHovered ? "scale-105" : "scale-100"
       }`}
       style={{
         boxShadow: isHovered 
-          ? "0 30px 60px rgba(160, 32, 240, 0.4), 0 0 40px rgba(0, 212, 255, 0.2)"
+          ? "0 20px 40px rgba(160, 32, 240, 0.3)"
           : "0 10px 20px rgba(0, 0, 0, 0.3)",
-        willChange: "transform, box-shadow",
-        transform: isHovered ? "scale(1.1) translateZ(0)" : "scale(1) translateZ(0)",
       }}
     >
       {/* Image or gradient background */}
