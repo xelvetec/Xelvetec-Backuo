@@ -2,10 +2,29 @@
 
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
+import { Instagram, Facebook, MessageCircle } from "lucide-react"
 
 export function Footer() {
   const { t } = useLanguage()
   const year = new Date().getFullYear()
+
+  const socialLinks = [
+    {
+      name: "Instagram",
+      url: "https://www.instagram.com/xelvetec",
+      icon: Instagram,
+    },
+    {
+      name: "Facebook",
+      url: "https://www.facebook.com/share/18RJcnouEu/?mibextid=wwXIfr",
+      icon: Facebook,
+    },
+    {
+      name: "WhatsApp",
+      url: "https://wa.me/41768443375",
+      icon: MessageCircle,
+    },
+  ]
 
   return (
     <footer className="relative py-12 overflow-hidden border-t border-foreground/5">
@@ -51,19 +70,25 @@ export function Footer() {
 
           {/* Social icons */}
           <div className="flex items-center gap-3">
-            {["X", "In", "Ig"].map((icon) => (
-              <a
-                key={icon}
-                href="#"
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold text-foreground/60 transition-all duration-300 hover:scale-110 hover:neon-glow"
-                style={{
-                  background: "rgba(160,32,240,0.1)",
-                  border: "1px solid rgba(160,32,240,0.2)",
-                }}
-              >
-                {icon}
-              </a>
-            ))}
+            {socialLinks.map((social) => {
+              const IconComponent = social.icon
+              return (
+                <a
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={social.name}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-foreground/60 transition-all duration-300 hover:scale-110 hover:text-foreground"
+                  style={{
+                    background: "rgba(160,32,240,0.1)",
+                    border: "1px solid rgba(160,32,240,0.2)",
+                  }}
+                >
+                  <IconComponent className="w-5 h-5" />
+                </a>
+              )
+            })}
           </div>
         </div>
 
