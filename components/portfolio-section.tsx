@@ -107,13 +107,15 @@ function PortfolioCard({
     >
       {/* Image or gradient background */}
       {project.image ? (
-        <Image
-          src={project.image}
-          alt={project.title}
-          width={800}
-          height={600}
-          className="w-full h-full aspect-[4/3] object-cover"
-        />
+        <div className="w-full h-full aspect-[4/3] bg-gradient-to-br from-black/20 to-black/40 flex items-center justify-center overflow-hidden">
+          <Image
+            src={project.image}
+            alt={project.title}
+            width={800}
+            height={600}
+            className="w-full h-full object-contain object-center"
+          />
+        </div>
       ) : (
         <div
           className={`aspect-[4/3] bg-gradient-to-br ${project.gradient} flex items-center justify-center relative`}
