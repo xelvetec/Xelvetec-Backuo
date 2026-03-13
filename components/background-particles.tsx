@@ -10,6 +10,8 @@ interface Particle {
   vy: number
   size: number
   opacity: number
+  baseVx: number
+  baseVy: number
 }
 
 export function BackgroundParticles() {
@@ -19,6 +21,7 @@ export function BackgroundParticles() {
   const lastScrollRef = useRef(0)
   const lastTimeRef = useRef(Date.now())
   const particleIdRef = useRef(0)
+  const mouseRef = useRef({ x: 0, y: 0, active: false })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -30,15 +33,21 @@ export function BackgroundParticles() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
-    const initialParticles: Particle[] = Array.from({ length: 80 }).map(() => ({
-      id: particleIdRef.current++,
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 1.5,
-      vy: (Math.random() - 0.5) * 1.5,
-      size: Math.random() * 2.5 + 1,
-      opacity: Math.random() * 0.6 + 0.4,
-    }))
+    const initialParticles: Particle[] = Array.from({ length: 80 }).map(() => {
+      const baseVx = (Math.random() - 0.5) * 1.5
+      const baseVy = (Math.random() - 0.5) * 1.5
+      return {
+        id: particleIdRef.current++,
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: baseVx,
+        vy: baseVy,
+        size: Math.random() * 2.5 + 1,
+        opacity: Math.random() * 0.6 + 0.4,
+        baseVx,
+        baseVy,
+      }
+    })
 
     particlesRef.current = initialParticles
 
@@ -53,21 +62,53 @@ export function BackgroundParticles() {
       lastTimeRef.current = currentTime
     }
 
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY, active: true }
+    }
+
+    const handleMouseLeave = () => {
+      mouseRef.current.active = false
+    }
+
     window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("mousemove", handleMouseMove, { passive: true })
+    window.addEventListener("mouseleave", handleMouseLeave, { passive: true })
 
     const animate = () => {
       if (!canvas || !ctx) return
 
-      // Clear canvas completely - no blur effect
+      // Clear canvas completely
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       particlesRef.current.forEach((particle) => {
-        particle.vy += scrollVelocity * 0.3
+        // Apply base velocity with scroll influence
+        particle.vx = particle.baseVx
+        particle.vy = particle.baseVy + scrollVelocity * 0.3
+
+        // Mouse repulsion
+        if (mouseRef.current.active) {
+          const dx = particle.x - mouseRef.current.x
+          const dy = particle.y - mouseRef.current.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          const repulsionRadius = 150
+
+          if (distance < repulsionRadius) {
+            const force = (1 - distance / repulsionRadius) * 0.12
+            const angle = Math.atan2(dy, dx)
+            particle.vx += Math.cos(angle) * force
+            particle.vy += Math.sin(angle) * force
+          }
+        }
+
+        // Apply scroll animation rotation effect
+        const scrollInfluence = Math.sin(scrollVelocity * 0.01) * 0.2
+        particle.vx += scrollInfluence * 0.1
+        particle.vy += scrollInfluence * 0.05
 
         particle.x += particle.vx
         particle.y += particle.vy
 
-        // Wrap particles around edges - no bouncing
+        // Wrap particles around edges
         if (particle.x > canvas.width + 50) particle.x = -50
         if (particle.x < -50) particle.x = canvas.width + 50
         if (particle.y > canvas.height + 50) particle.y = -50
@@ -84,6 +125,7 @@ export function BackgroundParticles() {
         ctx.fill()
       })
 
+      // Draw connections
       for (let i = 0; i < particlesRef.current.length; i++) {
         for (let j = i + 1; j < particlesRef.current.length; j++) {
           const p1 = particlesRef.current[i]
@@ -117,6 +159,8 @@ export function BackgroundParticles() {
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseleave", handleMouseLeave)
       window.removeEventListener("resize", handleResize)
     }
   }, [])
