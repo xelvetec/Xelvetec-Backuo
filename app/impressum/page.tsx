@@ -1,9 +1,7 @@
-import { getLanguage } from "@/lib/language-context"
 import { translations } from "@/lib/translations"
 
 export default function ImpressumPage() {
-  const language = getLanguage()
-  const t = (key: string) => (translations[language] as any)?.[key] || (translations.de as any)?.[key] || key
+  const t = (key: string) => (translations.de as any)?.[key] || key
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-32 pb-12">
