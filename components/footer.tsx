@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 import { Instagram, Facebook, MessageCircle, Linkedin } from "lucide-react"
+import { PaymentMethods } from "./payment-methods"
 
 export function Footer() {
   const { t } = useLanguage()
@@ -42,6 +43,11 @@ export function Footer() {
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4">
+        {/* Payment Methods Section */}
+        <div className="mb-12">
+          <PaymentMethods />
+        </div>
+
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           {/* Logo */}
           <div className="flex items-center gap-3">
