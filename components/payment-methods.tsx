@@ -87,36 +87,27 @@ export function PaymentMethods() {
               {t("currencies")}
             </h3>
 
-            <div className="space-y-4">
+            <div className="flex items-center gap-4">
               {currencies.map((currency, idx) => {
                 const colors = ["#3B82F6", "#A020F0", "#F59E0B"]
                 const bgColor = colors[idx]
+                const symbols = { CHF: "CHF", EUR: "€", "₺ (Lira)": "₺" }
                 return (
                   <div
                     key={currency}
-                    className="flex items-center gap-4 p-5 rounded-2xl border-2 transition-all hover:scale-105"
+                    className="flex items-center justify-center w-16 h-16 rounded-xl transition-all hover:scale-110"
                     style={{
-                      background: `linear-gradient(135deg, ${bgColor}12, ${bgColor}06)`,
-                      borderColor: bgColor + "30",
+                      background: `linear-gradient(135deg, ${bgColor}20, ${bgColor}10)`,
+                      border: `2px solid ${bgColor}40`,
                     }}
+                    title={currency}
                   >
-                    <div
-                      className="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-lg"
-                      style={{
-                        background: `linear-gradient(135deg, ${bgColor}, ${bgColor}dd)`,
-                        color: "#fff",
-                      }}
+                    <span
+                      className="font-bold text-2xl"
+                      style={{ color: bgColor }}
                     >
-                      {currency.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-bold text-foreground text-lg">{currency}</p>
-                      <p className="text-xs text-foreground/60">
-                        {currency === "CHF" && "Schweizer Franken"}
-                        {currency === "EUR" && "Euro"}
-                        {currency === "₺ (Lira)" && "Türkische Lira"}
-                      </p>
-                    </div>
+                      {symbols[currency] || currency.charAt(0)}
+                    </span>
                   </div>
                 )
               })}
