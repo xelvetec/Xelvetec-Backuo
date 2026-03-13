@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useLanguage } from "@/lib/language-context"
@@ -11,41 +12,40 @@ export function PaymentMethods() {
       title: t("payment_cards"),
       icon: CreditCard,
       items: ["Visa", "Mastercard", "Girocard (EC)"],
-      color: "from-blue-500/20 to-blue-600/10",
-      borderColor: "border-blue-500/20",
+      color: "#3B82F6",
     },
     {
       title: t("payment_digital"),
       icon: Smartphone,
       items: ["Twint", "Apple Pay"],
-      color: "from-purple-500/20 to-purple-600/10",
-      borderColor: "border-purple-500/20",
+      color: "#A020F0",
     },
     {
       title: t("payment_transfer"),
       icon: DollarSign,
       items: ["Banküberweisung"],
-      color: "from-green-500/20 to-green-600/10",
-      borderColor: "border-green-500/20",
+      color: "#10B981",
     },
     {
       title: t("payment_cash"),
       icon: Banknote,
       items: ["Barzahlung"],
-      color: "from-amber-500/20 to-amber-600/10",
-      borderColor: "border-amber-500/20",
+      color: "#F59E0B",
     },
   ]
 
   const currencies = ["CHF", "EUR", "₺ (Lira)"]
 
   return (
-    <div className="w-full bg-gradient-to-r from-foreground/5 to-transparent rounded-2xl p-6 md:p-8 border border-foreground/10">
-      <div className="grid md:grid-cols-2 gap-8">
+    <div className="w-full rounded-2xl p-8 md:p-12 border border-foreground/10"
+      style={{
+        background: "linear-gradient(135deg, rgba(160,32,240,0.08) 0%, rgba(59,130,246,0.05) 100%)",
+      }}>
+      <div className="grid md:grid-cols-2 gap-12">
         {/* Payment Methods */}
         <div>
-          <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-            <CreditCard className="w-5 h-5" style={{ color: "#A020F0" }} />
+          <h3 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3">
+            <CreditCard className="w-6 h-6" style={{ color: "#A020F0" }} />
             {t("payment_methods")}
           </h3>
 
@@ -55,16 +55,20 @@ export function PaymentMethods() {
               return (
                 <div
                   key={group.title}
-                  className={`bg-gradient-to-br ${group.color} border ${group.borderColor} rounded-xl p-4 transition-all duration-300 hover:scale-105 hover:border-foreground/30`}
+                  className="rounded-2xl p-5 transition-all duration-300 hover:scale-105 border-2"
+                  style={{
+                    background: `linear-gradient(135deg, ${group.color}15, ${group.color}08)`,
+                    borderColor: group.color + "40",
+                  }}
                 >
-                  <div className="flex items-start gap-2 mb-3">
-                    <IconComponent className="w-5 h-5 flex-shrink-0" style={{ color: "#A020F0" }} />
-                    <h4 className="font-semibold text-sm text-foreground">{group.title}</h4>
+                  <div className="flex items-start gap-3 mb-4">
+                    <IconComponent className="w-6 h-6 flex-shrink-0" style={{ color: group.color }} />
+                    <h4 className="font-bold text-sm text-foreground leading-tight">{group.title}</h4>
                   </div>
-                  <ul className="text-xs text-foreground/60 space-y-1">
+                  <ul className="text-xs text-foreground/70 space-y-2">
                     {group.items.map((item) => (
                       <li key={item} className="flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-foreground/30"></span>
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: group.color }}></span>
                         {item}
                       </li>
                     ))}
@@ -78,51 +82,57 @@ export function PaymentMethods() {
         {/* Currencies */}
         <div className="flex flex-col justify-between">
           <div>
-            <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-              <DollarSign className="w-5 h-5" style={{ color: "#A020F0" }} />
+            <h3 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3">
+              <DollarSign className="w-6 h-6" style={{ color: "#A020F0" }} />
               {t("currencies")}
             </h3>
 
-            <div className="space-y-3">
-              {currencies.map((currency) => (
-                <div
-                  key={currency}
-                  className="flex items-center gap-3 p-4 bg-gradient-to-r from-foreground/5 to-foreground/[0.02] border border-foreground/10 rounded-xl hover:border-foreground/20 transition-all"
-                >
+            <div className="space-y-4">
+              {currencies.map((currency, idx) => {
+                const colors = ["#3B82F6", "#A020F0", "#F59E0B"]
+                const bgColor = colors[idx]
+                return (
                   <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg"
+                    key={currency}
+                    className="flex items-center gap-4 p-5 rounded-2xl border-2 transition-all hover:scale-105"
                     style={{
-                      background: "linear-gradient(135deg, #A020F0, #3B82F6)",
-                      color: "#fff",
+                      background: `linear-gradient(135deg, ${bgColor}12, ${bgColor}06)`,
+                      borderColor: bgColor + "30",
                     }}
                   >
-                    {currency.charAt(0)}
+                    <div
+                      className="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-lg"
+                      style={{
+                        background: `linear-gradient(135deg, ${bgColor}, ${bgColor}dd)`,
+                        color: "#fff",
+                      }}
+                    >
+                      {currency.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground text-lg">{currency}</p>
+                      <p className="text-xs text-foreground/60">
+                        {currency === "CHF" && "Schweizer Franken"}
+                        {currency === "EUR" && "Euro"}
+                        {currency === "₺ (Lira)" && "Türkische Lira"}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-foreground">{currency}</p>
-                    <p className="text-xs text-foreground/40">
-                      {currency === "CHF" && "Schweizer Franken"}
-                      {currency === "EUR" && "Euro"}
-                      {currency === "₺ (Lira)" && "Türkische Lira"}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 
-          {/* Badge */}
+          {/* Security Badge */}
           <div
-            className="mt-6 p-4 rounded-xl text-center border"
+            className="mt-8 p-6 rounded-2xl text-center border-2 font-bold text-lg"
             style={{
               background: "linear-gradient(135deg, #A020F0, #3B82F6)",
-              opacity: 0.1,
               borderColor: "#A020F0",
+              color: "#fff",
             }}
           >
-            <p className="text-xs font-semibold text-foreground/70">
-              💳 Sichere & schnelle Zahlungsabwicklung
-            </p>
+            💳 Sichere & schnelle Zahlungsabwicklung
           </div>
         </div>
       </div>
