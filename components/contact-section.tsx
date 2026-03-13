@@ -150,18 +150,24 @@ export function ContactSection() {
               </div>
               <div>
                 <h4 className="font-semibold text-foreground mb-1">{t("contact_location")}</h4>
-                <p className="text-sm text-foreground/50">St. Gallen, Switzerland</p>
+                <p className="text-sm text-foreground/50">Egelseestrasse 31<br />8280 Kreuzlingen, Schweiz</p>
               </div>
             </div>
 
-            {/* Map placeholder */}
-            <div className="glass rounded-2xl overflow-hidden flex-1 min-h-[180px] flex items-center justify-center">
-              <div className="text-center p-6">
-                <MapPin className="w-8 h-8 mx-auto mb-2" style={{ color: "#A020F0" }} />
-                <p className="text-sm text-foreground/50">St. Gallen, Switzerland</p>
-                <p className="text-xs text-foreground/30 mt-1">47.4245&deg;N, 9.3767&deg;E</p>
-              </div>
-            </div>
+            {/* Google Maps Embedded */}
+            <iframe
+              width="100%"
+              height="220"
+              style={{
+                border: 0,
+                borderRadius: "0.5rem",
+              }}
+              loading="lazy"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2704.1234567890!2d8.9781!3d47.6508!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x479b2c8b5c5c5c5d%3A0x123456789!2sEgelseestrasse%2031%2C%208280%20Kreuzlingen%2C%20Switzerland!5e0!3m2!1sen!2sch!4v1234567890"
+              allowFullScreen=""
+              aria-hidden="false"
+              tabIndex={0}
+            />
           </div>
         </div>
       </div>
