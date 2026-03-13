@@ -15,10 +15,12 @@ const projects = [
     url: "https://mpuagentur-meiningen.de/",
   },
   {
-    id: "alpine",
-    title: "Alpine Luxus Hotel",
-    category: "E-Commerce",
+    id: "oda",
+    title: "Oda Schmidt Rechtsanwältin",
+    category: "Law/Business",
     gradient: "from-[#A020F0]/40 to-[#1E3A8A]/40",
+    image: "/images/portfolio-oda-schmidt.png",
+    url: "https://magnificent-narwhal-b530a8.netlify.app/",
   },
   {
     id: "istanbul",
