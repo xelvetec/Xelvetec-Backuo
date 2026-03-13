@@ -41,24 +41,6 @@ const projects = [
     image: "/images/portfolio-goldener-gabel.png",
     url: "https://enchanting-custard-6a0bcb.netlify.app/",
   },
-  {
-    id: "berlin",
-    title: "Berlin Creative Studio",
-    category: "Basic",
-    gradient: "from-[#7C3AED]/40 to-[#00D4FF]/40",
-  },
-  {
-    id: "vienna",
-    title: "Vienna Coffee House",
-    category: "Business",
-    gradient: "from-[#A020F0]/40 to-[#00D4FF]/40",
-  },
-  {
-    id: "antalya",
-    title: "Antalya Travel Agency",
-    category: "E-Commerce",
-    gradient: "from-[#00D4FF]/40 to-[#1E3A8A]/40",
-  },
 ]
 
 function PortfolioCard({
