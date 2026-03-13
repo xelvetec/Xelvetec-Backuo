@@ -126,7 +126,7 @@ export function ContactSection() {
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="telefon" className="text-sm font-medium text-foreground/70">
-                  Telefon
+                  {t("contact_phone")}
                 </label>
                 <input
                   id="telefon"
@@ -137,7 +137,7 @@ export function ContactSection() {
                     background: "rgba(255,255,255,0.05)",
                     border: "1px solid rgba(255,255,255,0.1)",
                   }}
-                  placeholder="Telefon"
+                  placeholder={t("contact_phone")}
                 />
               </div>
               <div className="flex flex-col gap-2">
