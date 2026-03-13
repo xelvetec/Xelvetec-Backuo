@@ -30,14 +30,14 @@ export function BackgroundParticles() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
-    const initialParticles: Particle[] = Array.from({ length: 30 }).map(() => ({
+    const initialParticles: Particle[] = Array.from({ length: 80 }).map(() => ({
       id: particleIdRef.current++,
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 1.5,
       vy: (Math.random() - 0.5) * 1.5,
-      size: Math.random() * 4 + 2,
-      opacity: Math.random() * 0.5 + 0.3,
+      size: Math.random() * 2.5 + 1,
+      opacity: Math.random() * 0.6 + 0.4,
     }))
 
     particlesRef.current = initialParticles
@@ -92,8 +92,8 @@ export function BackgroundParticles() {
           const dy = p1.y - p2.y
           const dist = Math.sqrt(dx * dx + dy * dy)
 
-          if (dist < 150) {
-            ctx.strokeStyle = `rgba(160, 32, 240, ${(1 - dist / 150) * 0.3})`
+          if (dist < 200) {
+            ctx.strokeStyle = `rgba(160, 32, 240, ${(1 - dist / 200) * 0.4})`
             ctx.lineWidth = 1.5
             ctx.beginPath()
             ctx.moveTo(p1.x, p1.y)
