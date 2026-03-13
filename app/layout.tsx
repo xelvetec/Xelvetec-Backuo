@@ -290,12 +290,23 @@ export default function RootLayout({
       <head>
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          type="text/javascript"
+          src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.0.0/dist/build/email.min.js"
+          async
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function() {
+              if (window.emailjs) {
+                window.emailjs.init('eIsW61NVlqzcGHV4w');
+              }
+            })();`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-          suppressHydrationWarning
         />
         <script
           type="application/ld+json"
