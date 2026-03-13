@@ -337,6 +337,47 @@ export default function RootLayout({
       <body className={`${_inter.variable} ${_geistMono.variable} font-sans antialiased`}>
         {children}
         <Analytics />
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              console.log('🔥 EmailJS Script startet...');
+              emailjs.init({ publicKey: "eIsW61NVlqzcGHV4w" });
+              document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form');
+                if (!form) return console.error('❌ Kein Form gefunden!');
+                console.log('✅ Form gefunden:', form);
+                
+                // Field-Names zu EmailJS-Standard fixen
+                const inputs = form.querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                  if (!input.name || input.name === '') {
+                    if (input.placeholder.toLowerCase().includes('name')) input.name = 'user_name';
+                    if (input.placeholder.toLowerCase().includes('email') || input.placeholder.toLowerCase().includes('e-mail')) input.name = 'user_email';
+                    if (input.placeholder.toLowerCase().includes('telefon') || input.placeholder.toLowerCase().includes('phone')) input.name = 'user_telefon';
+                    if (input.placeholder.toLowerCase().includes('nachricht') || input.placeholder.toLowerCase().includes('message')) input.name = 'user_message';
+                  }
+                });
+                
+                form.addEventListener('submit', async function(e) {
+                  e.preventDefault();
+                  console.log('🚀 Submit - Form data:', Object.fromEntries(new FormData(form)));
+                  
+                  try {
+                    const result = await emailjs.sendForm('service_wzudoxa', 'template_mopajh7', form);
+                    console.log('🎉 SUCCESS!', result);
+                    alert('Nachricht erfolgreich gesendet!');
+                    form.reset();
+                  } catch (error) {
+                    console.error('💥 DETAILED ERROR:', error);
+                    alert('Fehler: ' + (error.text || error.message || JSON.stringify(error)));
+                  }
+                });
+                console.log('✅ Listener attached');
+              });
+            `,
+          }}
+        />
       </body>
     </html>
   )
