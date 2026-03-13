@@ -4,9 +4,17 @@ import { useEffect, useRef, useState } from "react"
 import { Mail, MapPin, Phone, Send } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
+declare global {
+  interface Window {
+    emailjs: any
+  }
+}
+
 export function ContactSection() {
   const { t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -19,6 +27,35 @@ export function ContactSection() {
     if (sectionRef.current) observer.observe(sectionRef.current)
     return () => observer.disconnect()
   }, [])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    
+    if (!formRef.current) return
+    
+    setIsLoading(true)
+    
+    try {
+      if (typeof window !== 'undefined' && window.emailjs) {
+        await window.emailjs.sendForm(
+          'service_wzudoxa',
+          'template_mopajh7',
+          formRef.current
+        )
+        
+        alert(t('contact_success'))
+        formRef.current.reset()
+      } else {
+        console.error('[v0] EmailJS not initialized')
+        alert(t('contact_error'))
+      }
+    } catch (error) {
+      console.error('[v0] EmailJS Error:', error)
+      alert(t('contact_error'))
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <section id="contact" ref={sectionRef} className="relative py-24 md:py-32 overflow-hidden">
@@ -49,14 +86,16 @@ export function ContactSection() {
               isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
             }`}
           >
-            <form className="flex flex-col gap-5" onSubmit={(e) => e.preventDefault()}>
+            <form ref={formRef} className="flex flex-col gap-5" onSubmit={handleSubmit}>
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="text-sm font-medium text-foreground/70">
                   {t("contact_name")}
                 </label>
                 <input
                   id="name"
+                  name="name"
                   type="text"
+                  required
                   className="rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-[#A020F0]/50 transition-all"
                   style={{
                     background: "rgba(255,255,255,0.05)",
@@ -71,7 +110,9 @@ export function ContactSection() {
                 </label>
                 <input
                   id="email"
+                  name="email"
                   type="email"
+                  required
                   className="rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-[#A020F0]/50 transition-all"
                   style={{
                     background: "rgba(255,255,255,0.05)",
@@ -86,7 +127,9 @@ export function ContactSection() {
                 </label>
                 <textarea
                   id="message"
+                  name="message"
                   rows={5}
+                  required
                   className="rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-[#A020F0]/50 transition-all resize-none"
                   style={{
                     background: "rgba(255,255,255,0.05)",
@@ -97,14 +140,15 @@ export function ContactSection() {
               </div>
               <button
                 type="submit"
-                className="group flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-[1.02] neon-glow"
+                disabled={isLoading}
+                className="group flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-[1.02] neon-glow disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   background: "linear-gradient(135deg, #A020F0, #1E3A8A)",
                   color: "#fff",
                 }}
               >
                 <Send className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                {t("contact_send")}
+                {isLoading ? t("contact_sending") : t("contact_send")}
               </button>
             </form>
           </div>
@@ -124,7 +168,7 @@ export function ContactSection() {
               </div>
               <div>
                 <h4 className="font-semibold text-foreground mb-1">{t("contact_email")}</h4>
-                <p className="text-sm text-foreground/50">info@xelvetec.com</p>
+                <p className="text-sm text-foreground/50">info@xelvetec.ch</p>
               </div>
             </div>
 
@@ -137,7 +181,7 @@ export function ContactSection() {
               </div>
               <div>
                 <h4 className="font-semibold text-foreground mb-1">{t("contact_phone")}</h4>
-                <p className="text-sm text-foreground/50">+41 71 123 45 67</p>
+                <p className="text-sm text-foreground/50">+41 76 844 33 75</p>
               </div>
             </div>
 

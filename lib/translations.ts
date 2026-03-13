@@ -18,17 +18,17 @@ export const countryFlags: Record<Country, string> = {
 }
 
 export const countryCurrencies: Record<Country, string> = {
-  de: "\u20AC",
-  at: "\u20AC",
+  de: "€",
+  at: "€",
   ch: "CHF",
-  tr: "\u20BA",
-  en: "\u20AC",
+  tr: "₺",
+  en: "€",
 }
 
 export const prices = {
-  basic: { de: "499\u20AC", at: "499\u20AC", ch: "499CHF", tr: "18.999\u20BA", en: "499\u20AC" },
-  business: { de: "999\u20AC", at: "999\u20AC", ch: "999CHF", tr: "29.999\u20BA", en: "999\u20AC" },
-  ecommerce: { de: "1.999\u20AC", at: "1.999\u20AC", ch: "1.999CHF", tr: "49.999\u20BA", en: "1.999\u20AC" },
+  basic: { de: "499€", at: "499€", ch: "499CHF", tr: "18.999₺", en: "499€" },
+  business: { de: "999€", at: "999€", ch: "999CHF", tr: "29.999₺", en: "999€" },
+  ecommerce: { de: "1.999€", at: "1.999€", ch: "1.999CHF", tr: "49.999₺", en: "1.999€" },
 } as const
 
 export const translations: Record<Language, Record<string, string>> = {
@@ -83,6 +83,9 @@ export const translations: Record<Language, Record<string, string>> = {
     contact_send: "Nachricht senden",
     contact_phone: "Telefon",
     contact_location: "Standort",
+    contact_success: "Nachricht gesendet!",
+    contact_error: "Fehler beim Senden. Bitte versuchen Sie es später.",
+    contact_sending: "Wird gesendet...",
     footer_rights: "Alle Rechte vorbehalten.",
     footer_impressum: "Impressum",
     footer_privacy: "Datenschutz",
@@ -139,6 +142,9 @@ export const translations: Record<Language, Record<string, string>> = {
     contact_send: "Mesaj Gönder",
     contact_phone: "Telefon",
     contact_location: "Konum",
+    contact_success: "Mesaj Gönderildi!",
+    contact_error: "Gönderme hatası. Lütfen daha sonra tekrar deneyin.",
+    contact_sending: "Gönderiliyor...",
     footer_rights: "Tüm hakları saklıdır.",
     footer_impressum: "Yasal Bilgiler",
     footer_privacy: "Gizlilik",
@@ -180,7 +186,7 @@ export const translations: Record<Language, Record<string, string>> = {
     ecommerce_f5: "Customer Account Management",
     ecommerce_f6: "Marketing Tools",
     about_title: "About XelveTec",
-    about_text: "Based in Switzerland, we are a passionate team of web designers and developers. We combine creativity with cutting-edge technology to create digital experiences that transcend borders. From Turkey to Germany and Austria to Switzerland \u2014 we design the web of tomorrow.",
+    about_text: "Based in Switzerland, we are a passionate team of web designers and developers. We combine creativity with cutting-edge technology to create digital experiences that transcend borders. From Turkey to Germany and Austria to Switzerland — we design the web of tomorrow.",
     about_stat1_label: "Happy Clients",
     about_stat2_label: "Projects",
     about_stat3_label: "Countries",
@@ -195,6 +201,9 @@ export const translations: Record<Language, Record<string, string>> = {
     contact_send: "Send Message",
     contact_phone: "Phone",
     contact_location: "Location",
+    contact_success: "Message Sent!",
+    contact_error: "Error sending message. Please try again later.",
+    contact_sending: "Sending...",
     footer_rights: "All rights reserved.",
     footer_impressum: "Imprint",
     footer_privacy: "Privacy",
