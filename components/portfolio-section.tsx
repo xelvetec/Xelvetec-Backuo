@@ -18,14 +18,16 @@ const projects = [
     id: "oda",
     title: "Oda Schmidt Rechtsanwältin",
     category: "Law/Business",
+    badge: "Vorlage",
     gradient: "from-[#A020F0]/40 to-[#1E3A8A]/40",
     image: "/images/portfolio-oda-schmidt.png",
     url: "https://magnificent-narwhal-b530a8.netlify.app/",
   },
   {
     id: "kunsthandwerk",
-    title: "XelveTec Kunsthandwerk",
+    title: "Maler / Lackierer",
     category: "Handcraft/Design",
+    badge: "Vorlage",
     gradient: "from-[#00D4FF]/40 to-[#7C3AED]/40",
     image: "/images/portfolio-xelvetec-kunsthandwerk.png",
     url: "https://jade-cranachan-bab53b.netlify.app/",
@@ -34,6 +36,7 @@ const projects = [
     id: "goldener-gabel",
     title: "Goldener Gabel Restaurant",
     category: "Gastronomy",
+    badge: "Vorlage",
     gradient: "from-[#1E3A8A]/40 to-[#A020F0]/40",
     image: "/images/portfolio-goldener-gabel.png",
     url: "https://enchanting-custard-6a0bcb.netlify.app/",
@@ -157,17 +160,32 @@ function PortfolioCard({
       >
         <ExternalLink className="w-8 h-8 text-white transform group-hover:scale-110 transition-transform duration-300" />
         <h4 className="text-lg font-bold text-white text-center px-4">{project.title}</h4>
-        <span
-          className="text-xs px-4 py-1.5 rounded-full font-medium"
-          style={{
-            background: "linear-gradient(135deg, rgba(160,32,240,0.4), rgba(0,212,255,0.3))",
-            color: "#fff",
-            border: "1px solid rgba(255,255,255,0.3)",
-            boxShadow: "0 0 15px rgba(160, 32, 240, 0.4)",
-          }}
-        >
-          {project.category}
-        </span>
+        <div className="flex items-center gap-2 justify-center">
+          <span
+            className="text-xs px-4 py-1.5 rounded-full font-medium"
+            style={{
+              background: "linear-gradient(135deg, rgba(160,32,240,0.4), rgba(0,212,255,0.3))",
+              color: "#fff",
+              border: "1px solid rgba(255,255,255,0.3)",
+              boxShadow: "0 0 15px rgba(160, 32, 240, 0.4)",
+            }}
+          >
+            {project.category}
+          </span>
+          {project.badge && (
+            <span
+              className="text-xs px-3 py-1.5 rounded-full font-medium"
+              style={{
+                background: "rgba(255,215,0,0.2)",
+                color: "#FFD700",
+                border: "1px solid rgba(255,215,0,0.4)",
+                boxShadow: "0 0 10px rgba(255,215,0,0.3)",
+              }}
+            >
+              {project.badge}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )
