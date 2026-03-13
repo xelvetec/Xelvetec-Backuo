@@ -1,45 +1,32 @@
 'use client'
 
-import Image from "next/image"
+import { useLanguage } from "@/lib/language-context"
 
 export default function ImpressumPage() {
+  const { t } = useLanguage()
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-32 pb-12">
-      {/* Navigation Logo */}
-      <div className="fixed top-0 left-0 right-0 z-50 pt-4 px-4 flex justify-center">
-        <a href="/" className="inline-flex items-center group">
-          <div className="relative">
-            <Image
-              src="/images/xelvetec-logo.png"
-              alt="XelveTec"
-              width={48}
-              height={48}
-              className="w-12 h-12 md:w-14 md:h-14 transition-all duration-300 group-hover:scale-110"
-            />
-          </div>
-        </a>
-      </div>
-
       <div className="max-w-2xl mx-auto px-4">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Impressum</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">{t("legal_impressum_title")}</h1>
           <p className="text-foreground/60">Rechtliche Informationen zu XelveTec</p>
         </div>
 
         <div className="space-y-8 text-foreground/80">
           <section className="glass rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Anbieter</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">{t("legal_impressum_company")}</h2>
             <p><strong>Name:</strong> XelveTec</p>
             <p><strong>Geschäftsführer:</strong> Kubilay Demirci</p>
           </section>
 
           <section className="glass rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Adresse</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">{t("legal_impressum_address")}</h2>
             <p>Egelseestrasse 31<br />8280 Kreuzlingen<br />Schweiz</p>
           </section>
 
           <section className="glass rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Kontakt</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">{t("legal_impressum_contact")}</h2>
             <p><strong>Telefon:</strong> +41 76 844 33 75</p>
             <p><strong>E-Mail:</strong> info@xelvetec.ch</p>
           </section>
@@ -57,7 +44,7 @@ export default function ImpressumPage() {
 
           <section className="glass rounded-2xl p-8">
             <h2 className="text-2xl font-bold text-white mb-4">Datenschutz</h2>
-            <p>Für Informationen zum Datenschutz besuchen Sie bitte unsere <a href="/datenschutz" className="text-purple-400 hover:text-purple-300 underline">Datenschutzerklärung</a>.</p>
+            <p>Für Informationen zum Datenschutz besuchen Sie bitte unsere <a href="/datenschutz" className="text-purple-400 hover:text-purple-300 underline">{t("footer_privacy")}</a>.</p>
           </section>
         </div>
       </div>
