@@ -6,6 +6,8 @@ export function NeonBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const timeRef = useRef(0)
   const animationIdRef = useRef<number>()
+  const gridOffsetXRef = useRef(0)
+  const gridOffsetYRef = useRef(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -23,8 +25,6 @@ export function NeonBackground() {
 
     // Grid parameters for holographic mesh
     const gridSize = 80
-    const gridOffsetX = useRef(0)
-    const gridOffsetY = useRef(0)
 
     const animate = () => {
       timeRef.current += 0.016
@@ -34,8 +34,8 @@ export function NeonBackground() {
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Update grid offsets for flowing motion
-      gridOffsetX.current += 0.5
-      gridOffsetY.current += 0.2
+      gridOffsetXRef.current += 0.5
+      gridOffsetYRef.current += 0.2
 
       // Draw holographic grid mesh
       ctx.strokeStyle = "rgba(0, 212, 255, 0.1)"
@@ -43,7 +43,7 @@ export function NeonBackground() {
 
       // Horizontal lines
       for (let y = -canvas.height; y < canvas.height * 2; y += gridSize) {
-        const wave = Math.sin((y + gridOffsetY.current) * 0.01 + timeRef.current * 2) * 15
+        const wave = Math.sin((y + gridOffsetYRef.current) * 0.01 + timeRef.current * 2) * 15
         ctx.beginPath()
         ctx.moveTo(-canvas.width, y + wave)
         ctx.lineTo(canvas.width * 2, y + wave)
@@ -52,7 +52,7 @@ export function NeonBackground() {
 
       // Vertical lines
       for (let x = -canvas.width; x < canvas.width * 2; x += gridSize) {
-        const wave = Math.sin((x + gridOffsetX.current) * 0.01 + timeRef.current * 2) * 15
+        const wave = Math.sin((x + gridOffsetXRef.current) * 0.01 + timeRef.current * 2) * 15
         ctx.beginPath()
         ctx.moveTo(x + wave, -canvas.height)
         ctx.lineTo(x + wave, canvas.height * 2)
@@ -62,7 +62,7 @@ export function NeonBackground() {
       // Draw intersections with glow
       for (let y = 0; y < canvas.height; y += gridSize) {
         for (let x = 0; x < canvas.width; x += gridSize) {
-          const wave = Math.sin((x + y + gridOffsetX.current) * 0.01 + timeRef.current * 2) * 15
+          const wave = Math.sin((x + y + gridOffsetXRef.current) * 0.01 + timeRef.current * 2) * 15
           const distance = Math.sqrt(
             Math.pow(x + wave - canvas.width / 2, 2) + 
             Math.pow(y - canvas.height / 2, 2)
