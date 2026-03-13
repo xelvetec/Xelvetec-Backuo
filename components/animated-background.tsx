@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 
 export function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const scrollProgressRef = useRef(0)
   const timeRef = useRef(0)
   const animationIdRef = useRef<number>()
 
@@ -20,86 +21,129 @@ export function AnimatedBackground() {
     }
     resizeCanvas()
 
-    // Create multiple floating orbs with trails
-    const orbs = Array.from({ length: 8 }).map((_, i) => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 2,
-      vy: (Math.random() - 0.5) * 2,
-      size: Math.random() * 80 + 40,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-      hue: Math.random() * 360,
-    }))
+    // Handle scroll for reactive animation
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight
+      scrollProgressRef.current = totalScroll > 0 ? window.scrollY / totalScroll : 0
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
 
     const animate = () => {
       timeRef.current += 0.016
 
-      // Very subtle dark fade
-      ctx.fillStyle = "rgba(5, 5, 15, 0.02)"
+      // Epic animated gradient background that reacts to scroll
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
+      
+      const scrollIntensity = scrollProgressRef.current * 100
+      gradient.addColorStop(0, `hsl(270, 100%, ${5 + scrollIntensity * 0.05}%)`)
+      gradient.addColorStop(0.5, `hsl(250, 90%, ${8 + scrollIntensity * 0.08}%)`)
+      gradient.addColorStop(1, `hsl(260, 100%, ${6 + scrollIntensity * 0.05}%)`)
+
+      ctx.fillStyle = gradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Update and draw orbs
-      orbs.forEach((orb, i) => {
-        // Sine wave drift
-        orb.vx += Math.sin(timeRef.current * 0.5 + i) * 0.02
-        orb.vy += Math.cos(timeRef.current * 0.4 + i) * 0.02
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
+      const scrollOffset = scrollProgressRef.current * 600
 
-        orb.x += orb.vx
-        orb.y += orb.vy
+      // Draw 6 massive morphing orbs that intensify with scroll
+      for (let i = 0; i < 6; i++) {
+        const angle = (timeRef.current * 0.25 + (i / 6) * Math.PI * 2) + scrollProgressRef.current * Math.PI * 1.5
+        const baseRadius = 300 + Math.sin(timeRef.current * 0.4 + i) * 150
+        const radius = baseRadius + scrollOffset * 0.3
+        
+        const x = centerX + Math.cos(angle) * radius
+        const y = centerY + Math.sin(angle) * radius
 
-        // Wrap around
-        if (orb.x > canvas.width + 100) orb.x = -100
-        if (orb.x < -100) orb.x = canvas.width + 100
-        if (orb.y > canvas.height + 100) orb.y = -100
-        if (orb.y < -100) orb.y = canvas.height + 100
+        // Size increases dramatically with scroll
+        const baseSize = 100 + scrollProgressRef.current * 100
+        const pulseFactor = Math.sin(timeRef.current * 0.8 + i * 0.5) * 0.3 + 0.9
+        const size = baseSize * pulseFactor
 
-        // Update hue for rainbow effect
-        orb.hue = (orb.hue + 0.5) % 360
+        // Create multiple layer glow effect
+        const megaGlow = ctx.createRadialGradient(x, y, 0, x, y, size * 4)
+        megaGlow.addColorStop(0, `hsla(${280 + i * 25}, 100%, 60%, ${0.5 + scrollProgressRef.current * 0.4})`)
+        megaGlow.addColorStop(0.3, `hsla(${280 + i * 25}, 100%, 50%, ${0.3 + scrollProgressRef.current * 0.2})`)
+        megaGlow.addColorStop(1, `hsla(${280 + i * 25}, 100%, 30%, 0)`)
 
-        // Draw orb with multiple glows
-        const gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.size)
-        gradient.addColorStop(0, `hsla(${orb.hue}, 100%, 60%, 0.8)`)
-        gradient.addColorStop(0.5, `hsla(${orb.hue + 60}, 100%, 50%, 0.3)`)
-        gradient.addColorStop(1, `hsla(${orb.hue}, 100%, 40%, 0)`)
+        ctx.fillStyle = megaGlow
+        ctx.fillRect(x - size * 4, y - size * 4, size * 8, size * 8)
 
-        ctx.fillStyle = gradient
+        // Mid-layer glow
+        const midGlow = ctx.createRadialGradient(x, y, size * 0.5, x, y, size * 2.5)
+        midGlow.addColorStop(0, `hsla(${280 + i * 25}, 100%, 65%, ${0.7 + scrollProgressRef.current * 0.3})`)
+        midGlow.addColorStop(0.5, `hsla(${280 + i * 25}, 100%, 45%, ${0.4})`)
+        midGlow.addColorStop(1, `hsla(${280 + i * 25}, 100%, 25%, 0)`)
+
+        ctx.fillStyle = midGlow
         ctx.beginPath()
-        ctx.arc(orb.x, orb.y, orb.size, 0, Math.PI * 2)
+        ctx.arc(x, y, size * 2.5, 0, Math.PI * 2)
         ctx.fill()
 
-        // Outer glow
-        const outerGradient = ctx.createRadialGradient(orb.x, orb.y, orb.size, orb.x, orb.y, orb.size * 2)
-        outerGradient.addColorStop(0, `hsla(${orb.hue}, 100%, 50%, 0.2)`)
-        outerGradient.addColorStop(1, `hsla(${orb.hue}, 100%, 30%, 0)`)
+        // Core orb with intense brightness
+        const coreGradient = ctx.createRadialGradient(x, y, 0, x, y, size)
+        coreGradient.addColorStop(0, `hsl(${280 + i * 25}, 100%, 75%)`)
+        coreGradient.addColorStop(0.6, `hsl(${280 + i * 25}, 100%, 45%)`)
+        coreGradient.addColorStop(1, `hsl(${280 + i * 25}, 100%, 20%)`)
 
-        ctx.fillStyle = outerGradient
+        ctx.fillStyle = coreGradient
         ctx.beginPath()
-        ctx.arc(orb.x, orb.y, orb.size * 2, 0, Math.PI * 2)
+        ctx.arc(x, y, size, 0, Math.PI * 2)
         ctx.fill()
-      })
 
-      // Draw connections between nearby orbs
-      for (let i = 0; i < orbs.length; i++) {
-        for (let j = i + 1; j < orbs.length; j++) {
-          const dx = orbs[i].x - orbs[j].x
-          const dy = orbs[i].y - orbs[j].y
-          const dist = Math.sqrt(dx * dx + dy * dy)
+        // Intense rim lighting that pulses
+        const rimBrightness = 0.6 + Math.sin(timeRef.current * 1.5 + i) * 0.3 + scrollProgressRef.current * 0.3
+        ctx.strokeStyle = `hsla(${280 + i * 25}, 100%, 85%, ${rimBrightness})`
+        ctx.lineWidth = 3 + scrollProgressRef.current * 2
+        ctx.beginPath()
+        ctx.arc(x, y, size + 8, 0, Math.PI * 2)
+        ctx.stroke()
+      }
 
-          if (dist < 400) {
-            const alpha = (1 - dist / 400) * 0.3
-            const lineGradient = ctx.createLinearGradient(orbs[i].x, orbs[i].y, orbs[j].x, orbs[j].y)
-            lineGradient.addColorStop(0, `hsla(${orbs[i].hue}, 100%, 50%, ${alpha})`)
-            lineGradient.addColorStop(1, `hsla(${orbs[j].hue}, 100%, 50%, ${alpha})`)
+      // Draw ultra-vibrant connecting lines between orbs
+      for (let i = 0; i < 6; i++) {
+        const angle1 = (timeRef.current * 0.25 + (i / 6) * Math.PI * 2) + scrollProgressRef.current * Math.PI * 1.5
+        const baseRadius1 = 300 + Math.sin(timeRef.current * 0.4 + i) * 150
+        const radius1 = baseRadius1 + scrollOffset * 0.3
+        const x1 = centerX + Math.cos(angle1) * radius1
+        const y1 = centerY + Math.sin(angle1) * radius1
 
-            ctx.strokeStyle = lineGradient
-            ctx.lineWidth = 2 * (1 - dist / 400)
-            ctx.lineCap = "round"
-            ctx.beginPath()
-            ctx.moveTo(orbs[i].x, orbs[i].y)
-            ctx.lineTo(orbs[j].x, orbs[j].y)
-            ctx.stroke()
-          }
-        }
+        const angle2 = (timeRef.current * 0.25 + ((i + 1) / 6) * Math.PI * 2) + scrollProgressRef.current * Math.PI * 1.5
+        const baseRadius2 = 300 + Math.sin(timeRef.current * 0.4 + i + 1) * 150
+        const radius2 = baseRadius2 + scrollOffset * 0.3
+        const x2 = centerX + Math.cos(angle2) * radius2
+        const y2 = centerY + Math.sin(angle2) * radius2
+
+        const lineGradient = ctx.createLinearGradient(x1, y1, x2, y2)
+        lineGradient.addColorStop(0, `hsla(280, 100%, 65%, ${0.4 + scrollProgressRef.current * 0.3})`)
+        lineGradient.addColorStop(0.5, `hsla(300, 100%, 55%, ${0.6 + scrollProgressRef.current * 0.3})`)
+        lineGradient.addColorStop(1, `hsla(280, 100%, 65%, ${0.4 + scrollProgressRef.current * 0.3})`)
+
+        ctx.strokeStyle = lineGradient
+        ctx.lineWidth = 3 + scrollProgressRef.current * 2
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        ctx.beginPath()
+        ctx.moveTo(x1, y1)
+        ctx.lineTo(x2, y2)
+        ctx.stroke()
+      }
+
+      // Add 50 ultra-fast floating particles following scroll
+      for (let i = 0; i < 50; i++) {
+        const particleAngle = (timeRef.current * 0.5 + (i / 50) * Math.PI * 2) + scrollProgressRef.current * 3
+        const particleRadius = 400 + Math.sin(timeRef.current * 0.6 + i * 0.3) * 200 + scrollOffset * 0.2
+        const px = centerX + Math.cos(particleAngle) * particleRadius
+        const py = centerY + Math.sin(particleAngle) * particleRadius
+
+        const opacity = (0.5 + Math.sin(timeRef.current * 0.8 + i) * 0.4) * (0.6 + scrollProgressRef.current * 0.4)
+        const particleSize = 2 + Math.sin(timeRef.current + i * 0.2) * 1.5 + scrollProgressRef.current * 1.5
+        
+        ctx.fillStyle = `hsla(${280 + i * 2.5}, 100%, 65%, ${opacity})`
+        ctx.beginPath()
+        ctx.arc(px, py, particleSize, 0, Math.PI * 2)
+        ctx.fill()
       }
 
       animationIdRef.current = requestAnimationFrame(animate)
@@ -114,6 +158,7 @@ export function AnimatedBackground() {
     window.addEventListener("resize", handleResize)
 
     return () => {
+      window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("resize", handleResize)
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current)
@@ -125,7 +170,12 @@ export function AnimatedBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none"
-      style={{ background: "transparent", zIndex: 1, top: 0, left: 0 }}
+      style={{
+        background: "transparent",
+        zIndex: 0,
+        top: 0,
+        left: 0,
+      }}
     />
   )
 }
