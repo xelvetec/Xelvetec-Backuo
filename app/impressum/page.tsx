@@ -1,10 +1,4 @@
-'use client'
-
-import { useLanguage } from '@/lib/language-context'
-
 export default function ImpressumPage() {
-  const { t } = useLanguage()
-
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-32 pb-12">
       <div className="max-w-2xl mx-auto px-4">
