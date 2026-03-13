@@ -11,25 +11,25 @@ export function PaymentMethods() {
     {
       title: t("payment_cards"),
       icon: CreditCard,
-      items: ["Visa", "Mastercard", "Girocard (EC)"],
+      items: [t("payment_visa"), t("payment_mastercard"), t("payment_girocard")],
       color: "#3B82F6",
     },
     {
       title: t("payment_digital"),
       icon: Smartphone,
-      items: ["Twint", "Apple Pay", "PayPal"],
+      items: [t("payment_twint"), t("payment_applepay"), t("payment_paypal")],
       color: "#A020F0",
     },
     {
       title: t("payment_transfer"),
       icon: DollarSign,
-      items: ["Banküberweisung"],
+      items: [t("payment_banktransfer")],
       color: "#10B981",
     },
     {
       title: t("payment_cash"),
       icon: Banknote,
-      items: ["Barzahlung"],
+      items: [t("payment_cash_method")],
       color: "#F59E0B",
     },
   ]
