@@ -88,7 +88,7 @@ export function PaymentMethods() {
             </h3>
 
             <div className="flex items-center gap-4">
-              {currencies.map((currency) => {
+              {currencies.map((currency, idx) => {
                 const symbols = { CHF: "CHF", EUR: "€", "₺ (Lira)": "₺" }
                 return (
                   <div
@@ -97,6 +97,8 @@ export function PaymentMethods() {
                     style={{
                       background: "rgba(255,255,255,0.05)",
                       border: "1px solid rgba(255,255,255,0.1)",
+                      animation: `float 3s ease-in-out infinite`,
+                      animationDelay: `${idx * 0.3}s`,
                     }}
                     title={currency}
                   >

@@ -102,51 +102,14 @@
   }
 }
 
-/* Enhanced Glassmorphism utilities */
-.glass {
-  background: linear-gradient(135deg, rgba(160, 32, 240, 0.08), rgba(59, 130, 246, 0.06));
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.glass-strong {
-  background: linear-gradient(135deg, rgba(160, 32, 240, 0.15), rgba(59, 130, 246, 0.1));
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
-    0 12px 48px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(160, 32, 240, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.glass-card {
-  background: linear-gradient(135deg, rgba(160, 32, 240, 0.12), rgba(59, 130, 246, 0.08));
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.35),
-    0 0 20px rgba(160, 32, 240, 0.08);
-}
-
-/* Neon glow */
-.neon-glow {
-  box-shadow:
-    0 0 10px rgba(160, 32, 240, 0.3),
-    0 0 30px rgba(160, 32, 240, 0.15),
-    0 0 60px rgba(59, 130, 246, 0.1);
-}
-
-.neon-text {
-  text-shadow:
-    0 0 10px rgba(160, 32, 240, 0.5),
-    0 0 30px rgba(160, 32, 240, 0.3),
-    0 0 60px rgba(59, 130, 246, 0.2);
+/* Float animation for currency symbols */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 /* Intro animation */
