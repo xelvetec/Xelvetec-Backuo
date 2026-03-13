@@ -1,14 +1,10 @@
-import { translations } from "@/lib/translations"
-
 export default function DatenschutzPage() {
-  const t = (key: string) => (translations.de as any)?.[key] || key
-
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-32 pb-12">
       <div className="max-w-2xl mx-auto px-4">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">{t("legal_privacy_title")}</h1>
-          <p className="text-foreground/60">{t("legal_privacy_intro")}</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Datenschutzerklärung</h1>
+          <p className="text-foreground/60">Datenschutz ist für uns wichtig</p>
         </div>
 
         <div className="space-y-8 text-foreground/80">
@@ -18,13 +14,13 @@ export default function DatenschutzPage() {
           </section>
 
           <section className="glass rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">{t("legal_privacy_data")}</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Datenverarbeitung</h2>
             <p className="mb-3">Persönliche Daten werden streng vertraulich behandelt und weder an Dritte verkauft noch weitergegeben.</p>
             <p>In enger Zusammenarbeit mit unseren Hosting-Providern bemühen wir uns, die Datenbanken so gut wie möglich vor fremden Zugriffen, Verlusten, Missbrauch oder vor Fälschung zu schützen.</p>
           </section>
 
           <section className="glass rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">{t("legal_privacy_rights")}</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Ihre Rechte</h2>
             <p className="mb-3">Sie haben das Recht:</p>
             <ul className="list-disc list-inside space-y-2">
               <li>Einsicht in Ihre gespeicherten personenbezogenen Daten zu erhalten</li>
