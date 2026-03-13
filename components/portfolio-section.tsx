@@ -1,36 +1,51 @@
 "use client"
 
+import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
 import { ExternalLink } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 const projects = [
   {
+    id: "mpu",
+    title: "MPU Agentur Meiningen",
+    category: "Business",
+    gradient: "from-[#A020F0]/40 to-[#1E3A8A]/40",
+    image: "/images/portfolio-mpu.png",
+    url: "https://mpuagentur-meiningen.de/",
+  },
+  {
+    id: "alpine",
     title: "Alpine Luxus Hotel",
     category: "E-Commerce",
     gradient: "from-[#A020F0]/40 to-[#1E3A8A]/40",
   },
   {
+    id: "istanbul",
     title: "Istanbul Fashion Co.",
     category: "Business",
     gradient: "from-[#00D4FF]/40 to-[#7C3AED]/40",
   },
   {
+    id: "fintech",
     title: "Swiss FinTech App",
     category: "E-Commerce",
     gradient: "from-[#1E3A8A]/40 to-[#A020F0]/40",
   },
   {
+    id: "berlin",
     title: "Berlin Creative Studio",
     category: "Basic",
     gradient: "from-[#7C3AED]/40 to-[#00D4FF]/40",
   },
   {
+    id: "vienna",
     title: "Vienna Coffee House",
     category: "Business",
     gradient: "from-[#A020F0]/40 to-[#00D4FF]/40",
   },
   {
+    id: "antalya",
     title: "Antalya Travel Agency",
     category: "E-Commerce",
     gradient: "from-[#00D4FF]/40 to-[#1E3A8A]/40",
@@ -69,7 +84,7 @@ function PortfolioCard({
     })
   }
 
-  return (
+  const CardContent = () => (
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
@@ -88,30 +103,40 @@ function PortfolioCard({
           : "0 10px 30px rgba(0, 0, 0, 0.3)",
       }}
     >
-      {/* Background */}
-      <div
-        className={`aspect-[4/3] bg-gradient-to-br ${project.gradient} flex items-center justify-center relative`}
-      >
-        <div className="text-7xl font-bold text-foreground/10">{project.title[0]}</div>
-        
-        {/* Shimmer scanline effect */}
-        <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
-            backgroundSize: "200% 100%",
-            animation: isHovered ? "shimmer 1.5s infinite" : "none",
-          }}
+      {/* Image or gradient background */}
+      {project.image ? (
+        <Image
+          src={project.image}
+          alt={project.title}
+          width={800}
+          height={600}
+          className="w-full h-full aspect-[4/3] object-cover"
         />
-        
-        {/* Rainbow ring on hover */}
-        <div 
-          className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{
-            boxShadow: "inset 0 0 20px rgba(160, 32, 240, 0.3), inset 0 0 40px rgba(0, 212, 255, 0.2)",
-          }}
-        />
-      </div>
+      ) : (
+        <div
+          className={`aspect-[4/3] bg-gradient-to-br ${project.gradient} flex items-center justify-center relative`}
+        >
+          <div className="text-7xl font-bold text-foreground/10">{project.title[0]}</div>
+        </div>
+      )}
+      
+      {/* Shimmer scanline effect */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+          backgroundSize: "200% 100%",
+          animation: isHovered ? "shimmer 1.5s infinite" : "none",
+        }}
+      />
+      
+      {/* Rainbow ring on hover */}
+      <div 
+        className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          boxShadow: "inset 0 0 20px rgba(160, 32, 240, 0.3), inset 0 0 40px rgba(0, 212, 255, 0.2)",
+        }}
+      />
 
       {/* Glass overlay with zoom */}
       <div 
@@ -137,6 +162,14 @@ function PortfolioCard({
         </span>
       </div>
     </div>
+  )
+
+  return project.url ? (
+    <a href={project.url} target="_blank" rel="noopener noreferrer" className="block">
+      <CardContent />
+    </a>
+  ) : (
+    <CardContent />
   )
 }
 
