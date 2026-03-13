@@ -38,19 +38,19 @@ export function HeroSection() {
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
   const easedProgress = easeOutCubic(scrollProgress)
 
-  // Dramatic cinematic zoom-in animation - optimized for smooth, sharp transitions
-  const textScale = 0.8 + easedProgress * 0.8 // 0.8 -> 1.6 (reduced zoom range for stability)
-  const textMotionBlur = easedProgress * 1.5 // 0px -> 1.5px (subtle blur, only on scroll down)
+  // Ultra dramatic zoom-in animation - aggressive and punchy
+  const textScale = 0.7 + easedProgress * 1.2 // 0.7 -> 1.9 (more aggressive zoom!)
+  const textMotionBlur = 0 // NO blur for crisp, sharp text
   const textOpacity = 0.85 + easedProgress * 0.15 // 0.85 -> 1.0
 
-  // Background animation values based on scroll
-  const bgPurpleIntensity = 0.2 + easedProgress * 0.3 // 0.2 -> 0.5 (intensiver)
-  const bgCyanIntensity = 0.15 + easedProgress * 0.25 // 0.15 -> 0.4 (intensiver)
-  const bgRotation = easedProgress * 45 // 0 -> 45deg rotation
-  const bgPurpleX = 30 + easedProgress * 20 // 30% -> 50% horizontal shift
-  const bgCyanX = 70 - easedProgress * 20 // 70% -> 50% horizontal shift
-  const bgPurpleY = 20 + easedProgress * 30 // 20% -> 50% vertical shift
-  const bgCyanY = 80 - easedProgress * 30 // 80% -> 50% vertical shift
+  // Background animation values based on scroll - more intense
+  const bgPurpleIntensity = 0.25 + easedProgress * 0.4 // 0.25 -> 0.65 (even more intense!)
+  const bgCyanIntensity = 0.2 + easedProgress * 0.35 // 0.2 -> 0.55
+  const bgRotation = easedProgress * 60 // 0 -> 60deg rotation (more spin!)
+  const bgPurpleX = 30 + easedProgress * 25 // 30% -> 55% shift
+  const bgCyanX = 70 - easedProgress * 25 // 70% -> 45% shift
+  const bgPurpleY = 20 + easedProgress * 35 // 20% -> 55% shift
+  const bgCyanY = 80 - easedProgress * 35 // 80% -> 45% shift
 
   useEffect(() => {
     if (!mounted) return
@@ -145,14 +145,16 @@ export function HeroSection() {
               isVisible ? "opacity-100" : "opacity-0"
             }`}
             style={{
-              fontSize: `clamp(2rem, ${3 + textScale * 2.5}rem, 12rem)`,
+              fontSize: `clamp(2rem, ${3.5 + textScale * 3}rem, 14rem)`,
               transform: `scale(${textScale})`,
               filter: `blur(${textMotionBlur}px)`,
               opacity: mounted ? textOpacity : 0,
-              willChange: "transform, filter, opacity",
+              willChange: "transform, opacity",
               transformOrigin: "center center",
               backfaceVisibility: "hidden",
+              WebkitFontSmoothing: "antialiased",
               whiteSpace: "nowrap",
+              transition: "none",
             }}
           >
           <span 
