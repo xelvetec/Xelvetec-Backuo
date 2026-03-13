@@ -20,9 +20,9 @@ export function HeroSection() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Cinematic scroll-linked animation - Disabled on mobile for performance
+  // Cinematic scroll-linked animation - Active on all devices with optimized performance
   useEffect(() => {
-    if (!mounted || window.innerWidth < 768) return
+    if (!mounted) return
 
     let ticking = false
     const handleScroll = () => {
