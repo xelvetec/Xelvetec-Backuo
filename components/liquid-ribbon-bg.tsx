@@ -6,6 +6,7 @@ export function LiquidRibbonBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationIdRef = useRef<number>()
   const timeRef = useRef(0)
+  const ribbonPointsRef = useRef<Array<{ x: number; y: number; z: number }>>([])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -21,89 +22,137 @@ export function LiquidRibbonBg() {
 
     resizeCanvas()
 
-    const ribbonWaves = Array.from({ length: 3 }).map((_, i) => ({
-      offset: (i * Math.PI * 2) / 3,
-      amplitude: 80 + i * 20,
-      frequency: 0.005 + i * 0.001,
-      speed: 1.2 - i * 0.2,
-      color: ["#a020f0", "#00d4ff", "#8a4fff"][i],
-    }))
+    // Generate ribbon path
+    const generateRibbonPath = (time: number) => {
+      const points = []
+      const segments = 120
+      const amplitude = 80
+
+      for (let i = 0; i < segments; i++) {
+        const t = (i / segments) * Math.PI * 2
+        const x = Math.cos(t) * 200 + (Math.sin(t * 2 + time * 0.3) * amplitude)
+        const y = Math.sin(t) * 200 + (Math.cos(t * 1.5 + time * 0.2) * amplitude)
+        const z = Math.sin(t * 3 + time * 0.15) * 100
+
+        points.push({ x, y, z })
+      }
+
+      return points
+    }
+
+    // Draw 3D ribbon with perspective
+    const drawRibbon = (points: Array<{ x: number; y: number; z: number }>, time: number) => {
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
+      const scale = canvas.height / 5
+
+      // Light fade for motion trails
+      ctx.fillStyle = "rgba(10, 10, 26, 0.02)"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      // Draw ribbon with 3D depth
+      const ribbonWidth = 120
+      const ribbonWidthPoints = []
+
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i]
+        const nextP = points[(i + 1) % points.length]
+
+        // Calculate perpendicular direction for ribbon width
+        const dx = nextP.x - p.x
+        const dy = nextP.y - p.y
+        const len = Math.sqrt(dx * dx + dy * dy)
+        const perpX = -dy / len
+        const perpY = dx / len
+
+        // Project 3D point to 2D screen
+        const screenX = centerX + (p.x + p.z * Math.cos(time * 0.5)) * scale * 0.5
+        const screenY = centerY + (p.y + p.z * Math.sin(time * 0.3)) * scale * 0.5
+
+        const offsetX = perpX * ribbonWidth
+        const offsetY = perpY * ribbonWidth
+
+        ribbonWidthPoints.push({
+          x1: screenX - offsetX,
+          y1: screenY - offsetY,
+          x2: screenX + offsetX,
+          y2: screenY + offsetY,
+          z: p.z,
+          index: i,
+        })
+      }
+
+      // Draw ribbon segments with color gradient
+      for (let i = 0; i < ribbonWidthPoints.length - 1; i++) {
+        const curr = ribbonWidthPoints[i]
+        const next = ribbonWidthPoints[i + 1]
+
+        // Calculate gradient from blue to magenta
+        const ratio = i / ribbonWidthPoints.length
+        const hue = 240 + ratio * 120 // Blue to Magenta
+        const lightness = 50 + Math.sin(time * 0.5 + ratio * Math.PI) * 20
+
+        // Main ribbon body
+        const gradient = ctx.createLinearGradient(curr.x1, curr.y1, curr.x2, curr.y2)
+
+        // Blue to Magenta gradient
+        gradient.addColorStop(0, `hsl(240, 100%, ${40 + curr.z * 0.05}%)`)
+        gradient.addColorStop(0.5, `hsl(${280 + ratio * 20}, 100%, ${45 + curr.z * 0.08}%)`)
+        gradient.addColorStop(1, `hsl(${300 + ratio * 30}, 100%, ${40 + curr.z * 0.05}%)`)
+
+        ctx.fillStyle = gradient
+        ctx.beginPath()
+        ctx.moveTo(curr.x1, curr.y1)
+        ctx.lineTo(next.x1, next.y1)
+        ctx.lineTo(next.x2, next.y2)
+        ctx.lineTo(curr.x2, curr.y2)
+        ctx.closePath()
+        ctx.fill()
+
+        // Glow edge for depth
+        const glowGradient = ctx.createLinearGradient(curr.x1, curr.y1, curr.x2, curr.y2)
+        glowGradient.addColorStop(0, `hsla(240, 100%, 60%, ${0.4 + Math.sin(time * 1.5) * 0.2})`)
+        glowGradient.addColorStop(0.5, `hsla(280, 100%, 70%, ${0.6 + Math.sin(time * 1.2) * 0.25})`)
+        glowGradient.addColorStop(1, `hsla(300, 100%, 60%, ${0.4 + Math.sin(time * 1.3) * 0.2})`)
+
+        ctx.strokeStyle = glowGradient
+        ctx.lineWidth = 8
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        ctx.beginPath()
+        ctx.moveTo(curr.x1, curr.y1)
+        ctx.lineTo(next.x1, next.y1)
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.moveTo(curr.x2, curr.y2)
+        ctx.lineTo(next.x2, next.y2)
+        ctx.stroke()
+      }
+
+      // Add specular highlight for glossiness
+      for (let i = 0; i < ribbonWidthPoints.length; i += 3) {
+        const p = ribbonWidthPoints[i]
+        const highlightX = (p.x1 + p.x2) / 2
+        const highlightY = (p.y1 + p.y2) / 2
+
+        const highlightGradient = ctx.createRadialGradient(highlightX, highlightY - 30, 0, highlightX, highlightY, 60)
+        highlightGradient.addColorStop(0, `hsla(0, 100%, 100%, ${0.6 + Math.sin(time * 2 + p.index) * 0.3})`)
+        highlightGradient.addColorStop(1, `hsla(0, 100%, 100%, 0)`)
+
+        ctx.fillStyle = highlightGradient
+        ctx.beginPath()
+        ctx.arc(highlightX, highlightY - 30, 60, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
 
     const animate = () => {
       timeRef.current += 0.016
 
-      // Subtle background fade for trail effect
-      ctx.fillStyle = "rgba(10, 10, 26, 0.03)"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-      // Draw flowing liquid ribbons
-      ribbonWaves.forEach((wave, waveIndex) => {
-        // Create smooth flowing shape using quadratic curves
-        ctx.beginPath()
-
-        const startY = canvas.height * (0.3 + waveIndex * 0.15)
-        const segments = canvas.width / 20
-
-        for (let x = 0; x <= canvas.width; x += segments) {
-          const normalizedX = x / canvas.width
-          
-          // Multiple sine waves for organic motion
-          const wave1 = Math.sin(normalizedX * Math.PI * 3 + timeRef.current * wave.speed) * wave.amplitude
-          const wave2 = Math.sin(normalizedX * Math.PI * 2 - timeRef.current * wave.speed * 0.7) * (wave.amplitude * 0.6)
-          const wave3 = Math.sin(normalizedX * Math.PI + timeRef.current * wave.speed * 1.3) * (wave.amplitude * 0.4)
-
-          const y = startY + wave1 + wave2 + wave3 + Math.sin(timeRef.current * 0.5 + wave.offset) * 20
-
-          if (x === 0) {
-            ctx.moveTo(x, y)
-          } else {
-            ctx.lineTo(x, y)
-          }
-        }
-
-        // Close path downward for filled ribbon
-        ctx.lineTo(canvas.width, canvas.height + 100)
-        ctx.lineTo(0, canvas.height + 100)
-        ctx.closePath()
-
-        // Create gradient for smooth color transition
-        const gradient = ctx.createLinearGradient(0, startY - wave.amplitude, 0, startY + wave.amplitude)
-        const baseOpacity = 0.4 - waveIndex * 0.08
-
-        gradient.addColorStop(0, `${wave.color}00`)
-        gradient.addColorStop(0.3, `${wave.color}${Math.round(baseOpacity * 255).toString(16).padStart(2, '0')}`)
-        gradient.addColorStop(0.7, `${wave.color}${Math.round(baseOpacity * 255).toString(16).padStart(2, '0')}`)
-        gradient.addColorStop(1, `${wave.color}00`)
-
-        ctx.fillStyle = gradient
-        ctx.fill()
-
-        // Add glow edge
-        ctx.strokeStyle = `${wave.color}${Math.round(baseOpacity * 0.6 * 255).toString(16).padStart(2, '0')}`
-        ctx.lineWidth = 2
-        ctx.stroke()
-      })
-
-      // Add floating particles within the ribbons for extra dimension
-      ctx.fillStyle = "rgba(255, 255, 255, 0.15)"
-      for (let i = 0; i < 20; i++) {
-        const x = ((timeRef.current * 50 + i * 200) % (canvas.width + 100)) - 50
-        const waveIndex = i % ribbonWaves.length
-        const wave = ribbonWaves[waveIndex]
-        const startY = canvas.height * (0.3 + waveIndex * 0.15)
-
-        const normalizedX = (x + 50) / canvas.width
-        const offsetY =
-          Math.sin(normalizedX * Math.PI * 3 + timeRef.current * wave.speed) * wave.amplitude +
-          Math.sin(normalizedX * Math.PI * 2 - timeRef.current * wave.speed * 0.7) * (wave.amplitude * 0.6)
-
-        const y = startY + offsetY + Math.sin(timeRef.current * 0.5 + wave.offset) * 20
-
-        const size = 2 + Math.sin(timeRef.current * 0.8 + i) * 1
-        ctx.beginPath()
-        ctx.arc(x, y, size, 0, Math.PI * 2)
-        ctx.fill()
-      }
+      const points = generateRibbonPath(timeRef.current)
+      ribbonPointsRef.current = points
+      drawRibbon(points, timeRef.current)
 
       animationIdRef.current = requestAnimationFrame(animate)
     }
