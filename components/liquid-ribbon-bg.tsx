@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react"
 
 export function LiquidRibbonBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -11,10 +11,9 @@ export function LiquidRibbonBg() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    // Set canvas size
     const resizeCanvas = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
@@ -23,167 +22,115 @@ export function LiquidRibbonBg() {
     resizeCanvas()
 
     const animate = () => {
-      timeRef.current += 0.01
+      timeRef.current += 0.016
 
       // Clear with dark background
-      ctx.fillStyle = '#0a0a1a'
+      ctx.fillStyle = "rgba(10, 10, 26, 1)"
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       const centerX = canvas.width / 2
       const centerY = canvas.height / 2
-      const time = timeRef.current
+      const baseSize = Math.min(canvas.width, canvas.height) * 0.25
 
-      // Create ribbon path with multiple curves
-      const ribbonWidth = 120
-      const ribbonHeight = 200
+      // Draw realistic liquid ribbon with multiple layers for depth and glossiness
 
-      // Draw glossy ribbon with gradient
-      for (let i = 0; i < 3; i++) {
-        // Outer glow - magenta
-        const glowGradient = ctx.createRadialGradient(
-          centerX,
-          centerY,
-          0,
-          centerX,
-          centerY,
-          400 + i * 50
-        )
-        glowGradient.addColorStop(0, `rgba(255, 0, 200, ${0.15 - i * 0.04})`)
-        glowGradient.addColorStop(1, 'rgba(255, 0, 200, 0)')
+      // Shadow/depth layer (darker, below)
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2
+        const x = centerX + Math.cos(angle) * baseSize * 0.8
+        const y = centerY + Math.sin(angle) * baseSize * 0.8
 
-        ctx.fillStyle = glowGradient
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        const offset = Math.sin(timeRef.current * 0.5 + i) * baseSize * 0.3
+
+        ctx.fillStyle = `rgba(30, 10, 60, 0.4)`
+        ctx.beginPath()
+        ctx.ellipse(x, y + offset, baseSize * 0.5, baseSize * 0.3, angle, 0, Math.PI * 2)
+        ctx.fill()
       }
 
-      // Main ribbon using Bezier curves
-      const points: Array<{ x: number; y: number }> = []
-      const segments = 100
+      // Main ribbon body - smooth gradient
+      const ribbonSegments = 40
+      for (let i = 0; i < ribbonSegments; i++) {
+        const t = i / ribbonSegments
+        const angle = t * Math.PI * 2
 
-      for (let i = 0; i <= segments; i++) {
-        const t = i / segments
-        const angle = t * Math.PI * 3 + time
-        const radius = 100 + Math.sin(angle * 2) * 40
+        // Create wave deformation
+        const waveAmplitude = Math.sin(timeRef.current * 0.8 + t * 6) * 0.4
+        const deformX = Math.cos(angle + timeRef.current * 0.3) * baseSize * (0.8 + waveAmplitude)
+        const deformY = Math.sin(angle + timeRef.current * 0.3) * baseSize * (0.8 + waveAmplitude)
 
-        // Add wave deformation
-        const wave1 = Math.sin(t * Math.PI * 2 + time) * 50
-        const wave2 = Math.cos(t * Math.PI * 3 + time * 0.7) * 30
+        // Color gradient from cyan/blue to magenta
+        const hue = 200 + (t * 270) + Math.sin(timeRef.current * 0.4) * 30
+        const saturation = 90 + Math.sin(timeRef.current * 0.6) * 10
+        const lightness = 45 + Math.sin(timeRef.current * 0.5 + t * 5) * 15
 
-        const x = centerX + Math.cos(angle) * radius + wave1
-        const y = centerY + Math.sin(angle) * radius + wave2
+        const nextT = (i + 1) / ribbonSegments
+        const nextAngle = nextT * Math.PI * 2
+        const nextWaveAmplitude = Math.sin(timeRef.current * 0.8 + nextT * 6) * 0.4
+        const nextDeformX = Math.cos(nextAngle + timeRef.current * 0.3) * baseSize * (0.8 + nextWaveAmplitude)
+        const nextDeformY = Math.sin(nextAngle + timeRef.current * 0.3) * baseSize * (0.8 + nextWaveAmplitude)
 
-        points.push({ x, y })
+        // Main ribbon segment
+        ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+        ctx.beginPath()
+        ctx.moveTo(centerX + deformX - baseSize * 0.15, centerY + deformY)
+        ctx.lineTo(centerX + nextDeformX - baseSize * 0.15, centerY + nextDeformY)
+        ctx.lineTo(centerX + nextDeformX + baseSize * 0.15, centerY + nextDeformY)
+        ctx.lineTo(centerX + deformX + baseSize * 0.15, centerY + deformY)
+        ctx.closePath()
+        ctx.fill()
+
+        // Specular highlight - realistic glossy effect
+        const highlightIntensity = Math.sin(timeRef.current * 1.2 + t * 8) * 0.5 + 0.5
+        const highlightSize = baseSize * 0.08 * highlightIntensity
+
+        if (highlightIntensity > 0.3) {
+          const gradient = ctx.createRadialGradient(
+            centerX + deformX - baseSize * 0.12,
+            centerY + deformY - highlightSize * 2,
+            0,
+            centerX + deformX - baseSize * 0.12,
+            centerY + deformY,
+            highlightSize * 1.5
+          )
+          gradient.addColorStop(0, `rgba(255, 255, 255, ${highlightIntensity * 0.8})`)
+          gradient.addColorStop(0.5, `rgba(255, 255, 255, ${highlightIntensity * 0.3})`)
+          gradient.addColorStop(1, `rgba(255, 255, 255, 0)`)
+
+          ctx.fillStyle = gradient
+          ctx.beginPath()
+          ctx.ellipse(
+            centerX + deformX - baseSize * 0.12,
+            centerY + deformY - highlightSize,
+            highlightSize * 0.8,
+            highlightSize * 1.5,
+            0,
+            0,
+            Math.PI * 2
+          )
+          ctx.fill()
+        }
+
+        // Inner highlight for depth
+        const innerHighlight = Math.sin(timeRef.current * 0.9 + t * 6 + Math.PI / 2) * 0.5 + 0.5
+        if (innerHighlight > 0.4) {
+          ctx.fillStyle = `rgba(200, 100, 255, ${innerHighlight * 0.3})`
+          ctx.beginPath()
+          ctx.ellipse(centerX + deformX, centerY + deformY - baseSize * 0.05, baseSize * 0.08, baseSize * 0.04, 0, 0, Math.PI * 2)
+          ctx.fill()
+        }
       }
 
-      // Draw top surface of ribbon - Blue gradient
+      // Outer glow for realism
+      const glowGradient = ctx.createRadialGradient(centerX, centerY, baseSize * 0.7, centerX, centerY, baseSize * 1.2)
+      glowGradient.addColorStop(0, "rgba(0, 212, 255, 0.15)")
+      glowGradient.addColorStop(0.5, "rgba(160, 32, 240, 0.08)")
+      glowGradient.addColorStop(1, "rgba(160, 32, 240, 0)")
+
+      ctx.fillStyle = glowGradient
       ctx.beginPath()
-      ctx.moveTo(points[0].x - ribbonWidth / 2, points[0].y)
-
-      for (let i = 0; i < points.length; i++) {
-        const p = points[i]
-        const prev = points[Math.max(0, i - 1)]
-        const next = points[Math.min(points.length - 1, i + 1)]
-
-        // Perpendicular vector for ribbon width
-        const dx = next.x - prev.x
-        const dy = next.y - prev.y
-        const len = Math.sqrt(dx * dx + dy * dy)
-        const perpX = (dy / len) * (ribbonWidth / 2)
-        const perpY = (-dx / len) * (ribbonWidth / 2)
-
-        ctx.lineTo(p.x - perpX, p.y - perpY)
-      }
-
-      // Blue-to-cyan gradient
-      const topGradient = ctx.createLinearGradient(
-        centerX - 200,
-        centerY - 200,
-        centerX + 200,
-        centerY + 200
-      )
-      topGradient.addColorStop(0, 'rgb(0, 150, 255)')
-      topGradient.addColorStop(0.5, 'rgb(0, 200, 255)')
-      topGradient.addColorStop(1, 'rgb(100, 255, 200)')
-
-      ctx.fillStyle = topGradient
+      ctx.arc(centerX, centerY, baseSize * 1.2, 0, Math.PI * 2)
       ctx.fill()
-
-      // Draw bottom surface - darker blue with magenta
-      ctx.beginPath()
-      ctx.moveTo(points[0].x + ribbonWidth / 2, points[0].y)
-
-      for (let i = 0; i < points.length; i++) {
-        const p = points[i]
-        const prev = points[Math.max(0, i - 1)]
-        const next = points[Math.min(points.length - 1, i + 1)]
-
-        const dx = next.x - prev.x
-        const dy = next.y - prev.y
-        const len = Math.sqrt(dx * dx + dy * dy)
-        const perpX = (dy / len) * (ribbonWidth / 2)
-        const perpY = (-dx / len) * (ribbonWidth / 2)
-
-        ctx.lineTo(p.x + perpX, p.y + perpY)
-      }
-
-      const bottomGradient = ctx.createLinearGradient(
-        centerX - 200,
-        centerY - 200,
-        centerX + 200,
-        centerY + 200
-      )
-      bottomGradient.addColorStop(0, 'rgb(150, 0, 200)')
-      bottomGradient.addColorStop(0.5, 'rgb(200, 0, 150)')
-      bottomGradient.addColorStop(1, 'rgb(100, 0, 200)')
-
-      ctx.fillStyle = bottomGradient
-      ctx.fill()
-
-      // Add glossy highlight on top
-      ctx.beginPath()
-      ctx.moveTo(points[0].x - ribbonWidth / 3, points[0].y)
-
-      for (let i = 0; i < points.length; i++) {
-        const p = points[i]
-        const prev = points[Math.max(0, i - 1)]
-        const next = points[Math.min(points.length - 1, i + 1)]
-
-        const dx = next.x - prev.x
-        const dy = next.y - prev.y
-        const len = Math.sqrt(dx * dx + dy * dy)
-        const perpX = (dy / len) * (ribbonWidth / 6)
-        const perpY = (-dx / len) * (ribbonWidth / 6)
-
-        ctx.lineTo(p.x - perpX, p.y - perpY)
-      }
-
-      const glossGradient = ctx.createLinearGradient(0, centerY - 300, 0, centerY + 300)
-      glossGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)')
-      glossGradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.3)')
-      glossGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
-
-      ctx.fillStyle = glossGradient
-      ctx.fill()
-
-      // Draw edge glow - cyan
-      ctx.strokeStyle = 'rgba(0, 255, 200, 0.5)'
-      ctx.lineWidth = 2
-
-      ctx.beginPath()
-      ctx.moveTo(points[0].x - ribbonWidth / 2, points[0].y)
-      for (let i = 1; i < points.length; i++) {
-        const p = points[i]
-        const prev = points[i - 1]
-        const next = points[Math.min(points.length - 1, i + 1)]
-
-        const dx = next.x - prev.x
-        const dy = next.y - prev.y
-        const len = Math.sqrt(dx * dx + dy * dy)
-        const perpX = (dy / len) * (ribbonWidth / 2)
-        const perpY = (-dx / len) * (ribbonWidth / 2)
-
-        ctx.lineTo(p.x - perpX, p.y - perpY)
-      }
-      ctx.stroke()
 
       animationIdRef.current = requestAnimationFrame(animate)
     }
@@ -194,10 +141,10 @@ export function LiquidRibbonBg() {
       resizeCanvas()
     }
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener("resize", handleResize)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener("resize", handleResize)
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current)
       }
@@ -208,7 +155,7 @@ export function LiquidRibbonBg() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none"
-      style={{ background: 'transparent', zIndex: 1, top: 0, left: 0 }}
+      style={{ background: "transparent", zIndex: 1, top: 0, left: 0 }}
     />
   )
 }
