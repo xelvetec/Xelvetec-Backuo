@@ -17,7 +17,7 @@ export function PaymentMethods() {
     {
       title: t("payment_digital"),
       icon: Smartphone,
-      items: ["Twint", "Apple Pay"],
+      items: ["Twint", "Apple Pay", "PayPal"],
       color: "#A020F0",
     },
     {
