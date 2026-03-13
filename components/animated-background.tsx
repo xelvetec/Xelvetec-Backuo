@@ -18,103 +18,88 @@ export function AnimatedBackground() {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
     }
-
     resizeCanvas()
+
+    // Create multiple floating orbs with trails
+    const orbs = Array.from({ length: 8 }).map((_, i) => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 2,
+      vy: (Math.random() - 0.5) * 2,
+      size: Math.random() * 80 + 40,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+      hue: Math.random() * 360,
+    }))
 
     const animate = () => {
       timeRef.current += 0.016
 
-      // Clear with fade trail effect
-      ctx.fillStyle = "rgba(10, 10, 26, 0.05)"
+      // Very subtle dark fade
+      ctx.fillStyle = "rgba(5, 5, 15, 0.02)"
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Draw multiple flowing wave layers
-      for (let layer = 0; layer < 5; layer++) {
-        const layerTime = timeRef.current * (0.5 + layer * 0.2)
-        const yOffset = (canvas.height / 5) * layer + canvas.height / 10
+      // Update and draw orbs
+      orbs.forEach((orb, i) => {
+        // Sine wave drift
+        orb.vx += Math.sin(timeRef.current * 0.5 + i) * 0.02
+        orb.vy += Math.cos(timeRef.current * 0.4 + i) * 0.02
 
-        // Create gradient for this layer
-        const gradient = ctx.createLinearGradient(0, yOffset - 200, 0, yOffset + 200)
-        
-        const hue1 = (layer * 60 + layerTime * 20) % 360
-        const hue2 = (layer * 60 + 120 + layerTime * 20) % 360
-        
-        gradient.addColorStop(0, `hsla(${hue1}, 100%, 50%, 0)`)
-        gradient.addColorStop(0.25, `hsla(${hue1}, 100%, 50%, 0.15)`)
-        gradient.addColorStop(0.5, `hsla(${hue2}, 100%, 60%, 0.25)`)
-        gradient.addColorStop(0.75, `hsla(${hue1}, 100%, 50%, 0.15)`)
-        gradient.addColorStop(1, `hsla(${hue1}, 100%, 50%, 0)`)
+        orb.x += orb.vx
+        orb.y += orb.vy
+
+        // Wrap around
+        if (orb.x > canvas.width + 100) orb.x = -100
+        if (orb.x < -100) orb.x = canvas.width + 100
+        if (orb.y > canvas.height + 100) orb.y = -100
+        if (orb.y < -100) orb.y = canvas.height + 100
+
+        // Update hue for rainbow effect
+        orb.hue = (orb.hue + 0.5) % 360
+
+        // Draw orb with multiple glows
+        const gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.size)
+        gradient.addColorStop(0, `hsla(${orb.hue}, 100%, 60%, 0.8)`)
+        gradient.addColorStop(0.5, `hsla(${orb.hue + 60}, 100%, 50%, 0.3)`)
+        gradient.addColorStop(1, `hsla(${orb.hue}, 100%, 40%, 0)`)
 
         ctx.fillStyle = gradient
-
-        // Draw wavy form
         ctx.beginPath()
-        ctx.moveTo(0, yOffset)
+        ctx.arc(orb.x, orb.y, orb.size, 0, Math.PI * 2)
+        ctx.fill()
 
-        for (let x = 0; x <= canvas.width; x += 20) {
-          const wave1 = Math.sin((x * 0.005 + layerTime) * (1 + layer * 0.3)) * 60
-          const wave2 = Math.cos((x * 0.003 + layerTime * 1.5) * (0.8 + layer * 0.2)) * 40
-          const y = yOffset + wave1 + wave2
-          ctx.lineTo(x, y)
+        // Outer glow
+        const outerGradient = ctx.createRadialGradient(orb.x, orb.y, orb.size, orb.x, orb.y, orb.size * 2)
+        outerGradient.addColorStop(0, `hsla(${orb.hue}, 100%, 50%, 0.2)`)
+        outerGradient.addColorStop(1, `hsla(${orb.hue}, 100%, 30%, 0)`)
+
+        ctx.fillStyle = outerGradient
+        ctx.beginPath()
+        ctx.arc(orb.x, orb.y, orb.size * 2, 0, Math.PI * 2)
+        ctx.fill()
+      })
+
+      // Draw connections between nearby orbs
+      for (let i = 0; i < orbs.length; i++) {
+        for (let j = i + 1; j < orbs.length; j++) {
+          const dx = orbs[i].x - orbs[j].x
+          const dy = orbs[i].y - orbs[j].y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+
+          if (dist < 400) {
+            const alpha = (1 - dist / 400) * 0.3
+            const lineGradient = ctx.createLinearGradient(orbs[i].x, orbs[i].y, orbs[j].x, orbs[j].y)
+            lineGradient.addColorStop(0, `hsla(${orbs[i].hue}, 100%, 50%, ${alpha})`)
+            lineGradient.addColorStop(1, `hsla(${orbs[j].hue}, 100%, 50%, ${alpha})`)
+
+            ctx.strokeStyle = lineGradient
+            ctx.lineWidth = 2 * (1 - dist / 400)
+            ctx.lineCap = "round"
+            ctx.beginPath()
+            ctx.moveTo(orbs[i].x, orbs[i].y)
+            ctx.lineTo(orbs[j].x, orbs[j].y)
+            ctx.stroke()
+          }
         }
-
-        ctx.lineTo(canvas.width, canvas.height + 200)
-        ctx.lineTo(0, canvas.height + 200)
-        ctx.closePath()
-        ctx.fill()
-      }
-
-      // Draw floating orbs
-      for (let i = 0; i < 6; i++) {
-        const angle = (timeRef.current * 0.3 + (i / 6) * Math.PI * 2)
-        const radius = 200 + Math.sin(timeRef.current * 0.5 + i) * 100
-        const x = canvas.width / 2 + Math.cos(angle) * radius
-        const y = canvas.height / 2 + Math.sin(angle) * radius
-
-        const hue = (i * 60 + timeRef.current * 30) % 360
-        
-        // Glow effect
-        const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, 150)
-        glowGradient.addColorStop(0, `hsla(${hue}, 100%, 60%, 0.4)`)
-        glowGradient.addColorStop(0.5, `hsla(${hue}, 100%, 50%, 0.1)`)
-        glowGradient.addColorStop(1, `hsla(${hue}, 100%, 50%, 0)`)
-
-        ctx.fillStyle = glowGradient
-        ctx.beginPath()
-        ctx.arc(x, y, 150, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Core orb
-        const orbGradient = ctx.createRadialGradient(x - 20, y - 20, 0, x, y, 40)
-        orbGradient.addColorStop(0, `hsla(${hue}, 100%, 100%, 0.8)`)
-        orbGradient.addColorStop(1, `hsla(${hue}, 100%, 50%, 0)`)
-
-        ctx.fillStyle = orbGradient
-        ctx.beginPath()
-        ctx.arc(x, y, 40, 0, Math.PI * 2)
-        ctx.fill()
-      }
-
-      // Connecting lines between orbs
-      for (let i = 0; i < 6; i++) {
-        const angle1 = (timeRef.current * 0.3 + (i / 6) * Math.PI * 2)
-        const radius1 = 200 + Math.sin(timeRef.current * 0.5 + i) * 100
-        const x1 = canvas.width / 2 + Math.cos(angle1) * radius1
-        const y1 = canvas.height / 2 + Math.sin(angle1) * radius1
-
-        const angle2 = (timeRef.current * 0.3 + ((i + 1) / 6) * Math.PI * 2)
-        const radius2 = 200 + Math.sin(timeRef.current * 0.5 + i + 1) * 100
-        const x2 = canvas.width / 2 + Math.cos(angle2) * radius2
-        const y2 = canvas.height / 2 + Math.sin(angle2) * radius2
-
-        const hue = (i * 60 + timeRef.current * 30) % 360
-        ctx.strokeStyle = `hsla(${hue}, 100%, 60%, 0.3)`
-        ctx.lineWidth = 2
-        ctx.lineCap = "round"
-        ctx.beginPath()
-        ctx.moveTo(x1, y1)
-        ctx.lineTo(x2, y2)
-        ctx.stroke()
       }
 
       animationIdRef.current = requestAnimationFrame(animate)
