@@ -97,7 +97,7 @@ export function HeroSection() {
             radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%)
           `,
           opacity: 1,
-          transition: "background 0.05s cubic-bezier(0.23, 1, 0.32, 1)",
+          willChange: "none",
         }}
       />
 
