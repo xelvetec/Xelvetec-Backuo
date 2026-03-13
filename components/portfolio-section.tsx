@@ -31,10 +31,12 @@ const projects = [
     url: "https://jade-cranachan-bab53b.netlify.app/",
   },
   {
-    id: "fintech",
-    title: "Swiss FinTech App",
-    category: "E-Commerce",
+    id: "goldener-gabel",
+    title: "Goldener Gabel Restaurant",
+    category: "Gastronomy",
     gradient: "from-[#1E3A8A]/40 to-[#A020F0]/40",
+    image: "/images/portfolio-goldener-gabel.png",
+    url: "https://enchanting-custard-6a0bcb.netlify.app/",
   },
   {
     id: "berlin",
