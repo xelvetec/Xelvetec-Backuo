@@ -97,10 +97,16 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-foreground/5 text-center">
-          <p className="text-xs text-foreground/30">
-            &copy; {year} XelveTec. {t("footer_rights")}
-          </p>
+        <div className="mt-8 pt-6 border-t border-foreground/5">
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-sm font-semibold text-foreground/70">Swiss made</span>
+              <span className="text-2xl">🇨🇭</span>
+            </div>
+            <p className="text-xs text-foreground/30 text-center">
+              &copy; {year} XelveTec. {t("footer_rights")}
+            </p>
+          </div>
         </div>
       </div>
     </footer>
