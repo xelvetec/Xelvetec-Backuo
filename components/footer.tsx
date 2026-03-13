@@ -41,7 +41,7 @@ export function Footer() {
 
           {/* Links */}
           <div className="flex items-center gap-6 text-sm text-foreground/40">
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a href="/impressum" className="hover:text-foreground transition-colors">
               {t("footer_impressum")}
             </a>
             <a href="#" className="hover:text-foreground transition-colors">
