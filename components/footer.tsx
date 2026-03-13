@@ -101,7 +101,7 @@ export function Footer() {
           <div className="flex flex-col items-center justify-center gap-4">
             <div className="flex items-center justify-center gap-2">
               <span className="text-sm font-semibold text-foreground/70">Swiss made</span>
-              <span className="text-2xl">🇨🇭</span>
+              <span className="text-2xl md:hidden">🇨🇭</span>
             </div>
             <p className="text-xs text-foreground/30 text-center">
               &copy; {year} XelveTec. {t("footer_rights")}
