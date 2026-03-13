@@ -43,11 +43,11 @@ export function Navbar() {
             height={48}
             className="w-12 h-12 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-110"
           />
-          {/* Breathing glow ring */}
+          {/* Glow effect on hover - no box */}
           <div 
-            className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
             style={{
-              boxShadow: "0 0 20px rgba(160, 32, 240, 0.6), 0 0 40px rgba(0, 212, 255, 0.3)",
+              boxShadow: "0 0 20px rgba(160, 32, 240, 0.6), 0 0 40px rgba(0, 212, 255, 0.3), inset 0 0 15px rgba(160, 32, 240, 0.2)",
             }}
           />
         </div>
