@@ -241,6 +241,37 @@ export default function RootLayout({
     ]
   }
 
+  const reviewSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Review',
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: '5',
+      bestRating: '5',
+      worstRating: '1'
+    },
+    author: {
+      '@type': 'Person',
+      name: 'Google Maps Bewertung'
+    },
+    datePublished: '2026-03-13',
+    reviewBody: 'Professionelle Webdesign Services von XelveTec',
+    itemReviewed: {
+      '@type': 'LocalBusiness',
+      name: 'XelveTec',
+      url: 'https://xelvetec.ch',
+      telephone: '+41768443375',
+      image: 'https://xelvetec.ch/images/xelvetec-logo.png',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Egelseestrasse 31',
+        addressLocality: 'Kreuzlingen',
+        postalCode: '8280',
+        addressCountry: 'CH'
+      }
+    }
+  }
+
   return (
     <html lang="de" className="dark">
       <head>
@@ -259,6 +290,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }}
         />
         <link rel="canonical" href="https://xelvetec.ch" />
         <link rel="sitemap" href="https://xelvetec.ch/sitemap.xml" />
