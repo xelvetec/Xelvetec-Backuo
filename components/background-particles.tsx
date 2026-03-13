@@ -38,7 +38,15 @@ export function BackgroundParticles() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
-    const initialParticles: Particle[] = Array.from({ length: 80 }).map(() => {
+    // Responsive particle count based on screen size
+    let particleCount = 80
+    if (window.innerWidth < 768) {
+      particleCount = 30 // Mobile: weniger Partikel
+    } else if (window.innerWidth < 1024) {
+      particleCount = 50 // Tablet: mittelmäßig
+    }
+
+    const initialParticles: Particle[] = Array.from({ length: particleCount }).map(() => {
       const baseVx = (Math.random() - 0.5) * 1.5
       const baseVy = (Math.random() - 0.5) * 1.5
       return {
@@ -207,6 +215,40 @@ export function BackgroundParticles() {
     const handleResize = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
+
+      // Adjust particle count on resize if needed
+      let newParticleCount = 80
+      if (window.innerWidth < 768) {
+        newParticleCount = 30
+      } else if (window.innerWidth < 1024) {
+        newParticleCount = 50
+      }
+
+      // Add or remove particles based on new count
+      if (newParticleCount > particlesRef.current.length) {
+        const diff = newParticleCount - particlesRef.current.length
+        for (let i = 0; i < diff; i++) {
+          const baseVx = (Math.random() - 0.5) * 1.5
+          const baseVy = (Math.random() - 0.5) * 1.5
+          particlesRef.current.push({
+            id: particleIdRef.current++,
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: baseVx,
+            vy: baseVy,
+            size: Math.random() * 2.5 + 1,
+            opacity: Math.random() * 0.6 + 0.4,
+            baseVx,
+            baseVy,
+            hue: Math.random() * 360,
+            trailX: [],
+            trailY: [],
+            pulseTime: Math.random() * Math.PI * 2,
+          })
+        }
+      } else if (newParticleCount < particlesRef.current.length) {
+        particlesRef.current.splice(newParticleCount)
+      }
     }
 
     window.addEventListener("resize", handleResize)
