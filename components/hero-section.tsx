@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react"
 import { ArrowRight } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
-import { BackgroundParticles } from "./background-particles"
 
 export function HeroSection() {
   const { t } = useLanguage()
@@ -100,9 +99,6 @@ export function HeroSection() {
           willChange: "none",
         }}
       />
-
-      {/* Animated background particles - scroll reactive */}
-      <BackgroundParticles />
 
       {/* Mouse trail - index-based key instead of ID */}
       {mounted && mouseTrail.map((point, index) => (
