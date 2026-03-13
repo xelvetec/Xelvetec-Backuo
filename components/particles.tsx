@@ -39,7 +39,7 @@ export function ParticleField() {
 
     function init() {
       resize()
-      const count = Math.min(80, Math.floor((width * height) / 12000))
+      const count = Math.min(50, Math.floor((width * height) / 12000))
       particles.length = 0
       for (let i = 0; i < count; i++) {
         const alpha = Math.random() * 0.6 + 0.2

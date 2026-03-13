@@ -30,7 +30,7 @@ export function BackgroundParticles() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
-    const initialParticles: Particle[] = Array.from({ length: 50 }).map(() => ({
+    const initialParticles: Particle[] = Array.from({ length: 30 }).map(() => ({
       id: particleIdRef.current++,
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
