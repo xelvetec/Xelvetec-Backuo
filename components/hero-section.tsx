@@ -174,7 +174,7 @@ export function HeroSection() {
               animation: "gradient-shift 4s ease infinite",
             }}
           >
-            XelveTec
+            XelveTec<sup style={{ fontSize: "0.4em", marginLeft: "0.25em" }}>®</sup>
           </span>
           <br />
           <span
