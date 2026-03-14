@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useLanguage } from '@/lib/language-context'
 
 export default function DatenschutzPage() {
+  const { t } = useLanguage()
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-20 pb-12">
       {/* Logo - centered at top */}
@@ -21,8 +23,8 @@ export default function DatenschutzPage() {
 
       <div className="max-w-2xl mx-auto px-4">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white text-center">Datenschutzerklärung</h1>
-          <p className="text-foreground/60 text-center">Datenschutz ist für uns wichtig</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white text-center">{t('legal_privacy_title')}</h1>
+          <p className="text-foreground/60 text-center">{t('legal_privacy_intro')}</p>
         </div>
 
         <div className="space-y-8 text-foreground/80">
@@ -52,7 +54,7 @@ export default function DatenschutzPage() {
           <section className="glass rounded-2xl p-8">
             <h2 className="text-2xl font-bold text-white mb-4">Kontakt</h2>
             <p>Für Fragen zum Datenschutz oder zur Wahrnehmung Ihrer Rechte kontaktieren Sie uns bitte:</p>
-            <p className="mt-4"><strong>XelveTec</strong><br />Egelseestrasse 31<br />8280 Kreuzlingen<br />Schweiz<br /><br /><strong>Telefon:</strong> +41 76 844 33 75<br /><strong>E-Mail:</strong> info@xelvetec.ch</p>
+            <p className="mt-4"><strong>XelveTec</strong><br />{t('legal_impressum_address_street')}<br />{t('legal_impressum_address_city')}<br /><br /><strong>Telefon:</strong> +41 76 844 33 75<br /><strong>E-Mail:</strong> info@xelvetec.ch</p>
           </section>
 
           <section className="glass rounded-2xl p-8">

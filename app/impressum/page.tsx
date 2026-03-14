@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useLanguage } from '@/lib/language-context'
 
 export default function ImpressumPage() {
+  const { t } = useLanguage()
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-20 pb-12">
       {/* Logo - centered at top */}
@@ -21,24 +23,24 @@ export default function ImpressumPage() {
 
       <div className="max-w-2xl mx-auto px-4">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white text-center">Impressum</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white text-center">{t('legal_impressum_title')}</h1>
           <p className="text-foreground/60 text-center">Rechtliche Informationen zu XelveTec</p>
         </div>
 
         <div className="space-y-8 text-foreground/80">
           <section className="glass rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Unternehmensangaben</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">{t('legal_impressum_company')}</h2>
             <p><strong>Name:</strong> XelveTec</p>
             <p><strong>Geschäftsführer:</strong> Kubilay Demirci</p>
           </section>
 
           <section className="glass rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Adresse</h2>
-            <p>Egelseestrasse 31<br />8280 Kreuzlingen<br />Schweiz</p>
+            <h2 className="text-2xl font-bold text-white mb-4">{t('legal_impressum_address')}</h2>
+            <p>{t('legal_impressum_address_street')}<br />{t('legal_impressum_address_city')}</p>
           </section>
 
           <section className="glass rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Kontakt</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">{t('legal_impressum_contact')}</h2>
             <p><strong>Telefon:</strong> <a href="tel:+41768443375" className="text-[#A020F0] hover:text-[#00D4FF] transition-colors">+41 76 844 33 75</a></p>
             <p><strong>E-Mail:</strong> <a href="mailto:info@xelvetec.ch" className="text-[#A020F0] hover:text-[#00D4FF] transition-colors">info@xelvetec.ch</a></p>
           </section>
