@@ -200,10 +200,6 @@ export default function RootLayout({
     url: 'https://xelvetec.ch',
     telephone: '+41768443375',
     email: 'info@xelvetec.ch',
-    provider: {
-      '@type': 'Organization',
-      name: 'XelveTec'
-    },
     areaServed: ['DE', 'AT', 'CH', 'TR'],
     priceRange: '$$',
     hasOfferCatalog: {
