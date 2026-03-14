@@ -1,10 +1,28 @@
+'use client'
+
+import Link from 'next/link'
+import Image from 'next/image'
+
 export default function DatenschutzPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-32 pb-12">
+    <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-20 pb-12">
+      {/* Logo - centered at top */}
+      <div className="flex justify-center mb-12">
+        <Link href="/" className="hover:scale-110 transition-transform duration-300">
+          <Image
+            src="/images/xelvetec-logo.png"
+            alt="XelveTec"
+            width={80}
+            height={80}
+            className="w-20 h-20"
+          />
+        </Link>
+      </div>
+
       <div className="max-w-2xl mx-auto px-4">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Datenschutzerklärung</h1>
-          <p className="text-foreground/60">Datenschutz ist für uns wichtig</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white text-center">Datenschutzerklärung</h1>
+          <p className="text-foreground/60 text-center">Datenschutz ist für uns wichtig</p>
         </div>
 
         <div className="space-y-8 text-foreground/80">
@@ -45,6 +63,16 @@ export default function DatenschutzPage() {
           <section className="glass rounded-2xl p-8">
             <p className="text-sm text-foreground/60">Letzte Aktualisierung: März 2026</p>
           </section>
+
+          {/* Navigation back to home */}
+          <div className="pt-8 border-t border-foreground/20 flex justify-center">
+            <Link 
+              href="/" 
+              className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-[#A020F0] to-[#00D4FF] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-[#A020F0]/50 transition-all duration-300 transform hover:scale-105"
+            >
+              Zur Startseite
+            </Link>
+          </div>
         </div>
       </div>
     </main>
