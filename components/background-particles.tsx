@@ -40,8 +40,10 @@ export function BackgroundParticles() {
 
     // Responsive particle count based on screen size - MORE aggressive for mobile
     let particleCount = 80
-    if (window.innerWidth < 640) {
-      particleCount = 15 // Mobile: drastisch reduziert für 100 PageSpeed
+    if (window.innerWidth < 480) {
+      particleCount = 8 // Ultra-small phones: minimal particles
+    } else if (window.innerWidth < 640) {
+      particleCount = 12 // Mobile: very reduced
     } else if (window.innerWidth < 768) {
       particleCount = 20
     } else if (window.innerWidth < 1024) {

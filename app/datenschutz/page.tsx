@@ -72,7 +72,7 @@ export default function DatenschutzPage() {
               href="/" 
               className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-[#A020F0] to-[#00D4FF] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-[#A020F0]/50 transition-all duration-300 transform hover:scale-105"
             >
-              Zur Startseite
+              {t('impressum_back_button')}
             </Link>
           </div>
         </div>

@@ -117,6 +117,10 @@ export const translations: Record<Language, Record<string, string>> = {
     legal_privacy_intro: "Datenschutz ist für uns wichtig. Diese Datenschutzerklärung informiert Sie, wie wir Ihre Daten verarbeiten.",
     legal_privacy_data: "Datenverarbeitung",
     legal_privacy_rights: "Ihre Rechte",
+    not_found_title: "Diese Seite konnte nicht gefunden werden.",
+    not_found_subtitle: "Die Seite, die du suchst, existiert möglicherweise nicht oder wurde verschoben.",
+    not_found_button: "Zur Startseite",
+    impressum_back_button: "Zur Startseite",
     popular: "Beliebt",
   },
   tr: {
@@ -204,6 +208,10 @@ export const translations: Record<Language, Record<string, string>> = {
     legal_privacy_intro: "Gizlilik bizim için önemlidir. Bu gizlilik politikası verilerinizi nasıl işlediğimizi anlatır.",
     legal_privacy_data: "Veri İşleme",
     legal_privacy_rights: "Haklarınız",
+    not_found_title: "Bu sayfa bulunamadı.",
+    not_found_subtitle: "Aradığınız sayfa mevcut olmayabilir veya taşınmış olabilir.",
+    not_found_button: "Ana Sayfaya Dön",
+    impressum_back_button: "Ana Sayfaya Dön",
     popular: "Popüler",
   },
   en: {
@@ -291,6 +299,10 @@ export const translations: Record<Language, Record<string, string>> = {
     legal_privacy_intro: "Privacy is important to us. This privacy policy explains how we process your data.",
     legal_privacy_data: "Data Processing",
     legal_privacy_rights: "Your Rights",
+    not_found_title: "This page could not be found.",
+    not_found_subtitle: "The page you are looking for may not exist or has been moved.",
+    not_found_button: "Back to Home",
+    impressum_back_button: "Back to Home",
     popular: "Popular",
   },
 }
