@@ -172,13 +172,6 @@ export default function RootLayout({
     email: 'info@xelvetec.ch',
     url: 'https://xelvetec.ch',
     priceRange: '$$',
-    rating: {
-      '@type': 'AggregateRating',
-      ratingValue: '5',
-      bestRating: '5',
-      worstRating: '1',
-      ratingCount: '1'
-    },
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Egelseestrasse 31',
