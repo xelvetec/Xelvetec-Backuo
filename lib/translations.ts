@@ -198,7 +198,7 @@ export const translations: Record<Language, Record<string, string>> = {
     legal_impressum_company: "Şirket Bilgileri",
     legal_impressum_address: "Adres",
     legal_impressum_address_street: "Egelseestrasse 31",
-    legal_impressum_address_city: "8280 Kreuzlingen, Schweiz",
+    legal_impressum_address_city: "8280 Kreuzlingen, İsviçre",
     legal_impressum_contact: "İletişim",
     legal_privacy_title: "Gizlilik Politikası",
     legal_privacy_intro: "Gizlilik bizim için önemlidir. Bu gizlilik politikası verilerinizi nasıl işlediğimizi anlatır.",
