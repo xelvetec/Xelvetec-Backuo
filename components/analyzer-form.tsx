@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Spinner } from '@/components/ui/spinner'
-import { AlertCircle, CheckCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 interface AnalyzerFormProps {
   onAnalysisComplete?: (data: any) => void
@@ -12,6 +12,15 @@ export function AnalyzerForm({ onAnalysisComplete }: AnalyzerFormProps) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [lastAnalyzed, setLastAnalyzed] = useState<string | null>(null)
+
+  // Load last analyzed URL from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('analyzer_last_url')
+    if (stored) {
+      setLastAnalyzed(stored)
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,9 +28,31 @@ export function AnalyzerForm({ onAnalysisComplete }: AnalyzerFormProps) {
     setLoading(true)
 
     try {
+      // Parse URL to get hostname
+      const parsedUrl = new URL(url.startsWith('http') ? url : `https://${url}`)
+      const hostname = parsedUrl.hostname
+
+      // Check if same hostname was analyzed recently
+      const lastTime = localStorage.getItem(`analyzer_${hostname}`)
+      if (lastTime) {
+        const now = Date.now()
+        const lastTimestamp = parseInt(lastTime)
+        const oneHourInMs = 3600000
+
+        if (now - lastTimestamp < oneHourInMs) {
+          const minutesRemaining = Math.ceil((oneHourInMs - (now - lastTimestamp)) / 60000)
+          setError(`Diese Website wurde bereits analysiert. Bitte warte ${minutesRemaining} Minuten vor der nächsten Analyse.`)
+          setLoading(false)
+          return
+        }
+      }
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-last-analyzed': lastTime || '',
+        },
         body: JSON.stringify({ url }),
       })
 
@@ -29,8 +60,16 @@ export function AnalyzerForm({ onAnalysisComplete }: AnalyzerFormProps) {
 
       if (!response.ok) {
         setError(data.error || 'Analyse fehlgeschlagen. Bitte versuche es erneut.')
+        setLoading(false)
         return
       }
+
+      // Store analyzed URL with timestamp
+      localStorage.setItem(`analyzer_${hostname}`, Date.now().toString())
+      setLastAnalyzed(hostname)
+      
+      // Store the analyzed URL for potential contact form use
+      localStorage.setItem('analyzer_url', hostname)
 
       onAnalysisComplete?.(data)
     } catch (err) {
