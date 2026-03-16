@@ -13,6 +13,18 @@ export function ContactSection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    // Fill analyzer URL if available from localStorage
+    if (formRef.current) {
+      const analyzerUrl = localStorage.getItem('analyzer_url')
+      if (analyzerUrl) {
+        const hiddenInput = formRef.current.querySelector('input[name="analyzer_url"]') as HTMLInputElement
+        if (hiddenInput) {
+          hiddenInput.value = analyzerUrl
+        }
+      }
+    }
+
+    // Intersection observer for animations
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) setIsVisible(true)
@@ -90,6 +102,12 @@ export function ContactSection() {
             }`}
           >
             <form ref={formRef} className="flex flex-col gap-5" onSubmit={handleSubmit}>
+              {/* Hidden field for analyzer URL */}
+              <input
+                type="hidden"
+                name="analyzer_url"
+                defaultValue=""
+              />
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="text-sm font-medium text-foreground/70">
                   {t("contact_name")}
