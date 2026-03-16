@@ -1,33 +1,41 @@
-"use client"
+'use client'
 
-import Image from "next/image"
-import { useLanguage } from "@/lib/language-context"
-import { Instagram, Facebook, MessageCircle, Linkedin } from "lucide-react"
-import { PaymentMethods } from "./payment-methods"
+import Image from 'next/image'
+import { useLanguage } from '@/lib/language-context'
+import { Instagram, Facebook, MessageCircle, Linkedin, Sun, Moon } from 'lucide-react'
+import { PaymentMethods } from './payment-methods'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 
 export function Footer() {
   const { t } = useLanguage()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const year = new Date().getFullYear()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const socialLinks = [
     {
-      name: "Instagram",
-      url: "https://www.instagram.com/xelvetec",
+      name: 'Instagram',
+      url: 'https://www.instagram.com/xelvetec',
       icon: Instagram,
     },
     {
-      name: "Facebook",
-      url: "https://www.facebook.com/share/18RJcnouEu/?mibextid=wwXIfr",
+      name: 'Facebook',
+      url: 'https://www.facebook.com/share/18RJcnouEu/?mibextid=wwXIfr',
       icon: Facebook,
     },
     {
-      name: "LinkedIn",
-      url: "https://www.linkedin.com/company/xelvetec/",
+      name: 'LinkedIn',
+      url: 'https://www.linkedin.com/company/xelvetec/',
       icon: Linkedin,
     },
     {
-      name: "WhatsApp",
-      url: "https://wa.me/41768443375",
+      name: 'WhatsApp',
+      url: 'https://wa.me/41768443375',
       icon: MessageCircle,
     },
   ]
@@ -38,7 +46,7 @@ export function Footer() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 0%, rgba(160,32,240,0.04) 0%, transparent 50%)",
+            'radial-gradient(ellipse at 50% 0%, rgba(160,32,240,0.04) 0%, transparent 50%)',
         }}
       />
 
@@ -60,9 +68,9 @@ export function Footer() {
             <span
               className="text-lg font-bold"
               style={{
-                background: "linear-gradient(135deg, #A020F0, #3B82F6)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                background: 'linear-gradient(135deg, #A020F0, #3B82F6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
               }}
             >
               XelveTec
@@ -72,14 +80,14 @@ export function Footer() {
           {/* Links */}
           <div className="flex items-center gap-6 text-sm text-foreground/40">
             <a href="/impressum" className="hover:text-foreground transition-colors">
-              {t("footer_impressum")}
+              {t('footer_impressum')}
             </a>
             <a href="/datenschutz" className="hover:text-foreground transition-colors">
-              {t("footer_privacy")}
+              {t('footer_privacy')}
             </a>
           </div>
 
-          {/* Social icons */}
+          {/* Social icons & Theme Toggle */}
           <div className="flex items-center gap-3">
             {socialLinks.map((social) => {
               const IconComponent = social.icon
@@ -92,14 +100,33 @@ export function Footer() {
                   title={social.name}
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-foreground/60 transition-all duration-300 hover:scale-110 hover:text-foreground"
                   style={{
-                    background: "rgba(160,32,240,0.1)",
-                    border: "1px solid rgba(160,32,240,0.2)",
+                    background: 'rgba(160,32,240,0.1)',
+                    border: '1px solid rgba(160,32,240,0.2)',
                   }}
                 >
                   <IconComponent className="w-5 h-5" />
                 </a>
               )
             })}
+
+            {/* Theme Toggle Button */}
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                aria-label="Toggle theme"
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-foreground/60 transition-all duration-300 hover:scale-110 hover:text-foreground"
+                style={{
+                  background: 'rgba(160,32,240,0.1)',
+                  border: '1px solid rgba(160,32,240,0.2)',
+                }}
+              >
+                {theme === 'light' ? (
+                  <Moon className="w-5 h-5" />
+                ) : (
+                  <Sun className="w-5 h-5" />
+                )}
+              </button>
+            )}
           </div>
         </div>
 
@@ -110,7 +137,7 @@ export function Footer() {
               <span className="text-2xl md:hidden">🇨🇭</span>
             </div>
             <p className="text-xs text-foreground/30 text-center">
-              &copy; {year} XelveTec. {t("footer_rights")}
+              &copy; {year} XelveTec. {t('footer_rights')}
             </p>
           </div>
         </div>

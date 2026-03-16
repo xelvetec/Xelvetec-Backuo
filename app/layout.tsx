@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { BackgroundParticles } from '@/components/background-particles'
 import { CookieBanner } from '@/components/cookie-banner'
+import { ClientThemeProvider } from '@/components/client-theme-provider'
 import { LanguageProvider } from '@/lib/language-context'
 import './globals.css'
 
@@ -303,7 +304,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="de" className="dark">
+    <html lang="de" className="dark" suppressHydrationWarning>
       <head>
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -360,10 +361,12 @@ export default function RootLayout({
       <body className={`${_inter.variable} ${_geistMono.variable} font-sans antialiased`}>
         {/* Global background particles for entire website */}
         <BackgroundParticles />
-        <LanguageProvider>
-          {children}
-          <CookieBanner />
-        </LanguageProvider>
+        <ClientThemeProvider>
+          <LanguageProvider>
+            {children}
+            <CookieBanner />
+          </LanguageProvider>
+        </ClientThemeProvider>
         <Analytics />
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
         <script
