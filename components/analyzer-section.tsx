@@ -73,7 +73,7 @@ export function AnalyzerSection() {
                       onClick={handleNewAnalysis}
                       className="px-8 py-3 rounded-lg border border-white/20 hover:bg-white/10 text-white font-semibold transition-all duration-300"
                     >
-                      Neue Website analysieren
+                      {t('analyzer_new_analysis') || 'Neue Website analysieren'}
                     </button>
                   </div>
                 </div>

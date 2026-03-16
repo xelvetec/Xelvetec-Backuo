@@ -36,9 +36,9 @@ function ScoreCard({ title, score, suggestions }: { title: string; score: number
   }
 
   const getStatusText = (score: number) => {
-    if (score >= 80) return 'Gut'
-    if (score >= 60) return 'Befriedigend'
-    return 'Verbesserungsbedürftig'
+    if (score >= 80) return t('analyzer_status_good') || 'Gut'
+    if (score >= 60) return t('analyzer_status_fair') || 'Befriedigend'
+    return t('analyzer_status_poor') || 'Verbesserungsbedürftig'
   }
 
   return (
