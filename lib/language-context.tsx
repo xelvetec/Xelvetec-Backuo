@@ -52,15 +52,19 @@ const countryCodeMap: Record<string, Country> = {
 
 async function detectCountry(): Promise<Country> {
   try {
-    const response = await fetch("https://ipapi.co/json/")
+    // Use Vercel's native geolocation via our API route (most reliable)
+    const response = await fetch("/api/geolocation")
     const data = await response.json()
-    const countryCode = data.country_code?.toUpperCase()
+    const countryCode = data.country?.toUpperCase()
+    
+    console.log("[v0] Detected country code from Vercel header:", countryCode)
     
     if (countryCode && countryCode in countryCodeMap) {
+      console.log("[v0] Mapped to:", countryCodeMap[countryCode])
       return countryCodeMap[countryCode]
     }
   } catch (error) {
-    console.log("[v0] Country detection failed, using default")
+    console.log("[v0] Geolocation detection failed:", error)
   }
   
   return "de" // Default fallback
