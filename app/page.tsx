@@ -3,6 +3,7 @@ import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
 import { ServicesSection } from "@/components/services-section"
 import { AboutSection } from "@/components/about-section"
+import { AnalyzerSection } from "@/components/analyzer-section"
 import { LanguageProvider } from "@/lib/language-context"
 import { SmoothScroll } from "@/components/smooth-scroll"
 
@@ -33,6 +34,7 @@ export default function Home() {
           <HeroSection />
           <ServicesSection />
           <AboutSection />
+          <AnalyzerSection />
           <PortfolioSection />
           <ReviewsSection />
           <ContactSection />
