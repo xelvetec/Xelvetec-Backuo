@@ -39,6 +39,8 @@ export function TiltWrapper({
     ? {
         transform: `perspective(${tiltTransform.perspective}px) rotateX(${tiltTransform.rotateX}deg) rotateY(${tiltTransform.rotateY}deg)`,
         transition: 'transform 0.1s ease-out',
+        willChange: 'transform',
+        transformStyle: 'preserve-3d' as const,
       }
     : {}
 

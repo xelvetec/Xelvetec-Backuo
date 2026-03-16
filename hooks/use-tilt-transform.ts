@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useDeviceOrientation } from './use-device-orientation'
 
 export interface TiltTransform {
@@ -15,17 +15,31 @@ export function useTiltTransform(intensity: number = 1) {
     rotateY: 0,
     perspective: 1200,
   })
+  const [isScrolling, setIsScrolling] = useState(false)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>()
   const { orientation, isSupported, hasPermission } = useDeviceOrientation()
 
+  // Detect scrolling to disable tilt during scroll
   useEffect(() => {
-    if (!isSupported || !hasPermission) return
+    const handleScroll = () => {
+      setIsScrolling(true)
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+      scrollTimeoutRef.current = setTimeout(() => setIsScrolling(false), 150)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    // Don't update tilt while scrolling to improve performance
+    if (!isSupported || !hasPermission || isScrolling) return
 
     const updateTilt = () => {
-      // Beta: tilt forward/backward (-180 to 180)
-      // Gamma: tilt left/right (-90 to 90)
-      // Clamp values to ±5-8 degrees for subtle effect
       const maxTilt = 8 * intensity
-
       const rotateX = (orientation.beta / 180) * maxTilt
       const rotateY = (orientation.gamma / 90) * maxTilt
 
@@ -37,7 +51,7 @@ export function useTiltTransform(intensity: number = 1) {
     }
 
     updateTilt()
-  }, [orientation, isSupported, hasPermission, intensity])
+  }, [orientation, isSupported, hasPermission, intensity, isScrolling])
 
   return tiltTransform
 }
