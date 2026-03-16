@@ -82,7 +82,7 @@ export function CookieBanner() {
               <h3 className="text-lg font-semibold text-white mb-2">{t('cookie_title')}</h3>
               <p className="text-sm text-gray-300 mb-2">{t('cookie_description')}</p>
               <p className="text-xs text-gray-400 mb-3">{t('cookie_regions')}</p>
-              <a href="/impressum" className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+              <a href="/datenschutz" className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
                 {t('cookie_privacy_link')} →
               </a>
             </div>
