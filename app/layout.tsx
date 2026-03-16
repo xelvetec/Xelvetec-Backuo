@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { BackgroundParticles } from '@/components/background-particles'
-import { AdvancedCookieBanner } from '@/components/advanced-cookie-banner'
 import { LanguageProvider } from '@/lib/language-context'
 import './globals.css'
 
@@ -362,7 +361,6 @@ export default function RootLayout({
         <BackgroundParticles />
         <LanguageProvider>
           {children}
-          <AdvancedCookieBanner />
         </LanguageProvider>
         <Analytics />
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
