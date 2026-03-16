@@ -93,7 +93,7 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay 
       onMouseLeave={handleMouseLeave}
       className={`relative rounded-3xl p-px transition-all duration-700 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-      } ${popular ? "md:-mt-4 md:mb-4" : ""}`}
+      }`}
       style={{
         transitionDelay: `${delay}ms`,
         transform: `perspective(1000px) rotateX(${-mousePos.y}deg) rotateY(${mousePos.x}deg) translateX(${mousePos.x * 2}px) translateY(${mousePos.y * 2}px) ${
