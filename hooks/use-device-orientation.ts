@@ -33,12 +33,22 @@ export function useDeviceOrientation() {
 
       window.addEventListener('deviceorientation', handleOrientation)
 
-      // iOS 13+ requires permission
+      // iOS 13+ requires permission - request it automatically
       if (
         typeof DeviceOrientationEvent !== 'undefined' &&
         'requestPermission' in DeviceOrientationEvent
       ) {
-        setHasPermission(false)
+        ;(DeviceOrientationEvent as any).requestPermission()
+          .then((permission: string) => {
+            console.log("[v0] iOS Permission result:", permission)
+            if (permission === 'granted') {
+              setHasPermission(true)
+            }
+          })
+          .catch((error: Error) => {
+            console.log("[v0] iOS Permission error:", error.message)
+            setHasPermission(false)
+          })
       } else {
         setHasPermission(true)
       }

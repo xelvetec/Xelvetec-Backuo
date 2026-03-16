@@ -3,7 +3,6 @@ import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { BackgroundParticles } from '@/components/background-particles'
 import { CookieBanner } from '@/components/cookie-banner'
-import { MotionPermissionPopup } from '@/components/motion-permission-popup'
 import { LanguageProvider } from '@/lib/language-context'
 import './globals.css'
 
@@ -361,7 +360,6 @@ export default function RootLayout({
       <body className={`${_inter.variable} ${_geistMono.variable} font-sans antialiased`}>
         {/* Global background particles for entire website */}
         <BackgroundParticles />
-        <MotionPermissionPopup />
         <LanguageProvider>
           {children}
           <CookieBanner />
