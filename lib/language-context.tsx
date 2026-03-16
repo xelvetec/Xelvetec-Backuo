@@ -73,6 +73,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Auto-detect country on mount
   useEffect(() => {
     detectCountry().then((detectedCountry) => {
+      console.log("[v0] Detected country:", detectedCountry)
       setCountryState(detectedCountry)
       setMounted(true)
     })

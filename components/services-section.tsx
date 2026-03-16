@@ -78,6 +78,7 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay 
   }
 
   const priceString = prices[priceKey][country]
+  console.log("[v0] Country:", country, "Price Key:", priceKey, "Price String:", priceString)
   const priceNum = parseInt(priceString.replace(/[^\d]/g, ""))
   const animatedPrice = useAnimatedCounter(priceNum, 1500, isVisible)
   const currency = priceString.includes("CHF") ? " CHF" : priceString.includes("€") ? "€" : " ₺"
