@@ -76,19 +76,21 @@ function ScoreCard({ title, score, suggestions }: { title: string; score: number
 }
 
 export function AnalysisResults({ result }: AnalysisResultsProps) {
+  const { t } = useLanguage()
+  
   const categories = [
-    { key: 'speed', title: 'Ladegeschwindigkeit', icon: '⚡' },
-    { key: 'seo', title: 'SEO Bewertung', icon: '🔍' },
-    { key: 'mobile', title: 'Mobile Optimierung', icon: '📱' },
-    { key: 'design', title: 'Design Bewertung', icon: '🎨' },
-    { key: 'conversion', title: 'Conversion Potential', icon: '💰' },
+    { key: 'speed', title: t('analyzer_speed') || 'Ladegeschwindigkeit', icon: '⚡' },
+    { key: 'seo', title: t('analyzer_seo') || 'SEO Bewertung', icon: '🔍' },
+    { key: 'mobile', title: t('analyzer_mobile') || 'Mobile Optimierung', icon: '📱' },
+    { key: 'design', title: t('analyzer_design') || 'Design Bewertung', icon: '🎨' },
+    { key: 'conversion', title: t('analyzer_conversion') || 'Conversion Potential', icon: '💰' },
   ]
 
   return (
     <div className="w-full animate-fade-in">
       {/* Header mit Overall Score */}
       <div className="mb-8 text-center">
-        <p className="text-white/60 text-sm mb-2">Analyseergebnis für</p>
+        <p className="text-white/60 text-sm mb-2">{t('analyzer_analysis_for') || 'Analyseergebnis für'}</p>
         <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">{result.url}</h2>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
@@ -96,12 +98,12 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
             <div className="text-6xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
               {result.average}
             </div>
-            <p className="text-white/60">Gesamt-Score</p>
+            <p className="text-white/60">{t('analyzer_overall_score') || 'Gesamt-Score'}</p>
           </div>
 
           <div className="text-white/40">
             {result.loadTime && (
-              <p className="text-sm">⏱️ Ladezeit: {result.loadTime}ms</p>
+              <p className="text-sm">⏱️ {t('analyzer_load_time_label') || 'Ladezeit'}: {result.loadTime}ms</p>
             )}
           </div>
         </div>
