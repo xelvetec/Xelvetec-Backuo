@@ -178,7 +178,7 @@ export function ContactSection() {
               isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
             }`}
           >
-            <div className="glass rounded-2xl p-6 flex items-start gap-4 transition-all duration-300 hover:scale-[1.02]">
+            <a href="mailto:info@xelvetec.ch" className="glass rounded-2xl p-6 flex items-start gap-4 transition-all duration-300 hover:scale-[1.02]">
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: "linear-gradient(135deg, #A020F0, #3B82F6)" }}
@@ -189,9 +189,9 @@ export function ContactSection() {
                 <h4 className="font-semibold text-foreground mb-1">{t("contact_email")}</h4>
                 <p className="text-sm text-foreground/50">info@xelvetec.ch</p>
               </div>
-            </div>
+            </a>
 
-            <div className="glass rounded-2xl p-6 flex items-start gap-4 transition-all duration-300 hover:scale-[1.02]">
+            <a href="tel:+41768443375" className="glass rounded-2xl p-6 flex items-start gap-4 transition-all duration-300 hover:scale-[1.02]">
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: "linear-gradient(135deg, #A020F0, #3B82F6)" }}
@@ -202,7 +202,7 @@ export function ContactSection() {
                 <h4 className="font-semibold text-foreground mb-1">{t("contact_phone")}</h4>
                 <p className="text-sm text-foreground/50">+41 76 844 33 75</p>
               </div>
-            </div>
+            </a>
 
             <div className="glass rounded-2xl p-6 flex items-start gap-4 transition-all duration-300 hover:scale-[1.02]">
               <div
@@ -213,7 +213,7 @@ export function ContactSection() {
               </div>
               <div>
                 <h4 className="font-semibold text-foreground mb-1">{t("contact_location")}</h4>
-                <p className="text-sm text-foreground/50">Egelseestrasse 31<br />8280 Kreuzlingen, Schweiz</p>
+                <p className="text-sm text-foreground/50">{t("legal_impressum_address_street")}<br />{t("legal_impressum_address_city")}</p>
               </div>
             </div>
 
