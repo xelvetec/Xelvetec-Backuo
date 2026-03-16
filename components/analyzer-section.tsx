@@ -63,7 +63,7 @@ export function AnalyzerSection() {
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link
-                      href="/#contact?website={encodeURIComponent(result.url)}"
+                      href="/#contact"
                       className="px-8 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
                     >
                       {t('analyzer_cta_button')}
