@@ -46,7 +46,7 @@ export function HeroSection() {
   const easedProgress = easeOutCubic(scrollProgress)
 
   // Ultra dramatic zoom-in animation - aggressive and punchy
-  const textScale = 0.7 + easedProgress * 1.2 // 0.7 -> 1.9 (more aggressive zoom!)
+  const textScale = 0.7 + easedProgress * 0.7 // 0.7 -> 1.4 (prevents overlap with text below)
   const textMotionBlur = 0 // NO blur for crisp, sharp text
   const textOpacity = 0.85 + easedProgress * 0.15 // 0.85 -> 1.0
 
