@@ -1,6 +1,7 @@
 'use client'
 
 import { CheckCircle, AlertCircle, Lightbulb } from 'lucide-react'
+import { useLanguage } from '@/lib/language-context'
 
 interface AnalysisResult {
   url: string
@@ -27,6 +28,7 @@ interface AnalysisResultsProps {
 }
 
 function ScoreCard({ title, score, suggestions }: { title: string; score: number; suggestions: any[] }) {
+  const { t } = useLanguage()
   const getColor = (score: number) => {
     if (score >= 80) return 'from-green-500 to-emerald-600'
     if (score >= 60) return 'from-yellow-500 to-orange-600'

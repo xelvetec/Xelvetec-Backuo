@@ -5,8 +5,10 @@ import { AnalyzerForm } from './analyzer-form'
 import { AnalysisResults } from './analysis-results'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { useLanguage } from '@/lib/language-context'
 
 export function AnalyzerSection() {
+  const { t } = useLanguage()
   const [result, setResult] = useState(null)
   const [showCTA, setShowCTA] = useState(false)
 
@@ -35,10 +37,10 @@ export function AnalyzerSection() {
         {!result ? (
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-              Website Analyse
+              {t('analyzer_title')}
             </h2>
             <p className="text-lg text-white/60 mb-8 max-w-2xl mx-auto">
-              Erhalte eine kostenlose Analyse deiner Website. Wir prüfen Ladegeschwindigkeit, SEO, Mobile-Optimierung, Design und Conversion-Potential.
+              {t('analyzer_subtitle')}
             </p>
 
             <div className="flex justify-center mb-12">
@@ -53,19 +55,19 @@ export function AnalyzerSection() {
               <div className="mt-16 p-8 sm:p-12 rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-600/10 to-blue-600/10">
                 <div className="text-center">
                   <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-                    Wir können deine Website auf Premium-Level optimieren
+                    {t('analyzer_cta_title')}
                   </h3>
                   <p className="text-white/70 mb-8 max-w-2xl mx-auto">
-                    Unsere Experten identifizieren Schwachstellen und transformieren deine Website in ein High-Performance-Tool für mehr Conversions und Umsatz.
+                    {t('analyzer_cta_subtitle')}
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link
-                      href="/#contact"
+                      href="/#contact?website={encodeURIComponent(result.url)}"
                       className="px-8 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
                     >
-                      Kostenloses Beratungsgespräch
-                      <ArrowRight className="w-4 h-4" />
+                      {t('analyzer_cta_button')}
+                      <ArrowRight className="w-5 h-5" />
                     </Link>
                     <button
                       onClick={handleNewAnalysis}

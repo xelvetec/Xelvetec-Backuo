@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import { Spinner } from '@/components/ui/spinner'
 import { AlertCircle } from 'lucide-react'
+import { useLanguage } from '@/lib/language-context'
 
 interface AnalyzerFormProps {
   onAnalysisComplete?: (data: any) => void
 }
 
 export function AnalyzerForm({ onAnalysisComplete }: AnalyzerFormProps) {
+  const { t } = useLanguage()
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -85,7 +87,8 @@ export function AnalyzerForm({ onAnalysisComplete }: AnalyzerFormProps) {
       <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
-          placeholder="z.B. example.com oder https://example.com"
+          name="website_url"
+          placeholder={t('analyzer_placeholder')}
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           disabled={loading}
@@ -100,10 +103,10 @@ export function AnalyzerForm({ onAnalysisComplete }: AnalyzerFormProps) {
           {loading ? (
             <>
               <Spinner className="w-4 h-4" />
-              <span className="hidden sm:inline">Analysiere...</span>
+              <span className="hidden sm:inline">{t('analyzer_analyzing')}</span>
             </>
           ) : (
-            'Analysieren'
+            t('analyzer_button')
           )}
         </button>
       </div>
