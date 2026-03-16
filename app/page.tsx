@@ -3,7 +3,6 @@ import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
 import { ServicesSection } from "@/components/services-section"
 import { AboutSection } from "@/components/about-section"
-import { TiltWrapper } from "@/components/tilt-wrapper"
 import { LanguageProvider } from "@/lib/language-context"
 import { SmoothScroll } from "@/components/smooth-scroll"
 
@@ -31,24 +30,14 @@ export default function Home() {
       <SmoothScroll>
         <Navbar />
         <main>
-          <TiltWrapper intensity={0.9}>
-            <HeroSection />
-          </TiltWrapper>
-          <TiltWrapper intensity={0.8}>
-            <ServicesSection />
-          </TiltWrapper>
-          <TiltWrapper intensity={0.7}>
-            <AboutSection />
-          </TiltWrapper>
+          <HeroSection />
+          <ServicesSection />
+          <AboutSection />
           <PortfolioSection />
           <ReviewsSection />
-          <TiltWrapper intensity={0.75}>
-            <ContactSection />
-          </TiltWrapper>
+          <ContactSection />
         </main>
-        <TiltWrapper intensity={0.6}>
-          <Footer />
-        </TiltWrapper>
+        <Footer />
       </SmoothScroll>
     </LanguageProvider>
   )
