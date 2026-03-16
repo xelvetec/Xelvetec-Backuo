@@ -23,6 +23,7 @@ export function useDeviceOrientation() {
       setIsSupported(true)
 
       const handleOrientation = (event: DeviceOrientationEvent) => {
+        console.log("[v0] Device Orientation detected - Beta:", event.beta, "Gamma:", event.gamma)
         setOrientation({
           alpha: event.alpha || 0,
           beta: event.beta || 0,
