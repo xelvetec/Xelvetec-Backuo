@@ -204,58 +204,35 @@ export function HeroSection() {
           {t("hero_subtitle")}
         </p>
 
-        {/* Region Info */}
-        <p className="text-sm md:text-base text-cyan-400/80 max-w-2xl mx-auto mb-8">
-          ✓ Schweiz 🇨🇭 | Deutschland 🇩🇪 | Österreich 🇦🇹 | Türkei 🇹🇷
-        </p>
-
-        {/* Bundle Highlight */}
-        <div className="max-w-2xl mx-auto mb-10 px-4 py-3 rounded-lg border border-purple-500/30 bg-purple-500/10">
-          <p className="text-sm md:text-base text-white font-semibold">
-            📦 Website + Logo + Visitenkarten ab 499€
-          </p>
-        </div>
-
-        {/* Dual CTA Buttons */}
+        {/* Liquid morph CTA */}
         <div
           className={`transition-all duration-1000 delay-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            {/* Primary CTA - Book Now */}
-            <a
-              href="#contact"
-              className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-lg overflow-hidden transition-all duration-500 hover:scale-105 hover:gap-5"
-              style={{
-                background: "linear-gradient(135deg, #A020F0, #1E3A8A)",
-                color: "#fff",
-                boxShadow: "0 0 30px rgba(160, 32, 240, 0.4), 0 0 60px rgba(0, 212, 255, 0.2)",
-              }}
-            >
-              <span className="relative z-10 transition-transform duration-300 group-hover:scale-105">Jetzt starten</span>
-              <ArrowRight className="relative z-10 w-5 h-5 transition-all duration-500 group-hover:translate-x-2 group-hover:scale-125" />
-              
-              {/* Liquid morph effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#00D4FF] to-[#A020F0] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              {/* Shimmer */}
-              <div className="absolute inset-0 animate-shimmer" />
-            </a>
-
-            {/* Secondary CTA - Analyzer */}
-            <a
-              href="#analyzer"
-              className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-lg border border-purple-500/50 hover:border-cyan-400 overflow-hidden transition-all duration-500 hover:scale-105 hover:gap-5"
-              style={{
-                background: "rgba(160, 32, 240, 0.1)",
-                color: "#A020F0",
-              }}
-            >
-              <span className="relative z-10 transition-transform duration-300 group-hover:scale-105">Kostenlos analysieren</span>
-              <ArrowRight className="relative z-10 w-5 h-5 transition-all duration-500 group-hover:translate-x-2 group-hover:scale-125" />
-            </a>
-          </div>
+          <a
+            href="#contact"
+            className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-lg overflow-hidden transition-all duration-500 hover:scale-105 hover:gap-5"
+            style={{
+              background: "linear-gradient(135deg, #A020F0, #1E3A8A)",
+              color: "#fff",
+              boxShadow: "0 0 30px rgba(160, 32, 240, 0.4), 0 0 60px rgba(0, 212, 255, 0.2)",
+            }}
+          >
+            <span className="relative z-10 transition-transform duration-300 group-hover:scale-105">{t("hero_cta")}</span>
+            <ArrowRight className="relative z-10 w-5 h-5 transition-all duration-500 group-hover:translate-x-2 group-hover:scale-125" />
+            
+            {/* Liquid morph effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#00D4FF] to-[#A020F0] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            {/* Ripple explosion on hover */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 bg-white/20 rounded-full group-hover:animate-ripple-explosion" />
+            </div>
+            
+            {/* Shimmer */}
+            <div className="absolute inset-0 animate-shimmer" />
+          </a>
         </div>
       </div>
 
