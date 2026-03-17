@@ -274,12 +274,12 @@ export function ServicesSection() {
         <div className="grid md:grid-cols-4 gap-6 items-start mb-10">
           {/* Featured Starter Bundle - takes 2 columns on desktop */}
           <PricingCard
-            titleKey="starter_bundle_title"
-            descKey="starter_bundle_desc"
-            featureKeys=["starter_bundle_f1", "starter_bundle_f2", "starter_bundle_f3", "starter_bundle_f4", "starter_bundle_f5"]
-            priceKey="basic"
+            titleKey="starter_title"
+            descKey="starter_desc"
+            featureKeys={["starter_f1", "starter_f2", "starter_f3", "starter_f4", "starter_f5", "starter_f6"]}
+            priceKey="starter"
             popular
-            badge={t("starter_bundle_badge") || "Bestseller"}
+            badge={t("starter_bestseller") || "BESTSELLER"}
             delay={0}
             featured
           />
