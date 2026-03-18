@@ -7,7 +7,6 @@ const projects = [
   {
     id: "mpu",
     title: "MPU Agentur Meiningen",
-    category: "Business",
     gradient: "from-purple-600/40 to-blue-900/40",
     accentColor: "#A020F0",
     url: "https://mpuagentur-meiningen.de/",
@@ -15,8 +14,6 @@ const projects = [
   {
     id: "oda",
     title: "Oda Schmidt Rechtsanwältin",
-    category: "Law/Business",
-    badge: "Vorlage",
     gradient: "from-purple-600/40 to-blue-900/40",
     accentColor: "#A020F0",
     url: "https://magnificent-narwhal-b530a8.netlify.app/",
@@ -24,8 +21,6 @@ const projects = [
   {
     id: "kunsthandwerk",
     title: "Maler / Lackierer",
-    category: "Handcraft/Design",
-    badge: "Vorlage",
     gradient: "from-cyan-500/40 to-purple-600/40",
     accentColor: "#00D4FF",
     url: "https://jade-cranachan-bab53b.netlify.app/",
@@ -33,8 +28,6 @@ const projects = [
   {
     id: "goldener-gabel",
     title: "Goldener Gabel Restaurant",
-    category: "Gastronomy",
-    badge: "Vorlage",
     gradient: "from-blue-900/40 to-purple-600/40",
     accentColor: "#FFD700",
     url: "https://enchanting-custard-6a0bcb.netlify.app/",
@@ -88,31 +81,6 @@ function PortfolioCard({
             background: "linear-gradient(135deg, rgba(160, 32, 240, 0.2), rgba(0, 212, 255, 0.15))",
           }}
         >
-          <h4 className="text-lg font-bold text-white text-center px-4">{project.title}</h4>
-          <div className="flex items-center gap-2 justify-center flex-wrap px-4">
-            <span
-              className="text-xs px-4 py-1.5 rounded-full font-medium"
-              style={{
-                background: `${project.accentColor}30`,
-                color: project.accentColor,
-                border: `1px solid ${project.accentColor}60`,
-              }}
-            >
-              {project.category}
-            </span>
-            {project.badge && (
-              <span
-                className="text-xs px-3 py-1.5 rounded-full font-medium"
-                style={{
-                  background: "rgba(255,215,0,0.2)",
-                  color: "#FFD700",
-                  border: "1px solid rgba(255,215,0,0.4)",
-                }}
-              >
-                {project.badge}
-              </span>
-            )}
-          </div>
         </div>
       </div>
     </a>
