@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
-const XELVETEC_DOMAINS = ["xelvetec.ch", "www.xelvetec.ch"]
+const XELVETEC_DOMAINS = ["xelvetec.ch", "www.xelvetec.ch", "xelvetec.com", "www.xelvetec.com"]
 
 function getRecommendations(lang: string, metrics: {
   hasTitle: boolean
