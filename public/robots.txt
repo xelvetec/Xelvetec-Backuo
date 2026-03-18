@@ -7,7 +7,7 @@ Disallow: /private/
 Disallow: /*.json$
 Disallow: /?*
 
-Sitemap: https://xelvetec.ch/sitemap.xml
+Sitemap: https://xelvetec.com/sitemap.xml
 
 # Google-spezifische Regeln
 User-agent: Googlebot

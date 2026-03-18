@@ -22,7 +22,7 @@ const _geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://xelvetec.ch'),
+  metadataBase: new URL('https://xelvetec.com'),
   title: 'XelveTec - Premium Webdesign Agentur | Deutschland, Schweiz, Österreich, Türkei',
   description: 'XelveTec ist Ihre professionelle Webdesign Agentur in der Schweiz. Wir gestalten moderne, benutzerfreundliche Websites für KMU und Unternehmen in Deutschland, Schweiz, Österreich und Türkei. Responsive Design, SEO-optimiert, schnelle Ladezeiten.',
   keywords: ['Webdesign', 'Webdesign Agentur', 'Website erstellen', 'Responsive Design', 'Web Development', 'Schweiz', 'Deutschland', 'Österreich', 'Türkei', 'KMU', 'Webseite', 'Web-Agentur', 'Online Präsenz', 'Digitale Lösung'],
@@ -289,7 +289,7 @@ export default function RootLayout({
     itemReviewed: {
       '@type': 'LocalBusiness',
       name: 'XelveTec',
-      url: 'https://xelvetec.ch',
+    url: 'https://xelvetec.com',
       telephone: '+41768443375',
       image: 'https://xelvetec.ch/images/xelvetec-logo.png',
       address: {

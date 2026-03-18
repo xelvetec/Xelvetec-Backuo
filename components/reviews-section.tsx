@@ -19,7 +19,7 @@ export function ReviewsSection() {
       "itemReviewed": {
         "@type": "LocalBusiness",
         "name": "XelveTec",
-        "url": "https://xelvetec.ch"
+        "url": "https://xelvetec.com"
       },
       "ratingValue": 5,
       "bestRating": 5,
@@ -55,7 +55,7 @@ export function ReviewsSection() {
     {
       platform: "Trustpilot",
       rating: 4.1,
-      url: "https://www.trustpilot.com/review/xelvetec.ch",
+      url: "https://www.trustpilot.com/review/xelvetec.com",
       bgColor: "from-green-500/10 to-green-600/10",
       borderColor: "border-green-500/20",
       starColor: "#10B981",
