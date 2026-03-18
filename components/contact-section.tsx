@@ -196,7 +196,7 @@ export function ContactSection() {
               isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
             }`}
           >
-            <a href="mailto:info@xelvetec.ch" className="glass rounded-2xl p-6 flex items-start gap-4 transition-all duration-300 hover:scale-[1.02]">
+            <a href="mailto:business@xelvetec.com" className="glass rounded-2xl p-6 flex items-start gap-4 transition-all duration-300 hover:scale-[1.02]">
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: "linear-gradient(135deg, #A020F0, #3B82F6)" }}
@@ -205,7 +205,7 @@ export function ContactSection() {
               </div>
               <div>
                 <h4 className="font-semibold text-foreground mb-1">{t("contact_email")}</h4>
-                <p className="text-sm text-foreground/50">info@xelvetec.ch</p>
+                <p className="text-sm text-foreground/50">business@xelvetec.com</p>
               </div>
             </a>
 
