@@ -14,7 +14,6 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
-  swcMinify: true,
   productionBrowserSourceMaps: false,
   onDemandEntries: {
     maxInactiveAge: 60000,
