@@ -138,7 +138,7 @@ export default function RootLayout({
         '@type': 'ContactPoint',
         contactType: 'Sales',
         telephone: '+41768443375',
-        email: 'info@xelvetec.ch'
+        email: 'business@xelvetec.com'
       },
       {
         '@type': 'ContactPoint',
@@ -171,7 +171,7 @@ export default function RootLayout({
     image: 'https://xelvetec.ch/images/xelvetec-logo.png',
     description: 'Premium Webdesign Services für Unternehmen in Deutschland, Schweiz, Österreich und Türkei',
     telephone: '+41768443375',
-    email: 'info@xelvetec.ch',
+    email: 'business@xelvetec.com',
     url: 'https://xelvetec.ch',
     priceRange: '$$',
     address: {
@@ -201,7 +201,7 @@ export default function RootLayout({
     description: 'Moderne Webdesign und Web Development für KMU und Unternehmen',
     url: 'https://xelvetec.ch',
     telephone: '+41768443375',
-    email: 'info@xelvetec.ch',
+    email: 'business@xelvetec.com',
     areaServed: ['DE', 'AT', 'CH', 'TR'],
     priceRange: '$$',
     hasOfferCatalog: {
@@ -257,7 +257,7 @@ export default function RootLayout({
         name: 'Wie kann ich XelveTec kontaktieren?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sie können XelveTec unter +41 76 844 33 75 oder info@xelvetec.ch erreichen.'
+          text: 'Sie können XelveTec unter +41 76 844 33 75 oder business@xelvetec.com erreichen.'
         }
       },
       {

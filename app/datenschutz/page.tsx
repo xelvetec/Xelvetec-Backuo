@@ -54,7 +54,7 @@ export default function DatenschutzPage() {
           <section className="glass rounded-2xl p-8">
             <h2 className="text-2xl font-bold text-white mb-4">Kontakt</h2>
             <p>Für Fragen zum Datenschutz oder zur Wahrnehmung Ihrer Rechte kontaktieren Sie uns bitte:</p>
-            <p className="mt-4"><strong>XelveTec</strong><br />{t('legal_impressum_address_street')}<br />{t('legal_impressum_address_city')}<br /><br /><strong>Telefon:</strong> +41 76 844 33 75<br /><strong>E-Mail:</strong> info@xelvetec.ch</p>
+            <p className="mt-4"><strong>XelveTec</strong><br />{t('legal_impressum_address_street')}<br />{t('legal_impressum_address_city')}<br /><br /><strong>Telefon:</strong> +41 76 844 33 75<br /><strong>E-Mail:</strong> business@xelvetec.com</p>
           </section>
 
           <section className="glass rounded-2xl p-8">

@@ -8,8 +8,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  turbopack: {
-    root: __dirname,
+  experimental: {
+    turbopack: {
+      root: __dirname,
+    },
   },
   images: {
     unoptimized: false,

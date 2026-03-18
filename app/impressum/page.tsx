@@ -42,7 +42,7 @@ export default function ImpressumPage() {
           <section className="glass rounded-2xl p-8">
             <h2 className="text-2xl font-bold text-white mb-4">{t('legal_impressum_contact')}</h2>
             <p><strong>Telefon:</strong> <a href="tel:+41768443375" className="text-[#A020F0] hover:text-[#00D4FF] transition-colors">+41 76 844 33 75</a></p>
-            <p><strong>E-Mail:</strong> <a href="mailto:info@xelvetec.com" className="text-[#A020F0] hover:text-[#00D4FF] transition-colors">info@xelvetec.com</a></p>
+            <p><strong>E-Mail:</strong> <a href="mailto:business@xelvetec.com" className="text-[#A020F0] hover:text-[#00D4FF] transition-colors">business@xelvetec.com</a></p>
           </section>
 
           <section className="glass rounded-2xl p-8">
