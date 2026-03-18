@@ -80,7 +80,6 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay,
   }
 
   const priceString = prices[priceKey][country]
-  console.log("[v0] Country:", country, "Price Key:", priceKey, "Price String:", priceString)
   const priceNum = parseInt(priceString.replace(/[^\d]/g, ""))
   const animatedPrice = useAnimatedCounter(priceNum, 1500, isVisible)
   const currency = priceString.includes("CHF") ? " CHF" : priceString.includes("€") ? "€" : " ₺"
@@ -272,16 +271,16 @@ export function ServicesSection() {
 
         {/* Cards - Starter Bundle featured first with 4-column on desktop */}
         <div className="grid md:grid-cols-4 gap-6 items-start mb-10">
-          {/* Featured Starter Bundle - takes 2 columns on desktop */}
+          {/* Featured Starter Bundle */}
           <PricingCard
             titleKey="starter_bundle_title"
             descKey="starter_bundle_desc"
             featureKeys={["starter_bundle_f1", "starter_bundle_f2", "starter_bundle_f3", "starter_bundle_f4", "starter_bundle_f5"]}
             priceKey="basic"
-            popular
-            badge={t("starter_bundle_badge") || "Bestseller"}
+            popular={true}
+            badge="Bestseller"
             delay={0}
-            featured
+            featured={true}
           />
 
           {/* Other packages */}
