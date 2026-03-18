@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useLanguage } from "@/lib/language-context"
 
 export function AnalyzerSection() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [url, setUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -16,6 +16,40 @@ export function AnalyzerSection() {
       return true
     } catch {
       return false
+    }
+  }
+
+  const checkRateLimit = (urlString: string): { allowed: boolean; minutesLeft?: number } => {
+    const normalizedUrl = urlString.startsWith("http") ? urlString : `https://${urlString}`
+    const key = `analyzer_${normalizedUrl}`
+    const lastAnalyzed = localStorage.getItem(key)
+    
+    if (!lastAnalyzed) return { allowed: true }
+    
+    const lastTime = parseInt(lastAnalyzed)
+    const now = Date.now()
+    const minutesElapsed = (now - lastTime) / (1000 * 60)
+    
+    if (minutesElapsed >= 60) {
+      return { allowed: true }
+    }
+    
+    return { allowed: false, minutesLeft: Math.ceil(60 - minutesElapsed) }
+  }
+
+  const setRateLimit = (urlString: string) => {
+    const normalizedUrl = urlString.startsWith("http") ? urlString : `https://${urlString}`
+    const key = `analyzer_${normalizedUrl}`
+    localStorage.setItem(key, Date.now().toString())
+  }
+
+  const getRateLimitMessage = (minutesLeft: number) => {
+    if (language === "de") {
+      return `Diese URL wurde bereits analysiert. Bitte warten Sie noch ${minutesLeft} Minute${minutesLeft !== 1 ? 'n' : ''}.`
+    } else if (language === "tr") {
+      return `Bu URL zaten analiz edildi. Lütfen ${minutesLeft} dakika daha bekleyin.`
+    } else {
+      return `This URL was already analyzed. Please wait ${minutesLeft} more minute${minutesLeft !== 1 ? 's' : ''}.`
     }
   }
 
@@ -32,12 +66,22 @@ export function AnalyzerSection() {
       return
     }
 
+    const rateLimit = checkRateLimit(url)
+    
+    if (!rateLimit.allowed) {
+      setError(getRateLimitMessage(rateLimit.minutesLeft || 1))
+      return
+    }
+
     setLoading(true)
     try {
+      const normalizedUrl = url.startsWith("http") ? url : `https://${url}`
+      
       await new Promise(resolve => setTimeout(resolve, 2000))
       
+      setRateLimit(url)
       setResults({
-        url: url.startsWith("http") ? url : `https://${url}`,
+        url: normalizedUrl,
         speed: Math.floor(Math.random() * 40) + 50,
         seo: Math.floor(Math.random() * 40) + 60,
         mobile: Math.floor(Math.random() * 30) + 70,
@@ -79,84 +123,61 @@ export function AnalyzerSection() {
                 }}
                 onKeyPress={(e) => e.key === "Enter" && handleAnalyze()}
                 placeholder={t("analyzer_placeholder")}
-                className="flex-1 px-6 py-4 rounded-lg bg-white/5 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
+                className="flex-1 px-4 py-3 rounded-lg bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500/50"
               />
               <button
                 onClick={handleAnalyze}
                 disabled={loading}
-                className="px-8 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold transition-all disabled:opacity-50"
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg font-semibold text-white transition-all disabled:opacity-50"
               >
                 {loading ? t("analyzer_analyzing") : t("analyzer_button")}
               </button>
             </div>
-            {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
+            {error && <p className="text-red-400 text-sm mt-3">{error}</p>}
           </div>
         ) : (
           <div className="space-y-8">
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <p className="text-white/60 mb-2">{t("analyzer_analysis_for")}</p>
-                <h3 className="text-2xl font-bold text-white">{results.url}</h3>
+            <div className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-2xl border border-white/10 p-8 md:p-12">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-400">{results.speed}</div>
+                  <div className="text-sm text-white/60">{t("analyzer_speed")}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-400">{results.seo}</div>
+                  <div className="text-sm text-white/60">{t("analyzer_seo")}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-cyan-400">{results.mobile}</div>
+                  <div className="text-sm text-white/60">{t("analyzer_mobile")}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-pink-400">{results.design}</div>
+                  <div className="text-sm text-white/60">{t("analyzer_design")}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-yellow-400">{results.conversion}</div>
+                  <div className="text-sm text-white/60">{t("analyzer_conversion")}</div>
+                </div>
               </div>
+
+              <div className="text-center pt-8 border-t border-white/10">
+                <div className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">{overallScore}</div>
+                <div className="text-white/60">{t("analyzer_average")}</div>
+              </div>
+            </div>
+
+            <div className="text-center">
               <button
                 onClick={() => {
                   setResults(null)
                   setUrl("")
+                  setError("")
                 }}
-                className="px-6 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg font-semibold text-white transition-all"
               >
-                {t("analyzer_new_analysis")}
+                {language === "de" ? "Neue Analyse" : language === "tr" ? "Yeni Analiz" : "New Analysis"}
               </button>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-2xl border border-white/10 p-8">
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-white/60 mb-2">{t("analyzer_overall_score")}</p>
-                  <div className="flex items-baseline gap-4">
-                    <span className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-                      {overallScore}
-                    </span>
-                    <span className="text-xl text-white/80">{getScoreStatus(overallScore)}</span>
-                  </div>
-                </div>
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border-2 border-purple-400 flex items-center justify-center">
-                  <span className="text-3xl font-bold text-purple-400">{overallScore}%</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {[
-                { key: "speed", label: t("analyzer_speed"), value: results.speed },
-                { key: "seo", label: t("analyzer_seo"), value: results.seo },
-                { key: "mobile", label: t("analyzer_mobile"), value: results.mobile },
-                { key: "design", label: t("analyzer_design"), value: results.design },
-                { key: "conversion", label: t("analyzer_conversion"), value: results.conversion },
-              ].map((metric) => (
-                <div key={metric.key} className="bg-gradient-to-br from-white/5 to-white/10 rounded-xl border border-white/10 p-6">
-                  <p className="text-white/60 text-sm mb-3">{metric.label}</p>
-                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-purple-400 to-blue-400 transition-all"
-                      style={{ width: `${metric.value}%` }}
-                    />
-                  </div>
-                  <p className="text-2xl font-bold text-white mt-3">{metric.value}</p>
-                  <p className="text-xs text-white/60 mt-1">{t("analyzer_score")}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-2xl border border-white/10 p-8 md:p-12 text-center">
-              <h3 className="text-2xl font-bold text-white mb-2">{t("analyzer_cta_title")}</h3>
-              <p className="text-white/60 mb-6">{t("analyzer_cta_subtitle")}</p>
-              <a
-                href="/#contact"
-                className="inline-block px-8 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold transition-all"
-              >
-                {t("analyzer_cta_button")}
-              </a>
             </div>
           </div>
         )}
