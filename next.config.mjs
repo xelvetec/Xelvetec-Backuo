@@ -3,6 +3,11 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    turbopack: {
+      root: './',
+    },
+  },
   images: {
     unoptimized: false,
     formats: ['image/webp', 'image/avif'],
