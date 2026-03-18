@@ -3,180 +3,292 @@
 import { useState } from "react"
 import { useLanguage } from "@/lib/language-context"
 
+type AnalysisResult = {
+  url: string
+  speed: number
+  seo: number
+  mobile: number
+  design: number
+  conversion: number
+  loadTime: string | number
+  pageSize: number
+  hasHttps: boolean
+  hasCompression: boolean
+  recommendations: string[]
+  highlights?: string[]
+}
+
 export function AnalyzerSection() {
   const { t, language } = useLanguage()
   const [url, setUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [results, setResults] = useState<any>(null)
+  const [results, setResults] = useState<AnalysisResult | null>(null)
 
-  const validateUrl = (urlString: string) => {
+  const normalizeUrl = (raw: string) =>
+    raw.trim().startsWith("http") ? raw.trim() : `https://${raw.trim()}`
+
+  const validateUrl = (raw: string) => {
     try {
-      new URL(urlString.startsWith("http") ? urlString : `https://${urlString}`)
+      new URL(normalizeUrl(raw))
       return true
     } catch {
       return false
     }
   }
 
-  const checkRateLimit = (urlString: string): { allowed: boolean; minutesLeft?: number } => {
-    const normalizedUrl = urlString.startsWith("http") ? urlString : `https://${urlString}`
-    const key = `analyzer_${normalizedUrl}`
-    const lastAnalyzed = localStorage.getItem(key)
-    
-    if (!lastAnalyzed) return { allowed: true }
-    
-    const lastTime = parseInt(lastAnalyzed)
-    const now = Date.now()
-    const minutesElapsed = (now - lastTime) / (1000 * 60)
-    
-    if (minutesElapsed >= 60) {
-      return { allowed: true }
+  const getRateLimitKey = (raw: string) => `xlv_analyzer_${normalizeUrl(raw)}`
+
+  const checkRateLimit = (raw: string): { allowed: boolean; minutesLeft: number } => {
+    try {
+      const stored = localStorage.getItem(getRateLimitKey(raw))
+      if (!stored) return { allowed: true, minutesLeft: 0 }
+      const elapsed = (Date.now() - parseInt(stored)) / 60000
+      if (elapsed >= 60) return { allowed: true, minutesLeft: 0 }
+      return { allowed: false, minutesLeft: Math.ceil(60 - elapsed) }
+    } catch {
+      return { allowed: true, minutesLeft: 0 }
     }
-    
-    return { allowed: false, minutesLeft: Math.ceil(60 - minutesElapsed) }
   }
 
-  const setRateLimit = (urlString: string) => {
-    const normalizedUrl = urlString.startsWith("http") ? urlString : `https://${urlString}`
-    const key = `analyzer_${normalizedUrl}`
-    localStorage.setItem(key, Date.now().toString())
+  const saveRateLimit = (raw: string) => {
+    try {
+      localStorage.setItem(getRateLimitKey(raw), Date.now().toString())
+    } catch {}
   }
 
-  const getRateLimitMessage = (minutesLeft: number) => {
-    if (language === "de") {
-      return `Diese URL wurde bereits analysiert. Bitte warten Sie noch ${minutesLeft} Minute${minutesLeft !== 1 ? 'n' : ''}.`
-    } else if (language === "tr") {
-      return `Bu URL zaten analiz edildi. Lütfen ${minutesLeft} dakika daha bekleyin.`
-    } else {
-      return `This URL was already analyzed. Please wait ${minutesLeft} more minute${minutesLeft !== 1 ? 's' : ''}.`
-    }
+  const getRateLimitMessage = (minutes: number): string => {
+    if (language === "de")
+      return `Diese URL wurde bereits analysiert. Bitte warte noch ${minutes} Minute${minutes !== 1 ? "n" : ""}.`
+    if (language === "tr")
+      return `Bu URL zaten analiz edildi. Lütfen ${minutes} dakika daha bekleyin.`
+    return `This URL was already analyzed. Please wait ${minutes} more minute${minutes !== 1 ? "s" : ""}.`
   }
 
   const handleAnalyze = async () => {
     setError("")
-    
+
     if (!url.trim()) {
       setError(t("analyzer_error_invalid_url"))
       return
     }
-
     if (!validateUrl(url)) {
       setError(t("analyzer_error_invalid_url"))
       return
     }
 
-    const rateLimit = checkRateLimit(url)
-    
-    if (!rateLimit.allowed) {
-      setError(getRateLimitMessage(rateLimit.minutesLeft || 1))
+    const { allowed, minutesLeft } = checkRateLimit(url)
+    if (!allowed) {
+      setError(getRateLimitMessage(minutesLeft))
       return
     }
 
     setLoading(true)
     try {
-      const normalizedUrl = url.startsWith("http") ? url : `https://${url}`
-      
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      setRateLimit(url)
-      setResults({
-        url: normalizedUrl,
-        speed: Math.floor(Math.random() * 40) + 50,
-        seo: Math.floor(Math.random() * 40) + 60,
-        mobile: Math.floor(Math.random() * 30) + 70,
-        design: Math.floor(Math.random() * 35) + 65,
-        conversion: Math.floor(Math.random() * 30) + 60,
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: url.trim(), language }),
       })
-    } catch (err) {
+
+      if (!res.ok) {
+        const data = await res.json()
+        if (data.error === "not_accessible") {
+          setError(t("analyzer_error_not_accessible"))
+        } else {
+          setError(t("analyzer_error_invalid_url"))
+        }
+        return
+      }
+
+      const data = await res.json()
+      saveRateLimit(url)
+      setResults(data)
+    } catch {
       setError(t("analyzer_error_not_accessible"))
     } finally {
       setLoading(false)
     }
   }
 
-  const getScoreStatus = (score: number) => {
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "#22c55e"
+    if (score >= 60) return "#eab308"
+    return "#ef4444"
+  }
+
+  const getScoreLabel = (score: number) => {
     if (score >= 80) return t("analyzer_status_good")
     if (score >= 60) return t("analyzer_status_fair")
     return t("analyzer_status_poor")
   }
 
-  const overallScore = results ? Math.round((results.speed + results.seo + results.mobile + results.design + results.conversion) / 5) : 0
+  const overall = results
+    ? Math.round((results.speed + results.seo + results.mobile + results.design + results.conversion) / 5)
+    : 0
+
+  const metrics = results
+    ? [
+        { label: t("analyzer_speed"), value: results.speed, key: "speed" },
+        { label: t("analyzer_seo"), value: results.seo, key: "seo" },
+        { label: t("analyzer_mobile"), value: results.mobile, key: "mobile" },
+        { label: t("analyzer_design"), value: results.design, key: "design" },
+        { label: t("analyzer_conversion"), value: results.conversion, key: "conversion" },
+      ]
+    : []
 
   return (
-    <section id="analyzer" className="relative py-24 md:py-32 overflow-hidden bg-gradient-to-b from-transparent via-purple-500/5 to-transparent">
+    <section
+      id="analyzer"
+      className="relative py-24 md:py-32 overflow-hidden"
+      style={{
+        background: "linear-gradient(180deg, transparent 0%, rgba(160,32,240,0.04) 50%, transparent 100%)",
+      }}
+    >
       <div className="max-w-4xl mx-auto px-4 md:px-6">
+        {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-balance">{t("analyzer_title")}</h2>
-          <p className="text-lg text-white/60">{t("analyzer_subtitle")}</p>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-balance bg-clip-text text-transparent"
+            style={{ backgroundImage: "linear-gradient(90deg, #ffffff, #A020F0, #00D4FF)" }}>
+            {t("analyzer_title")}
+          </h2>
+          <p className="text-lg text-white/60 max-w-2xl mx-auto">{t("analyzer_subtitle")}</p>
         </div>
 
         {!results ? (
-          <div className="bg-gradient-to-br from-purple-600/10 to-blue-600/10 rounded-2xl border border-white/10 p-8 md:p-12">
+          /* Input Form */
+          <div className="rounded-2xl border border-white/10 p-8 md:p-12"
+            style={{ background: "linear-gradient(135deg, rgba(160,32,240,0.08), rgba(0,212,255,0.06))" }}>
             <div className="flex flex-col md:flex-row gap-4">
               <input
                 type="text"
                 value={url}
-                onChange={(e) => {
-                  setUrl(e.target.value)
-                  setError("")
-                }}
-                onKeyPress={(e) => e.key === "Enter" && handleAnalyze()}
+                onChange={(e) => { setUrl(e.target.value); setError("") }}
+                onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
                 placeholder={t("analyzer_placeholder")}
-                className="flex-1 px-4 py-3 rounded-lg bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500/50"
+                className="flex-1 px-5 py-4 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-purple-500 text-base"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)" }}
               />
               <button
                 onClick={handleAnalyze}
                 disabled={loading}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg font-semibold text-white transition-all disabled:opacity-50"
+                className="px-8 py-4 rounded-xl font-bold text-white text-base transition-all disabled:opacity-50 whitespace-nowrap"
+                style={{ background: "linear-gradient(135deg, #A020F0, #00D4FF)" }}
               >
                 {loading ? t("analyzer_analyzing") : t("analyzer_button")}
               </button>
             </div>
-            {error && <p className="text-red-400 text-sm mt-3">{error}</p>}
+            {error && (
+              <p className="text-red-400 text-sm mt-4 flex items-center gap-2">
+                <span>⚠</span> {error}
+              </p>
+            )}
           </div>
         ) : (
-          <div className="space-y-8">
-            <div className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-2xl border border-white/10 p-8 md:p-12">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-400">{results.speed}</div>
-                  <div className="text-sm text-white/60">{t("analyzer_speed")}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-400">{results.seo}</div>
-                  <div className="text-sm text-white/60">{t("analyzer_seo")}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-cyan-400">{results.mobile}</div>
-                  <div className="text-sm text-white/60">{t("analyzer_mobile")}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-pink-400">{results.design}</div>
-                  <div className="text-sm text-white/60">{t("analyzer_design")}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-400">{results.conversion}</div>
-                  <div className="text-sm text-white/60">{t("analyzer_conversion")}</div>
-                </div>
+          /* Results */
+          <div className="space-y-6">
+            {/* URL analyzed */}
+            <p className="text-center text-white/50 text-sm">
+              {t("analyzer_analysis_for")}: <span className="text-white/80 font-medium">{results.url}</span>
+            </p>
+
+            {/* Overall Score */}
+            <div className="rounded-2xl border border-white/10 p-8 text-center"
+              style={{ background: "linear-gradient(135deg, rgba(160,32,240,0.12), rgba(0,212,255,0.08))" }}>
+              <div className="text-7xl font-bold mb-2" style={{ color: getScoreColor(overall) }}>
+                {overall}
+              </div>
+              <div className="text-white/60 text-lg mb-1">{t("analyzer_overall_score")}</div>
+              <div className="font-semibold text-base" style={{ color: getScoreColor(overall) }}>
+                {getScoreLabel(overall)}
               </div>
 
-              <div className="text-center pt-8 border-t border-white/10">
-                <div className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">{overallScore}</div>
-                <div className="text-white/60">{t("analyzer_average")}</div>
+              {/* Meta info */}
+              <div className="flex justify-center gap-6 mt-4 text-sm text-white/50">
+                <span>{t("analyzer_load_time_label")}: <strong className="text-white/80">{results.loadTime}s</strong></span>
+                <span>HTTPS: <strong className={results.hasHttps ? "text-green-400" : "text-red-400"}>{results.hasHttps ? "✓" : "✗"}</strong></span>
+                <span>GZIP: <strong className={results.hasCompression ? "text-green-400" : "text-red-400"}>{results.hasCompression ? "✓" : "✗"}</strong></span>
               </div>
             </div>
 
+            {/* Per-metric scores */}
+            <div className="rounded-2xl border border-white/10 p-8"
+              style={{ background: "rgba(255,255,255,0.03)" }}>
+              <div className="space-y-5">
+                {metrics.map((m) => (
+                  <div key={m.key}>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-white font-medium text-sm">{m.label}</span>
+                      <span className="font-bold text-base" style={{ color: getScoreColor(m.value) }}>
+                        {m.value}/100 — {getScoreLabel(m.value)}
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full w-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+                      <div
+                        className="h-2 rounded-full transition-all duration-700"
+                        style={{ width: `${m.value}%`, background: getScoreColor(m.value) }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recommendations */}
+            {results.recommendations && results.recommendations.length > 0 && (
+              <div className="rounded-2xl border border-white/10 p-8"
+                style={{ background: "rgba(255,255,255,0.03)" }}>
+                <h3 className="font-bold text-white mb-4">{t("analyzer_improvements")}</h3>
+                <ul className="space-y-3">
+                  {results.recommendations.map((rec, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-white/70">
+                      <span className="text-red-400 mt-0.5 flex-shrink-0">✗</span>
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Highlights (perfect score) */}
+            {results.highlights && results.highlights.length > 0 && (
+              <div className="rounded-2xl border border-green-500/20 p-8"
+                style={{ background: "rgba(34,197,94,0.05)" }}>
+                <ul className="space-y-3">
+                  {results.highlights.map((h, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-green-400">
+                      <span className="flex-shrink-0">✓</span>
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* CTA */}
+            <div className="rounded-2xl border p-8 text-center"
+              style={{
+                background: "linear-gradient(135deg, rgba(160,32,240,0.15), rgba(0,212,255,0.1))",
+                borderColor: "rgba(160,32,240,0.4)",
+              }}>
+              <h3 className="text-2xl font-bold text-white mb-2">{t("analyzer_cta_title")}</h3>
+              <p className="text-white/60 mb-6">{t("analyzer_cta_subtitle")}</p>
+              <a
+                href="#contact"
+                className="inline-block px-8 py-4 rounded-xl font-bold text-white text-lg transition-all hover:scale-105"
+                style={{ background: "linear-gradient(135deg, #A020F0, #00D4FF)" }}
+              >
+                {t("analyzer_cta_button")}
+              </a>
+            </div>
+
+            {/* New analysis button */}
             <div className="text-center">
               <button
-                onClick={() => {
-                  setResults(null)
-                  setUrl("")
-                  setError("")
-                }}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg font-semibold text-white transition-all"
+                onClick={() => { setResults(null); setUrl(""); setError("") }}
+                className="px-6 py-3 rounded-xl font-semibold text-white/60 border border-white/10 hover:border-white/30 hover:text-white transition-all text-sm"
               >
-                {language === "de" ? "Neue Analyse" : language === "tr" ? "Yeni Analiz" : "New Analysis"}
+                {t("analyzer_new_analysis")}
               </button>
             </div>
           </div>
