@@ -276,7 +276,7 @@ export function ServicesSection() {
           <PricingCard
             titleKey="starter_bundle_title"
             descKey="starter_bundle_desc"
-            featureKeys=["starter_bundle_f1", "starter_bundle_f2", "starter_bundle_f3", "starter_bundle_f4", "starter_bundle_f5"]
+            featureKeys={["starter_bundle_f1", "starter_bundle_f2", "starter_bundle_f3", "starter_bundle_f4", "starter_bundle_f5"]}
             priceKey="basic"
             popular
             badge={t("starter_bundle_badge") || "Bestseller"}
