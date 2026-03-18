@@ -43,11 +43,9 @@ interface PricingCardProps {
   priceKey: keyof typeof prices
   popular?: boolean
   delay: number
-  badge?: string
-  featured?: boolean
 }
 
-function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay, badge, featured }: PricingCardProps) {
+function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay }: PricingCardProps) {
   const { country, t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -80,6 +78,7 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay,
   }
 
   const priceString = prices[priceKey][country]
+  console.log("[v0] Country:", country, "Price Key:", priceKey, "Price String:", priceString)
   const priceNum = parseInt(priceString.replace(/[^\d]/g, ""))
   const animatedPrice = useAnimatedCounter(priceNum, 1500, isVisible)
   const currency = priceString.includes("CHF") ? " CHF" : priceString.includes("€") ? "€" : " ₺"
@@ -127,21 +126,8 @@ function PricingCard({ titleKey, descKey, featureKeys, priceKey, popular, delay,
           }}
         />
 
-        {/* Bestseller badge - overrides popular badge for featured */}
-        {badge && (
-          <div className="absolute top-4 right-4 flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold animate-pulse-glow"
-            style={{
-              background: "linear-gradient(135deg, #A020F0, #00D4FF)",
-              color: "#fff",
-            }}
-          >
-            <Sparkles className="w-4 h-4" />
-            {badge}
-          </div>
-        )}
-
-        {/* Popular badge - secondary indicator */}
-        {popular && !badge && (
+        {/* Popular badge */}
+        {popular && (
           <div className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold animate-pulse-glow"
             style={{
               background: "linear-gradient(135deg, #A020F0, #00D4FF)",
@@ -269,21 +255,15 @@ export function ServicesSection() {
           <p className="text-foreground/50 text-lg max-w-xl mx-auto">{t("services_subtitle")}</p>
         </div>
 
-        {/* Cards - Starter Bundle featured first with 4-column on desktop */}
-        <div className="grid md:grid-cols-4 gap-6 items-start mb-10">
-          {/* Featured Starter Bundle */}
+        {/* Cards */}
+        <div className="grid md:grid-cols-3 gap-6 items-start">
           <PricingCard
-            titleKey="starter_bundle_title"
-            descKey="starter_bundle_desc"
-            featureKeys={["starter_bundle_f1", "starter_bundle_f2", "starter_bundle_f3", "starter_bundle_f4", "starter_bundle_f5"]}
+            titleKey="basic_title"
+            descKey="basic_desc"
+            featureKeys={["basic_f1", "basic_f2", "basic_f3", "basic_f4", "basic_f5"]}
             priceKey="basic"
-            popular={true}
-            badge="Bestseller"
             delay={0}
-            featured={true}
           />
-
-          {/* Other packages */}
           <PricingCard
             titleKey="business_title"
             descKey="business_desc"
@@ -296,6 +276,7 @@ export function ServicesSection() {
               "business_f6",
             ]}
             priceKey="business"
+            popular
             delay={150}
           />
           <PricingCard
@@ -312,19 +293,6 @@ export function ServicesSection() {
             priceKey="ecommerce"
             delay={300}
           />
-          
-          {/* Hourly solutions */}
-          <PricingCard
-            titleKey="hourly_title"
-            descKey="hourly_desc"
-            featureKeys={["hourly_f1", "hourly_f2", "hourly_f3", "hourly_f4", "hourly_f5"]}
-            priceKey="hourly"
-            delay={450}
-          />
-        </div>
-
-        {/* Old grid kept for reference - will be removed after testing */}
-        <div className="hidden md:grid md:grid-cols-3 gap-6 items-start">
         </div>
 
         {/* Individuelle Lösungen – mittig darunter */}
