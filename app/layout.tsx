@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'de_DE',
     alternateLocale: ['de_AT', 'de_CH', 'tr_TR', 'en_US'],
-    url: 'https://xelvetec.ch',
+    url: 'https://xelvetec.com',
     title: 'XelveTec - Premium Webdesign Agentur für Ihr Unternehmen',
     description: 'Professionelle Webdesign Services in der Schweiz, Deutschland, Österreich & Türkei',
     siteName: 'XelveTec',
@@ -72,13 +72,14 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://xelvetec.ch',
+    canonical: 'https://xelvetec.com',
     languages: {
-      'de-DE': 'https://xelvetec.ch/de',
-      'de-CH': 'https://xelvetec.ch/de-ch',
-      'de-AT': 'https://xelvetec.ch/de-at',
-      'tr-TR': 'https://xelvetec.ch/tr',
-      'en-US': 'https://xelvetec.ch/en',
+      'de-CH': 'https://xelvetec.com/',
+      'de-DE': 'https://xelvetec.com/webdesign-deutschland',
+      'de-AT': 'https://xelvetec.com/webdesign-oesterreich',
+      'tr-TR': 'https://xelvetec.com/webdesign-tuerkei',
+      'en': 'https://xelvetec.com/webdesign-international',
+      'x-default': 'https://xelvetec.com/',
     },
   },
   icons: {
@@ -101,6 +102,35 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'XelveTec',
+    url: 'https://xelvetec.com',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: 'https://xelvetec.com/?q={search_term_string}'
+      },
+      'query-input': 'required name=search_term_string'
+    }
+  }
+
+  const aggregateRatingSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'XelveTec',
+    url: 'https://xelvetec.com',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '5',
+      reviewCount: '12',
+      bestRating: '5',
+      worstRating: '1'
+    }
+  }
+
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -109,19 +139,19 @@ export default function RootLayout({
         '@type': 'ListItem',
         'position': 1,
         'name': 'Home',
-        'item': 'https://xelvetec.ch'
+        'item': 'https://xelvetec.com'
       },
       {
         '@type': 'ListItem',
         'position': 2,
         'name': 'Portfolio',
-        'item': 'https://xelvetec.ch#portfolio'
+        'item': 'https://xelvetec.com/#portfolio'
       },
       {
         '@type': 'ListItem',
         'position': 3,
         'name': 'Kontakt',
-        'item': 'https://xelvetec.ch#kontakt'
+        'item': 'https://xelvetec.com/#kontakt'
       }
     ]
   }
@@ -130,8 +160,8 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'XelveTec',
-    url: 'https://xelvetec.ch',
-    logo: 'https://xelvetec.ch/images/xelvetec-logo.png',
+    url: 'https://xelvetec.com',
+    logo: 'https://xelvetec.com/images/xelvetec-logo.png',
     description: 'Professionelle Webdesign Agentur für Deutschland, Schweiz, Österreich und Türkei',
     contactPoint: [
       {
@@ -166,13 +196,13 @@ export default function RootLayout({
   const localBusinessSchema = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': 'https://xelvetec.ch',
+    '@id': 'https://xelvetec.com',
     name: 'XelveTec',
-    image: 'https://xelvetec.ch/images/xelvetec-logo.png',
+    image: 'https://xelvetec.com/images/xelvetec-logo.png',
     description: 'Premium Webdesign Services für Unternehmen in Deutschland, Schweiz, Österreich und Türkei',
     telephone: '+41768443375',
     email: 'business@xelvetec.com',
-    url: 'https://xelvetec.ch',
+    url: 'https://xelvetec.com',
     priceRange: '$$',
     address: {
       '@type': 'PostalAddress',
@@ -199,7 +229,7 @@ export default function RootLayout({
     '@type': 'ProfessionalService',
     name: 'Webdesign Services',
     description: 'Moderne Webdesign und Web Development für KMU und Unternehmen',
-    url: 'https://xelvetec.ch',
+    url: 'https://xelvetec.com',
     telephone: '+41768443375',
     email: 'business@xelvetec.com',
     areaServed: ['DE', 'AT', 'CH', 'TR'],
@@ -286,12 +316,12 @@ export default function RootLayout({
     },
     datePublished: '2026-03-13',
     reviewBody: 'Professionelle Webdesign Services von XelveTec',
-    itemReviewed: {
+      itemReviewed: {
       '@type': 'LocalBusiness',
       name: 'XelveTec',
-    url: 'https://xelvetec.com',
+      url: 'https://xelvetec.com',
       telephone: '+41768443375',
-      image: 'https://xelvetec.ch/images/xelvetec-logo.png',
+      image: 'https://xelvetec.com/images/xelvetec-logo.png',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Egelseestrasse 31',
@@ -325,6 +355,14 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(aggregateRatingSchema) }}
+        />
+        <script
+          type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
         <script
@@ -351,8 +389,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }}
           suppressHydrationWarning
         />
-        <link rel="canonical" href="https://xelvetec.ch" />
-        <link rel="sitemap" href="https://xelvetec.ch/sitemap.xml" />
+        <link rel="canonical" href="https://xelvetec.com" />
+        <link rel="sitemap" href="https://xelvetec.com/sitemap.xml" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="format-detection" content="telephone=no" />
