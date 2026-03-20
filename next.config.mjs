@@ -3,6 +3,22 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'xelvetec.ch' }],
+        destination: 'https://xelvetec.com/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.xelvetec.ch' }],
+        destination: 'https://xelvetec.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
   images: {
     unoptimized: false,
     formats: ['image/webp', 'image/avif'],

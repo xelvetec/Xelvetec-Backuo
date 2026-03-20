@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'XelveTec',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'XelveTec - Webdesign Agentur',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'XelveTec - Premium Webdesign Agentur',
     description: 'Moderne Websites für Ihr Geschäft in Deutschland, Schweiz, Österreich & Türkei',
     creator: '@XelveTec',
-    images: ['/og-image.png'],
+    images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
@@ -407,29 +407,17 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              console.log('🔥 EmailJS Script startet...');
               emailjs.init({ publicKey: "eIsW61NVlqzcGHV4w" });
               document.addEventListener('DOMContentLoaded', function() {
                 const form = document.querySelector('form[data-contact-form]');
-                if (!form) {
-                  console.error('❌ Kontakt-Form nicht gefunden!');
-                  return;
-                }
-                console.log('✅ Kontakt-Form gefunden:', form);
-                
+                if (!form) return;
                 form.addEventListener('submit', async function(e) {
                   e.preventDefault();
-                  console.log('🚀 Submit - Form data:', Object.fromEntries(new FormData(form)));
-                  
                   try {
                     const result = await emailjs.sendForm('service_wzudoxa', 'template_mopajh7', form);
-                    console.log('🎉 SUCCESS!', result);
                     form.reset();
-                  } catch (error) {
-                    console.error('💥 DETAILED ERROR:', error);
-                  }
+                  } catch (error) {}
                 });
-                console.log('✅ Listener attached');
               });
             `,
           }}
