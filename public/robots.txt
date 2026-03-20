@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /images/
-Allow: /api/
+Disallow: /api/
 Disallow: /admin/
 Disallow: /private/
 Disallow: /*.json$
