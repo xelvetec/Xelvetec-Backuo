@@ -34,17 +34,18 @@ interface PricingCardProps {
   titleKey: string
   descKey: string
   featureKeys: string[]
-  priceKey: keyof typeof prices
-  popular?: boolean
+  priceKey: 'basic' | 'business' | 'ecommerce'
   delay: number
   oneTimePrice: string
   subscriptionPrice: string
-  subscriptionFeatures: Array<{ icon: React.ReactNode; key: string }>
+  subscriptionFeatures: { icon: React.ReactNode; key: string }[]
+  popular?: boolean
+  isSubscriptionAvailable?: boolean
 }
 
 function PricingCard({ 
   titleKey, descKey, featureKeys, priceKey, popular, delay,
-  oneTimePrice, subscriptionPrice, subscriptionFeatures
+  oneTimePrice, subscriptionPrice, subscriptionFeatures, isSubscriptionAvailable = true
 }: PricingCardProps) {
   const { country, t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
@@ -244,6 +245,7 @@ export function ServicesSection() {
               { icon: <Zap className="w-4 h-4" />, key: "subscription_updates" },
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
             ] : []}
+            isSubscriptionAvailable={isSubscriptionAvailable}
           />
           <PricingCard
             titleKey="business_title"
@@ -261,6 +263,7 @@ export function ServicesSection() {
               { icon: <Zap className="w-4 h-4" />, key: "subscription_updates" },
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
             ] : []}
+            isSubscriptionAvailable={isSubscriptionAvailable}
           />
           <PricingCard
             titleKey="ecommerce_title"
@@ -277,6 +280,8 @@ export function ServicesSection() {
               { icon: <Zap className="w-4 h-4" />, key: "subscription_updates" },
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
             ] : []}
+            isSubscriptionAvailable={isSubscriptionAvailable}
+          />
           />
         </div>
       </div>
