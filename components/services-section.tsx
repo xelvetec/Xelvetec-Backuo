@@ -217,7 +217,8 @@ function PricingCard({
 }
 
 export function ServicesSection() {
-  const { t } = useLanguage()
+  const { t, country } = useLanguage()
+  const isSubscriptionAvailable = country !== 'TR'
 
   return (
     <section id="services" className="relative py-24 md:py-32 overflow-hidden bg-gradient-to-b from-transparent via-purple-500/5 to-transparent">
@@ -235,14 +236,14 @@ export function ServicesSection() {
             priceKey="basic"
             delay={0}
             oneTimePrice="499"
-            subscriptionPrice="29.90"
-            subscriptionFeatures={[
+            subscriptionPrice={isSubscriptionAvailable ? "29.90" : ""}
+            subscriptionFeatures={isSubscriptionAvailable ? [
               { icon: <Globe className="w-4 h-4" />, key: "subscription_hosting" },
               { icon: <Globe className="w-4 h-4" />, key: "subscription_domain" },
               { icon: <Lock className="w-4 h-4" />, key: "subscription_ssl" },
               { icon: <Zap className="w-4 h-4" />, key: "subscription_updates" },
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
-            ]}
+            ] : []}
           />
           <PricingCard
             titleKey="business_title"
@@ -252,14 +253,14 @@ export function ServicesSection() {
             popular
             delay={150}
             oneTimePrice="999"
-            subscriptionPrice="79.90"
-            subscriptionFeatures={[
+            subscriptionPrice={isSubscriptionAvailable ? "79.90" : ""}
+            subscriptionFeatures={isSubscriptionAvailable ? [
               { icon: <Globe className="w-4 h-4" />, key: "subscription_hosting" },
               { icon: <Globe className="w-4 h-4" />, key: "subscription_domain" },
               { icon: <Lock className="w-4 h-4" />, key: "subscription_ssl" },
               { icon: <Zap className="w-4 h-4" />, key: "subscription_updates" },
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
-            ]}
+            ] : []}
           />
           <PricingCard
             titleKey="ecommerce_title"
@@ -268,14 +269,14 @@ export function ServicesSection() {
             priceKey="ecommerce"
             delay={300}
             oneTimePrice="1999"
-            subscriptionPrice="199.90"
-            subscriptionFeatures={[
+            subscriptionPrice={isSubscriptionAvailable ? "199.90" : ""}
+            subscriptionFeatures={isSubscriptionAvailable ? [
               { icon: <Globe className="w-4 h-4" />, key: "subscription_hosting" },
               { icon: <Globe className="w-4 h-4" />, key: "subscription_domain" },
               { icon: <Lock className="w-4 h-4" />, key: "subscription_ssl" },
               { icon: <Zap className="w-4 h-4" />, key: "subscription_updates" },
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
-            ]}
+            ] : []}
           />
         </div>
       </div>
