@@ -52,9 +52,6 @@ function PricingCard({
   const [pricingMode, setPricingMode] = useState<'onetime' | 'subscription'>('onetime')
   const cardRef = useRef<HTMLDivElement>(null)
 
-  // Check if subscription is available in current country
-  const isSubscriptionAvailable = country !== 'TR'
-
   // Force onetime mode if subscription is not available
   useEffect(() => {
     if (!isSubscriptionAvailable) {
