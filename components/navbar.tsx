@@ -5,7 +5,6 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/lib/auth-context"
-import { Button } from "@/components/ui/button"
 
 export function Navbar() {
   const { country } = useLanguage()
@@ -58,9 +57,12 @@ export function Navbar() {
       <div className="ml-auto flex items-center gap-3">
         {user ? (
           <Link href="/dashboard">
-            <Button type="button" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+            <button
+              type="button"
+              className="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all"
+            >
               Mein Konto
-            </Button>
+            </button>
           </Link>
         ) : (
           <button

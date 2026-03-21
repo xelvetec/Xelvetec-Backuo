@@ -1,14 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { useLanguage } from '@/lib/language-context'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 export default function AuthFormContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/dashboard'
   const [isLogin, setIsLogin] = useState(true)
@@ -21,10 +19,12 @@ export default function AuthFormContent() {
   const { translate } = useLanguage()
 
   // Redirect if already logged in
-  if (user) {
-    router.push(redirectTo)
-    return null
-  }
+  useEffect(() => {
+    if (user) {
+      console.log('[v0] User authenticated, redirecting to:', redirectTo)
+      window.location.href = redirectTo
+    }
+  }, [user, redirectTo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -101,13 +101,13 @@ export default function AuthFormContent() {
               </div>
             )}
 
-            <Button
+            <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all disabled:opacity-50"
             >
               {loading ? translate('loading') : isLogin ? translate('auth_login_button') : translate('auth_signup_button')}
-            </Button>
+            </button>
           </form>
 
           <div className="mt-6 text-center">
