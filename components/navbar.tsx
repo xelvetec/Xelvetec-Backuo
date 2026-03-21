@@ -31,9 +31,9 @@ export function Navbar() {
   const logoScale = mounted ? 1 + easedProgress * 0.4 : 1
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 animate-float-subtle pt-4 px-4 flex justify-between items-center">
-      {/* Logo - left side */}
-      <a href="#home" className="inline-flex items-center group">
+    <nav className="fixed top-0 left-0 right-0 z-50 animate-float-subtle pt-4 px-4 flex justify-center items-center">
+      {/* Logo - centered */}
+      <a href="#home" className="absolute left-1/2 -translate-x-1/2 inline-flex items-center group">
         <div 
           className="relative animate-breathing transition-transform duration-75 ease-out"
           style={{
@@ -55,7 +55,7 @@ export function Navbar() {
       </a>
       
       {/* Auth buttons - right side */}
-      <div className="flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-3">
         {user ? (
           <Link href="/dashboard">
             <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
