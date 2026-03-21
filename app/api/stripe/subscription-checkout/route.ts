@@ -22,6 +22,52 @@ export async function POST(request: NextRequest) {
     }
     
     const countryKey = countryCodeMap[country.toLowerCase()] || 'CHF'
+    
+    // Use predefined Stripe Price ID (no dynamic pricing = no currency conversion)
+    const stripePriceId = product.stripePrices[countryKey]
+    
+    if (!stripePriceId || stripePriceId.startsWith('price_')) {
+      console.warn(`[v0] Using fallback pricing for ${tier} in ${countryKey}`)
+      return NextResponse.json({ 
+        error: 'Price configuration missing. Please set Stripe Price IDs in environment variables.',
+        hint: `Missing: STRIPE_${tier.toUpperCase()}_PRICE_${countryKey}`
+      }, { status: 500 })
+    }
+
+    console.log('[v0] Creating Stripe checkout session:', { tier, country: countryKey, priceId: stripePriceId })
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: stripePriceId, // Use predefined Price ID - NO automatic conversion
+          quantity: 1
+        }
+      ],
+      mode: 'subscription',
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/cancel`,
+    })
+
+    return NextResponse.json({ url: session.url, customerId: session.customer })
+  } catch (error) {
+    console.error('Stripe checkout error:', error)
+    return NextResponse.json({ 
+      error: 'Failed to create checkout session',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
+  }
+}
+
+    // Map country codes from context (lowercase) to uppercase for products
+    const countryCodeMap: { [key: string]: 'CHF' | 'EUR' | 'TRY' } = {
+      'ch': 'CHF',
+      'de': 'EUR',
+      'at': 'EUR',
+      'tr': 'TRY'
+    }
+    
+    const countryKey = countryCodeMap[country.toLowerCase()] || 'CHF'
     const priceInCents = product.prices[countryKey] || product.prices.CHF
     
     // Map country to correct Stripe currency
