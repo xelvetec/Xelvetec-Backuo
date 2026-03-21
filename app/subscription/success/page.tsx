@@ -91,44 +91,12 @@ function SuccessContent() {
     </div>
   )
 }
-        </p>
-        <ul className="text-sm text-foreground/70 text-left space-y-2">
-          <li>✓ Hosting wird konfiguriert</li>
-          <li>✓ Domain wird aktiviert</li>
-          <li>✓ SSL-Zertifikat wird installiert</li>
-        </ul>
-      </div>
-
-      <div className="space-y-3">
-        <button
-          onClick={handleManageSubscription}
-          disabled={isLoadingPortal}
-          className="w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] disabled:opacity-50"
-          style={{ background: 'linear-gradient(135deg, #A020F0, #00D4FF)' }}
-        >
-          <Settings className="w-4 h-4" />
-          {isLoadingPortal ? (t('contact_loading') || 'Wird geladen...') : (t('manage_subscription') || 'Abo verwalten')}
-        </button>
-
-        <Link href="/">
-          <Button 
-            className="w-full py-3 font-semibold"
-            style={{ background: 'rgba(160,32,240,0.15)', color: '#fff', border: '1px solid rgba(160,32,240,0.4)' }}
-          >
-            {t('back_to_home') || 'Zurück zur Startseite'}
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </Link>
-      </div>
-    </div>
-  )
-}
 
 function SuccessLoading() {
   return (
     <div className="max-w-md w-full text-center">
       <Loader className="w-12 h-12 text-[#A020F0] mx-auto mb-4 animate-spin" />
-      <p className="text-foreground/60">Loading success page...</p>
+      <p className="text-foreground/60">{typeof window !== 'undefined' ? 'Loading...' : 'Loading...'}</p>
     </div>
   )
 }
