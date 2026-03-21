@@ -1,16 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import { useLanguage } from '@/lib/language-context'
 import { getUserSubscription, getUserInvoices } from '@/lib/auth'
 import { CancellationFlow } from '@/components/cancellation-flow'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 
 export default function DashboardPage() {
   const { user, loading: authLoading, signOut } = useAuth()
-  const router = useRouter()
+  const { t } = useLanguage()
   const [subscription, setSubscription] = useState<any>(null)
   const [invoices, setInvoices] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -18,9 +16,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/auth')
+      window.location.href = '/auth'
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading])
 
   useEffect(() => {
     if (user) {
@@ -55,7 +53,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p>Wird geladen...</p>
+          <p>{t('loading')}</p>
         </div>
       </div>
     )
@@ -67,36 +65,36 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-b from-background to-background py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Mein Konto</h1>
-          <Button
+          <h1 className="text-4xl font-bold">{t('dashboard_title')}</h1>
+          <button
             onClick={async () => {
               await signOut()
-              router.push('/')
+              window.location.href = '/'
             }}
-            variant="outline"
+            className="px-4 py-2 border border-foreground/20 rounded-lg hover:bg-foreground/5 text-foreground text-sm font-medium transition-colors"
           >
-            Abmelden
-          </Button>
+            {t('dashboard_logout')}
+          </button>
         </div>
 
         {/* Profile Section */}
-        <Card className="p-6 mb-6 border border-foreground/10">
-          <h2 className="text-xl font-bold mb-4">Profilinformationen</h2>
+        <div className="p-6 mb-6 border border-foreground/10 rounded-lg bg-background/50">
+          <h2 className="text-xl font-bold mb-4">{t('dashboard_profile_title')}</h2>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-foreground/60">E-Mail</label>
+              <label className="text-sm text-foreground/60">{t('auth_email')}</label>
               <p className="text-lg font-medium">{user.email}</p>
             </div>
             <div>
-              <label className="text-sm text-foreground/60">Benutzer-ID</label>
+              <label className="text-sm text-foreground/60">{t('dashboard_user_id')}</label>
               <p className="text-sm font-mono text-foreground/60">{user.id}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Subscription Section */}
-        <Card className="p-6 mb-6 border border-foreground/10">
-          <h2 className="text-xl font-bold mb-4">Abonnement</h2>
+        <div className="p-6 mb-6 border border-foreground/10 rounded-lg bg-background/50">
+          <h2 className="text-xl font-bold mb-4">{t('dashboard_subscription_title')}</h2>
           {subscription ? (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -124,39 +122,44 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="flex gap-4 pt-4">
-                <Button variant="outline">Zahlungsmethode ändern</Button>
-                <Button 
-                  variant="destructive"
+                <button
+                  className="flex-1 px-4 py-2 border border-foreground/20 rounded-lg hover:bg-foreground/5 text-foreground text-sm font-medium transition-colors"
+                  onClick={() => window.location.href = '/api/stripe/billing-portal'}
+                >
+                  {t('dashboard_manage_payment_method')}
+                </button>
+                <button
+                  className="flex-1 px-4 py-2 border border-red-500/30 rounded-lg hover:bg-red-500/10 text-red-400 text-sm font-medium transition-colors"
                   onClick={() => setShowCancellation(true)}
                 >
-                  Abonnement kündigen
-                </Button>
+                  {t('dashboard_cancel_subscription')}
+                </button>
               </div>
             </div>
           ) : (
-            <p className="text-foreground/60">Kein aktives Abonnement</p>
+            <p className="text-foreground/60">{t('dashboard_no_subscription')}</p>
           )}
-        </Card>
+        </div>
 
         {/* Invoices Section */}
-        <Card className="p-6 border border-foreground/10">
-          <h2 className="text-xl font-bold mb-4">Rechnungen</h2>
+        <div className="p-6 border border-foreground/10 rounded-lg bg-background/50">
+          <h2 className="text-xl font-bold mb-4">{t('dashboard_invoices_title')}</h2>
           {invoices.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-foreground/10">
-                    <th className="text-left py-3 px-2 text-sm font-medium">Datum</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium">Betrag</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium">Status</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium">Aktion</th>
+                    <th className="text-left py-3 px-2 text-sm font-medium">{t('dashboard_invoice_date')}</th>
+                    <th className="text-left py-3 px-2 text-sm font-medium">{t('dashboard_invoice_amount')}</th>
+                    <th className="text-left py-3 px-2 text-sm font-medium">{t('dashboard_invoice_status')}</th>
+                    <th className="text-left py-3 px-2 text-sm font-medium">{t('dashboard_invoice_action')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {invoices.map((invoice) => (
                     <tr key={invoice.id} className="border-b border-foreground/5 hover:bg-foreground/5">
                       <td className="py-3 px-2 text-sm">
-                        {new Date(invoice.created_at).toLocaleDateString('de-DE')}
+                        {new Date(invoice.created_at).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-2 text-sm font-medium">
                         {(invoice.amount / 100).toFixed(2)} {invoice.currency.toUpperCase()}
@@ -170,7 +173,7 @@ export default function DashboardPage() {
                             rel="noopener noreferrer"
                             className="text-purple-500 hover:text-purple-400"
                           >
-                            PDF
+                            {t('dashboard_download_pdf')}
                           </a>
                         )}
                       </td>
@@ -180,9 +183,9 @@ export default function DashboardPage() {
               </table>
             </div>
           ) : (
-            <p className="text-foreground/60">Keine Rechnungen</p>
+            <p className="text-foreground/60">{t('dashboard_no_invoices')}</p>
           )}
-        </Card>
+        </div>
 
         {/* Cancellation Prevention Flow */}
         {showCancellation && subscription && (

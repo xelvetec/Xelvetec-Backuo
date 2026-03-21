@@ -2,14 +2,14 @@
 
 import { Suspense } from 'react'
 import { useLanguage } from '@/lib/language-context'
-import { Button } from '@/components/ui/button'
 import { CheckCircle, ArrowRight, Settings, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 function SuccessContent() {
-  const { t } = useLanguage()
+  const languageContext = useLanguage()
+  const translate = languageContext?.t || ((key: string) => key)
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const [isLoadingPortal, setIsLoadingPortal] = useState(false)
@@ -27,7 +27,7 @@ function SuccessContent() {
         window.location.href = data.url
       }
     } catch (error) {
-      console.error('Error opening billing portal:', error)
+      console.error('[v0] Error opening billing portal:', error)
     } finally {
       setIsLoadingPortal(false)
     }
@@ -38,16 +38,59 @@ function SuccessContent() {
       <CheckCircle className="w-16 h-16 mx-auto mb-6 animate-bounce" style={{ color: '#00D4FF' }} />
       
       <h1 className="text-3xl font-bold mb-2 text-foreground">
-        {t('subscription_success_title') || 'Abonnement aktiviert!'}
+        {translate('subscription_success_title')}
       </h1>
       
       <p className="text-foreground/70 mb-8">
-        {t('subscription_success_desc') || 'Vielen Dank! Ihr Abonnement ist jetzt aktiv. Sie erhalten eine Bestätigungsmail in Kürze.'}
+        {translate('subscription_success_desc')}
       </p>
 
       <div className="space-y-3 mb-8 p-4 rounded-xl" style={{ background: 'rgba(160,32,240,0.1)' }}>
         <p className="text-sm text-foreground/60">
-          {t('subscription_success_next') || 'Nächste Schritte:'}
+          {translate('subscription_success_next')}
+        </p>
+        <ul className="text-left space-y-2">
+          <li className="text-sm text-foreground/70">
+            ✓ {translate('subscription_success_step1')}
+          </li>
+          <li className="text-sm text-foreground/70">
+            ✓ {translate('subscription_success_step2')}
+          </li>
+        </ul>
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          onClick={handleManageSubscription}
+          disabled={isLoadingPortal}
+          className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-semibold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {isLoadingPortal ? (
+            <>
+              <Loader className="w-4 h-4 animate-spin" />
+              {translate('loading')}
+            </>
+          ) : (
+            <>
+              <Settings className="w-4 h-4" />
+              {translate('subscription_manage')}
+            </>
+          )}
+        </button>
+        <Link href="/dashboard">
+          <button className="flex-1 px-4 py-3 border border-foreground/20 rounded-lg font-semibold text-sm transition-colors hover:bg-foreground/5 flex items-center justify-center gap-2">
+            <ArrowRight className="w-4 h-4" />
+            {translate('subscription_go_dashboard')}
+          </button>
+        </Link>
+      </div>
+
+      <p className="text-xs text-foreground/50 mt-6">
+        {translate('subscription_support_info')}
+      </p>
+    </div>
+  )
+}
         </p>
         <ul className="text-sm text-foreground/70 text-left space-y-2">
           <li>✓ Hosting wird konfiguriert</li>
