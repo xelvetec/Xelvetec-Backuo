@@ -7,6 +7,8 @@ import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/lib/auth-context"
 
 export function Navbar() {
+  const languageContext = useLanguage()
+  const translate = languageContext?.t || ((key: string) => key)
   const { country } = useLanguage()
   const { user } = useAuth()
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -61,7 +63,7 @@ export function Navbar() {
               type="button"
               className="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all"
             >
-              Mein Konto
+              {translate('navbar_my_account')}
             </button>
           </Link>
         ) : (
@@ -72,7 +74,7 @@ export function Navbar() {
             }}
             className="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all"
           >
-            Anmelden
+            {translate('navbar_login')}
           </button>
         )}
       </div>

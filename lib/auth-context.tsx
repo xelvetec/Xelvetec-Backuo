@@ -48,12 +48,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } }
     })
     if (error) throw error
+
+    // Update user state after signup so email verification banner shows
+    if (data.user) {
+      setUser(data.user)
+    }
 
     // Link existing subscriptions with the same email
     await linkExistingSubscriptions(email)

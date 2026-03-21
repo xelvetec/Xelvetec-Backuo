@@ -59,10 +59,10 @@ export default function AuthFormContent() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <label className="block text-sm font-medium mb-2">Vollständiger Name</label>
+                <label className="block text-sm font-medium mb-2">{translate('auth_full_name')}</label>
                 <input
                   type="text"
-                  placeholder="Max Mustermann"
+                  placeholder={translate('auth_full_name_placeholder')}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
