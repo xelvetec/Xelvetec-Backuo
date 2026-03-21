@@ -39,7 +39,6 @@ export async function POST(request: NextRequest) {
         'giropay',        // giropay (Deutschland)
         'eps',            // EPS (Österreich)
         'p24',            // Przelewy24 (Polen)
-        'klarna',         // Klarna (Buy Now Pay Later)
       ],
       line_items: [
         {
