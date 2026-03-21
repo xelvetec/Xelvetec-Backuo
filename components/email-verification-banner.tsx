@@ -7,7 +7,7 @@ import { useLanguage } from '@/lib/language-context'
 export function EmailVerificationBanner() {
   const { user } = useAuth()
   const languageContext = useLanguage()
-  const translate = languageContext?.translate || ((key: string) => key)
+  const translate = languageContext?.t || ((key: string) => key)
   const [dismissed, setDismissed] = useState(false)
   const [resending, setResending] = useState(false)
 

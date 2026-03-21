@@ -16,7 +16,7 @@ export default function AuthFormContent() {
   const [loading, setLoading] = useState(false)
   const { signIn, signUp, user } = useAuth()
   const languageContext = useLanguage()
-  const translate = languageContext?.translate || ((key: string) => key)
+  const translate = languageContext?.t || ((key: string) => key)
 
   // Redirect if already logged in
   useEffect(() => {
