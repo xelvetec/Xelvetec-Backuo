@@ -27,10 +27,8 @@ export async function POST(request: NextRequest) {
     const stripePriceId = product.stripePrices[countryKey]
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: [
-        'card',        // Kreditkarte
-        'paypal',      // PayPal
-      ],
+      payment_method_collection: 'always',
+      payment_method_configuration: 'pmc_1TDV192Uie3LBmwR6uI9pa7n',
       line_items: [
         {
           price: stripePriceId,
