@@ -64,11 +64,6 @@ export function EmailVerificationBanner() {
     </div>
   )
 }
-    } catch (error) {
-      console.error('[v0] Error resending verification email:', error)
-    } finally {
-      setResending(false)
-    }
   }
 
   return (
