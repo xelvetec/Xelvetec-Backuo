@@ -234,7 +234,6 @@ function PricingCard({
 export function ServicesSection() {
   const { t, country } = useLanguage()
   const { user } = useAuth()
-  const router = useRouter()
   const isSubscriptionAvailable = country !== 'TR'
 
   const handleSubscriptionCheckout = (tier: string) => {
