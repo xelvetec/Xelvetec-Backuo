@@ -13,8 +13,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    const priceInCents = product.prices[country as keyof typeof product.prices] || product.prices.CHF
-    const currency = country === 'CH' ? 'chf' : country === 'DE' ? 'eur' : country === 'AT' ? 'eur' : country === 'TR' ? 'try' : 'chf'
+    // Map country codes from context (lowercase) to uppercase for products
+    const countryCodeMap: { [key: string]: 'CHF' | 'EUR' | 'TRY' } = {
+      'ch': 'CHF',
+      'de': 'EUR',
+      'at': 'EUR',
+      'tr': 'TRY'
+    }
+    
+    const countryKey = countryCodeMap[country.toLowerCase()] || 'CHF'
+    const priceInCents = product.prices[countryKey] || product.prices.CHF
+    
+    // Map country to correct Stripe currency
+    const currencyMap: { [key: string]: 'chf' | 'eur' | 'try' } = {
+      'ch': 'chf',
+      'de': 'eur',
+      'at': 'eur',
+      'tr': 'try'
+    }
+    const currency = currencyMap[country.toLowerCase()] || 'chf'
+
+    console.log('[v0] Creating Stripe session:', { tier, country, countryKey, priceInCents, currency })
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],

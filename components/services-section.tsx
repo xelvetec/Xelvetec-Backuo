@@ -118,30 +118,32 @@ function PricingCard({
         <h3 className="text-xl font-bold text-foreground mb-2">{t(titleKey)}</h3>
         <p className="text-sm text-foreground/50 mb-6">{t(descKey)}</p>
 
-        <div className={`flex gap-2 mb-6 p-1 rounded-lg ${isSubscriptionAvailable ? '' : 'hidden'}`} style={{ background: "rgba(160,32,240,0.1)" }}>
-          <button
-            onClick={() => setPricingMode('onetime')}
-            className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all ${
-              pricingMode === 'onetime' ? 'text-white' : 'text-foreground/60'
-            }`}
-            style={{
-              background: pricingMode === 'onetime' ? 'linear-gradient(135deg, #A020F0, #00D4FF)' : 'transparent'
-            }}
-          >
-            {t("pricing_onetime")}
-          </button>
-          <button
-            onClick={() => setPricingMode('subscription')}
-            className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all ${
-              pricingMode === 'subscription' ? 'text-white' : 'text-foreground/60'
-            }`}
-            style={{
-              background: pricingMode === 'subscription' ? 'linear-gradient(135deg, #A020F0, #00D4FF)' : 'transparent'
-            }}
-          >
-            {t("pricing_subscription")}
-          </button>
-        </div>
+        {isSubscriptionAvailable && (
+          <div className="flex gap-2 mb-6 p-1 rounded-lg" style={{ background: "rgba(160,32,240,0.1)" }}>
+            <button
+              onClick={() => setPricingMode('onetime')}
+              className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all ${
+                pricingMode === 'onetime' ? 'text-white' : 'text-foreground/60'
+              }`}
+              style={{
+                background: pricingMode === 'onetime' ? 'linear-gradient(135deg, #A020F0, #00D4FF)' : 'transparent'
+              }}
+            >
+              {t("pricing_onetime")}
+            </button>
+            <button
+              onClick={() => setPricingMode('subscription')}
+              className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all ${
+                pricingMode === 'subscription' ? 'text-white' : 'text-foreground/60'
+              }`}
+              style={{
+                background: pricingMode === 'subscription' ? 'linear-gradient(135deg, #A020F0, #00D4FF)' : 'transparent'
+              }}
+            >
+              {t("pricing_subscription")}
+            </button>
+          </div>
+        )}
 
         {pricingMode === 'onetime' ? (
           <>
