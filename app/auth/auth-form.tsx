@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { useLanguage } from '@/lib/language-context'
-import { Input } from '@/components/ui/input'
 
 export default function AuthFormContent() {
   const searchParams = useSearchParams()
@@ -16,7 +15,8 @@ export default function AuthFormContent() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { signIn, signUp, user } = useAuth()
-  const { translate } = useLanguage()
+  const languageContext = useLanguage()
+  const translate = languageContext?.translate || ((key: string) => key)
 
   // Redirect if already logged in
   useEffect(() => {
@@ -60,38 +60,41 @@ export default function AuthFormContent() {
             {!isLogin && (
               <div>
                 <label className="block text-sm font-medium mb-2">Vollständiger Name</label>
-                <Input
+                <input
                   type="text"
                   placeholder="Max Mustermann"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   disabled={loading}
+                  className="w-full px-4 py-2 border border-foreground/20 rounded-lg bg-background/50 focus:outline-none focus:border-purple-500 transition-colors"
                 />
               </div>
             )}
 
             <div>
               <label className="block text-sm font-medium mb-2">{translate('auth_email')}</label>
-              <Input
+              <input
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                className="w-full px-4 py-2 border border-foreground/20 rounded-lg bg-background/50 focus:outline-none focus:border-purple-500 transition-colors"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">{translate('auth_password')}</label>
-              <Input
+              <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                className="w-full px-4 py-2 border border-foreground/20 rounded-lg bg-background/50 focus:outline-none focus:border-purple-500 transition-colors"
               />
             </div>
 
