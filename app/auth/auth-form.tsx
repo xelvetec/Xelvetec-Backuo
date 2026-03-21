@@ -50,10 +50,10 @@ export default function AuthFormContent() {
       <div className="w-full max-w-md">
         <div className="bg-background/50 backdrop-blur border border-foreground/10 rounded-2xl p-8">
           <h1 className="text-3xl font-bold text-center mb-2">
-            {isLogin ? 'Willkommen zurück' : 'Konto erstellen'}
+            {isLogin ? translate('auth_welcome_back') : translate('auth_create_account')}
           </h1>
           <p className="text-center text-foreground/60 mb-8">
-            {isLogin ? 'Melden Sie sich an, um Ihr Abonnement zu verwalten' : 'Erstellen Sie ein Konto für Ihr Abonnement'}
+            {isLogin ? translate('auth_login_subtitle') : translate('auth_signup_subtitle')}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -115,7 +115,7 @@ export default function AuthFormContent() {
 
           <div className="mt-6 text-center">
             <p className="text-foreground/60 text-sm">
-              {isLogin ? 'Noch kein Konto?' : 'Bereits ein Konto?'}{' '}
+              {isLogin ? translate('auth_no_account') : translate('auth_have_account')}{' '}
               <button
                 onClick={() => {
                   setIsLogin(!isLogin)
@@ -123,7 +123,7 @@ export default function AuthFormContent() {
                 }}
                 className="text-purple-500 hover:text-purple-400 font-medium"
               >
-                {isLogin ? 'Registrieren' : 'Anmelden'}
+                {isLogin ? translate('auth_signup_link_text') : translate('auth_login_link_text')}
               </button>
             </p>
           </div>

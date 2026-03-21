@@ -51,11 +51,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } }
+      options: { 
+        data: { full_name: fullName },
+        emailRedirectTo: undefined // Disable email confirmation
+      }
     })
     if (error) throw error
 
-    // Update user state after signup so email verification banner shows
+    // Update user state after signup immediately
     if (data.user) {
       setUser(data.user)
     }
