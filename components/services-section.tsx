@@ -235,7 +235,7 @@ export function ServicesSection() {
             priceKey="basic"
             delay={0}
             oneTimePrice="499"
-            subscriptionPrice="29.90"
+            subscriptionPrice={country === 'TR' ? "999" : "29.90"}
             subscriptionFeatures={[
               { icon: <Globe className="w-4 h-4" />, key: "subscription_hosting" },
               { icon: <Globe className="w-4 h-4" />, key: "subscription_domain" },
@@ -252,7 +252,7 @@ export function ServicesSection() {
             popular
             delay={150}
             oneTimePrice="999"
-            subscriptionPrice="79.90"
+            subscriptionPrice={country === 'TR' ? "2599" : "79.90"}
             subscriptionFeatures={[
               { icon: <Globe className="w-4 h-4" />, key: "subscription_hosting" },
               { icon: <Globe className="w-4 h-4" />, key: "subscription_domain" },
@@ -268,7 +268,7 @@ export function ServicesSection() {
             priceKey="ecommerce"
             delay={300}
             oneTimePrice="1999"
-            subscriptionPrice="199.90"
+            subscriptionPrice={country === 'TR' ? "6499" : "199.90"}
             subscriptionFeatures={[
               { icon: <Globe className="w-4 h-4" />, key: "subscription_hosting" },
               { icon: <Globe className="w-4 h-4" />, key: "subscription_domain" },
