@@ -6,6 +6,7 @@ import { AboutSection } from "@/components/about-section"
 import { AnalyzerSection } from "@/components/analyzer-section"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { LanguageProvider } from "@/lib/language-context"
+import { AuthProvider } from "@/lib/auth-context"
 import { SmoothScroll } from "@/components/smooth-scroll"
 
 // Lazy load heavy components below the fold for better LCP
@@ -28,21 +29,23 @@ const Footer = dynamic(() => import("@/components/footer").then(mod => ({ defaul
 
 export default function Home() {
   return (
-    <LanguageProvider>
-      <SmoothScroll>
-        <Navbar />
-        <EmailVerificationBanner />
-        <main>
-          <HeroSection />
-          <ServicesSection />
-          <AboutSection />
-          <AnalyzerSection />
-          <PortfolioSection />
-          <ReviewsSection />
-          <ContactSection />
-        </main>
-        <Footer />
-      </SmoothScroll>
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        <SmoothScroll>
+          <Navbar />
+          <EmailVerificationBanner />
+          <main>
+            <HeroSection />
+            <ServicesSection />
+            <AboutSection />
+            <AnalyzerSection />
+            <PortfolioSection />
+            <ReviewsSection />
+            <ContactSection />
+          </main>
+          <Footer />
+        </SmoothScroll>
+      </LanguageProvider>
+    </AuthProvider>
   )
 }
