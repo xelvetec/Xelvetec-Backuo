@@ -23,16 +23,8 @@ export async function POST(request: NextRequest) {
     
     const countryKey = countryCodeMap[country.toLowerCase()] || 'CHF'
     
-    // Use predefined Stripe Price ID (no dynamic pricing = no currency conversion)
+    // Use predefined Stripe Price ID (multi-currency, no conversion)
     const stripePriceId = product.stripePrices[countryKey]
-    
-    if (!stripePriceId || stripePriceId.startsWith('price_')) {
-      console.warn(`[v0] Using fallback pricing for ${tier} in ${countryKey}`)
-      return NextResponse.json({ 
-        error: 'Price configuration missing. Please set Stripe Price IDs in environment variables.',
-        hint: `Missing: STRIPE_${tier.toUpperCase()}_PRICE_${countryKey}`
-      }, { status: 500 })
-    }
 
     console.log('[v0] Creating Stripe checkout session:', { tier, country: countryKey, priceId: stripePriceId })
 
@@ -40,7 +32,7 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: stripePriceId, // Use predefined Price ID - NO automatic conversion
+          price: stripePriceId, // Multi-currency Price ID - NO automatic conversion
           quantity: 1
         }
       ],

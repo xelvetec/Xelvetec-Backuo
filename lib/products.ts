@@ -24,9 +24,9 @@ export const SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
     description: 'Basic Website Subscription',
     prices: { CHF: 2990, EUR: 2990, TRY: 99900 },
     stripePrices: {
-      CHF: process.env.STRIPE_BASIC_PRICE_CHF || 'price_basic_chf',
-      EUR: process.env.STRIPE_BASIC_PRICE_EUR || 'price_basic_eur',
-      TRY: process.env.STRIPE_BASIC_PRICE_TRY || 'price_basic_try'
+      CHF: 'price_1TDTxT2Uie3LBmwRfqhc9IJf',
+      EUR: 'price_1TDTxT2Uie3LBmwRfqhc9IJf',
+      TRY: 'price_1TDTxT2Uie3LBmwRfqhc9IJf'
     }
   },
   {
@@ -36,9 +36,9 @@ export const SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
     description: 'Business Website Subscription',
     prices: { CHF: 7990, EUR: 7990, TRY: 259900 },
     stripePrices: {
-      CHF: process.env.STRIPE_BUSINESS_PRICE_CHF || 'price_business_chf',
-      EUR: process.env.STRIPE_BUSINESS_PRICE_EUR || 'price_business_eur',
-      TRY: process.env.STRIPE_BUSINESS_PRICE_TRY || 'price_business_try'
+      CHF: 'price_1TDUAR2Uie3LBmwRZGPU3ey5',
+      EUR: 'price_1TDUAR2Uie3LBmwRZGPU3ey5',
+      TRY: 'price_1TDUAR2Uie3LBmwRZGPU3ey5'
     }
   },
   {
@@ -48,9 +48,9 @@ export const SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
     description: 'E-Commerce Website Subscription',
     prices: { CHF: 19990, EUR: 19990, TRY: 649900 },
     stripePrices: {
-      CHF: process.env.STRIPE_ECOMMERCE_PRICE_CHF || 'price_ecommerce_chf',
-      EUR: process.env.STRIPE_ECOMMERCE_PRICE_EUR || 'price_ecommerce_eur',
-      TRY: process.env.STRIPE_ECOMMERCE_PRICE_TRY || 'price_ecommerce_try'
+      CHF: 'price_1TDUCQ2Uie3LBmwRb24PvhMU',
+      EUR: 'price_1TDUCQ2Uie3LBmwRb24PvhMU',
+      TRY: 'price_1TDUCQ2Uie3LBmwRb24PvhMU'
     }
   }
 ]
