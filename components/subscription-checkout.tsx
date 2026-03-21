@@ -58,9 +58,14 @@ export function SubscriptionCheckout({ tier }: SubscriptionCheckoutProps) {
           <CheckCircle className="w-16 h-16 text-[#00D4FF] mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2 text-foreground">{t('subscription_success_title')}</h1>
           <p className="text-foreground/60 mb-6">{t('subscription_success_desc')}</p>
-          <a href="/" className="inline-block py-2 px-6 rounded-lg bg-gradient-to-r from-[#A020F0] to-[#00D4FF] text-white text-sm font-semibold hover:shadow-lg transition-shadow">
-            {t('back_to_home')}
-          </a>
+          <div className="space-y-3">
+            <a href={`/subscription/success?session_id=${sessionId}`} className="inline-block w-full py-2 px-6 rounded-lg bg-gradient-to-r from-[#A020F0] to-[#00D4FF] text-white text-sm font-semibold hover:shadow-lg transition-shadow">
+              {t('manage_subscription') || 'Abo verwalten'}
+            </a>
+            <a href="/" className="inline-block w-full py-2 px-6 rounded-lg border border-[#A020F0]/40 text-foreground text-sm font-semibold hover:bg-[#A020F0]/5 transition-colors">
+              {t('back_to_home')}
+            </a>
+          </div>
         </div>
       </div>
     )
