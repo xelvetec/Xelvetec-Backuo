@@ -29,7 +29,18 @@ export async function POST(request: NextRequest) {
     console.log('[v0] Creating Stripe checkout session:', { tier, country: countryKey, priceId: stripePriceId })
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: [
+        'card',           // Kreditkarte (Visa, Mastercard, etc.)
+        'paypal',         // PayPal
+        'apple_pay',      // Apple Pay
+        'google_pay',     // Google Pay
+        'ideal',          // iDEAL (Niederlande)
+        'bancontact',     // Bancontact (Belgien)
+        'giropay',        // giropay (Deutschland)
+        'eps',            // EPS (Österreich)
+        'p24',            // Przelewy24 (Polen)
+        'klarna',         // Klarna (Buy Now Pay Later)
+      ],
       line_items: [
         {
           price: stripePriceId, // Multi-currency Price ID - NO automatic conversion
