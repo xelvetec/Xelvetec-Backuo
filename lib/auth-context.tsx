@@ -20,18 +20,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check if user is already logged in
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      setLoading(false)
-    })
+    try {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        setUser(user)
+        setLoading(false)
+      }).catch((error) => {
+        console.error('[v0] Error getting user:', error)
+        setLoading(false)
+      })
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null)
-      setLoading(false)
-    })
+      // Listen for auth changes
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        setUser(session?.user || null)
+        setLoading(false)
+      })
 
-    return () => subscription?.unsubscribe()
+      return () => subscription?.unsubscribe()
+    } catch (error) {
+      console.error('[v0] Auth error:', error)
+      setLoading(false)
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
