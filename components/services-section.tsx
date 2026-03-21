@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Check, Sparkles, Globe, Lock, Zap, Headphones } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { prices } from "@/lib/translations"
+import Link from "next/link"
 
 function useAnimatedCounter(target: number, duration: number = 1500, isVisible: boolean) {
   const [count, setCount] = useState(0)
@@ -189,13 +190,13 @@ function PricingCard({
                 </li>
               ))}
             </ul>
-            <button className="block text-center py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] relative overflow-hidden" style={{
+            <Link href={`/subscription/checkout?tier=${priceKey === 'basic' ? 'basic' : priceKey === 'business' ? 'business' : 'ecommerce'}`} className="block text-center py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] relative overflow-hidden" style={{
               background: popular ? "linear-gradient(135deg, #A020F0, #00D4FF)" : "rgba(160,32,240,0.15)",
               color: "#fff",
               border: popular ? "none" : "1px solid rgba(160,32,240,0.4)",
             }}>
               {t("pricing_subscription_cta")}
-            </button>
+            </Link>
           </>
         )}
       </div>
