@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/cancel`,
     })
 
-    return NextResponse.json({ url: session.url })
+    return NextResponse.json({ url: session.url, customerId: session.customer })
   } catch (error) {
     console.error('Stripe error:', error)
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 })

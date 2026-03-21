@@ -2,11 +2,36 @@
 
 import { useLanguage } from '@/lib/language-context'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, ArrowRight } from 'lucide-react'
+import { CheckCircle, ArrowRight, Settings } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
 export default function SubscriptionSuccessPage() {
   const { t } = useLanguage()
+  const searchParams = useSearchParams()
+  const sessionId = searchParams.get('session_id')
+  const [portalUrl, setPortalUrl] = useState<string>('')
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false)
+
+  const handleManageSubscription = async () => {
+    try {
+      setIsLoadingPortal(true)
+      const response = await fetch('/api/stripe/billing-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      })
+      const data = await response.json()
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } catch (error) {
+      console.error('Error opening billing portal:', error)
+    } finally {
+      setIsLoadingPortal(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex items-center justify-center p-4">
@@ -32,15 +57,27 @@ export default function SubscriptionSuccessPage() {
           </ul>
         </div>
 
-        <Link href="/">
-          <Button 
-            className="w-full py-3 font-semibold"
+        <div className="space-y-3">
+          <button
+            onClick={handleManageSubscription}
+            disabled={isLoadingPortal}
+            className="w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg, #A020F0, #00D4FF)' }}
           >
-            {t('back_to_home') || 'Zurück zur Startseite'}
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </Link>
+            <Settings className="w-4 h-4" />
+            {isLoadingPortal ? (t('contact_loading') || 'Wird geladen...') : (t('manage_subscription') || 'Abo verwalten')}
+          </button>
+
+          <Link href="/">
+            <Button 
+              className="w-full py-3 font-semibold"
+              style={{ background: 'rgba(160,32,240,0.15)', color: '#fff', border: '1px solid rgba(160,32,240,0.4)' }}
+            >
+              {t('back_to_home') || 'Zurück zur Startseite'}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   )
