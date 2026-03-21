@@ -212,8 +212,11 @@ function PricingCard({
             <button
               type="button"
               onClick={() => {
-                console.log('[v0] Subscription checkout clicked, user:', user, 'priceKey:', priceKey, 'onSubscriptionCheckout:', onSubscriptionCheckout)
-                onSubscriptionCheckout?.(priceKey)
+                try {
+                  onSubscriptionCheckout?.(priceKey)
+                } catch (error) {
+                  console.error('[v0] Error in subscription checkout:', error)
+                }
               }}
               className="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] relative overflow-hidden" style={{
                 background: popular ? "linear-gradient(135deg, #A020F0, #00D4FF)" : "rgba(160,32,240,0.15)",
