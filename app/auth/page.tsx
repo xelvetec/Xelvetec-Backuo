@@ -1,20 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import { useLanguage } from '@/lib/language-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 export default function AuthPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { signIn, signUp } = useAuth()
-  const router = useRouter()
+  const { signIn, signUp, user } = useAuth()
+  const { translate } = useLanguage()
+
+  // Redirect if already logged in
+  if (user) {
+    router.push(redirectTo)
+    return null
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,9 +37,9 @@ export default function AuthPage() {
       } else {
         await signUp(email, password, fullName)
       }
-      router.push('/dashboard')
+      // Auth context will handle redirect after successful signup/login
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : translate('auth_error'))
     } finally {
       setLoading(false)
     }
@@ -62,7 +72,7 @@ export default function AuthPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-2">E-Mail</label>
+              <label className="block text-sm font-medium mb-2">{translate('auth_email')}</label>
               <Input
                 type="email"
                 placeholder="you@example.com"
@@ -74,7 +84,7 @@ export default function AuthPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Passwort</label>
+              <label className="block text-sm font-medium mb-2">{translate('auth_password')}</label>
               <Input
                 type="password"
                 placeholder="••••••••"
@@ -96,7 +106,7 @@ export default function AuthPage() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
             >
-              {loading ? 'Wird geladen...' : isLogin ? 'Anmelden' : 'Konto erstellen'}
+              {loading ? translate('loading') : isLogin ? translate('auth_login_button') : translate('auth_signup_button')}
             </Button>
           </form>
 
@@ -119,3 +129,4 @@ export default function AuthPage() {
     </div>
   )
 }
+

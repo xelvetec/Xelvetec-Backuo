@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react"
 import { Check, Sparkles, Globe, Lock, Zap, Headphones } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
+import { useAuth } from "@/lib/auth-context"
+import { useRouter } from "next/navigation"
 import { prices } from "@/lib/translations"
 import Link from "next/link"
 
@@ -41,11 +43,13 @@ interface PricingCardProps {
   subscriptionFeatures: { icon: React.ReactNode; key: string }[]
   popular?: boolean
   isSubscriptionAvailable?: boolean
+  onSubscriptionCheckout?: (tier: string) => void
 }
 
 function PricingCard({ 
   titleKey, descKey, featureKeys, priceKey, popular, delay,
-  oneTimePrice, subscriptionPrice, subscriptionFeatures, isSubscriptionAvailable = true
+  oneTimePrice, subscriptionPrice, subscriptionFeatures, isSubscriptionAvailable = true,
+  onSubscriptionCheckout
 }: PricingCardProps) {
   const { country, t } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
@@ -205,13 +209,15 @@ function PricingCard({
                 </li>
               ))}
             </ul>
-            <Link href={`/subscription/checkout?tier=${priceKey === 'basic' ? 'basic' : priceKey === 'business' ? 'business' : 'ecommerce'}`} className="block text-center py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] relative overflow-hidden" style={{
-              background: popular ? "linear-gradient(135deg, #A020F0, #00D4FF)" : "rgba(160,32,240,0.15)",
-              color: "#fff",
-              border: popular ? "none" : "1px solid rgba(160,32,240,0.4)",
-            }}>
+            <button
+              onClick={() => onSubscriptionCheckout?.(priceKey)}
+              className="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] relative overflow-hidden" style={{
+                background: popular ? "linear-gradient(135deg, #A020F0, #00D4FF)" : "rgba(160,32,240,0.15)",
+                color: "#fff",
+                border: popular ? "none" : "1px solid rgba(160,32,240,0.4)",
+              }}>
               {t("pricing_subscription_cta")}
-            </Link>
+            </button>
           </>
         )}
       </div>
@@ -221,7 +227,20 @@ function PricingCard({
 
 export function ServicesSection() {
   const { t, country } = useLanguage()
+  const { user } = useAuth()
+  const router = useRouter()
   const isSubscriptionAvailable = country !== 'TR'
+
+  const handleSubscriptionCheckout = (tier: string) => {
+    if (!user) {
+      // Redirect to login with return URL
+      const redirectUrl = `/subscription/checkout?tier=${tier}`
+      router.push(`/auth?redirect=${encodeURIComponent(redirectUrl)}`)
+    } else {
+      // User is authenticated, proceed to checkout
+      router.push(`/subscription/checkout?tier=${tier}`)
+    }
+  }
 
   return (
     <section id="services" className="relative py-24 md:py-32 overflow-hidden bg-gradient-to-b from-transparent via-purple-500/5 to-transparent">
@@ -248,6 +267,7 @@ export function ServicesSection() {
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
             ] : []}
             isSubscriptionAvailable={isSubscriptionAvailable}
+            onSubscriptionCheckout={handleSubscriptionCheckout}
           />
           <PricingCard
             titleKey="business_title"
@@ -266,6 +286,7 @@ export function ServicesSection() {
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
             ] : []}
             isSubscriptionAvailable={isSubscriptionAvailable}
+            onSubscriptionCheckout={handleSubscriptionCheckout}
           />
           <PricingCard
             titleKey="ecommerce_title"
@@ -283,6 +304,7 @@ export function ServicesSection() {
               { icon: <Headphones className="w-4 h-4" />, key: "subscription_support" },
             ] : []}
             isSubscriptionAvailable={isSubscriptionAvailable}
+            onSubscriptionCheckout={handleSubscriptionCheckout}
           />
         </div>
       </div>

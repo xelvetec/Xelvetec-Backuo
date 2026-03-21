@@ -46,6 +46,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       options: { data: { full_name: fullName } }
     })
     if (error) throw error
+
+    // Link existing subscriptions with the same email
+    await linkExistingSubscriptions(email)
+  }
+
+  const linkExistingSubscriptions = async (email: string) => {
+    try {
+      const { data: user } = await supabase.auth.getUser()
+      if (!user?.user) return
+
+      // Find subscriptions with matching email
+      const { data: subscriptions, error } = await supabase
+        .from('subscriptions')
+        .select('id')
+        .eq('customer_email', email)
+        .is('user_id', null)
+
+      if (error) {
+        console.error('[v0] Error finding subscriptions to link:', error)
+        return
+      }
+
+      if (subscriptions && subscriptions.length > 0) {
+        // Link all matching subscriptions to this user
+        const { error: updateError } = await supabase
+          .from('subscriptions')
+          .update({ user_id: user.user.id })
+          .eq('customer_email', email)
+          .is('user_id', null)
+
+        if (updateError) {
+          console.error('[v0] Error linking subscriptions:', updateError)
+        } else {
+          console.log(`[v0] Linked ${subscriptions.length} subscription(s) to user ${user.user.id}`)
+        }
+      }
+    } catch (error) {
+      console.error('[v0] Error in linkExistingSubscriptions:', error)
+    }
   }
 
   const signOut = async () => {
