@@ -282,7 +282,6 @@ export function ServicesSection() {
             ] : []}
             isSubscriptionAvailable={isSubscriptionAvailable}
           />
-          />
         </div>
       </div>
     </section>
