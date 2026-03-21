@@ -58,16 +58,20 @@ export function Navbar() {
       <div className="ml-auto flex items-center gap-3">
         {user ? (
           <Link href="/dashboard">
-            <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+            <Button type="button" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
               Mein Konto
             </Button>
           </Link>
         ) : (
-          <Link href="/auth">
-            <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
-              Anmelden
-            </Button>
-          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = '/auth'
+            }}
+            className="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all"
+          >
+            Anmelden
+          </button>
         )}
       </div>
 

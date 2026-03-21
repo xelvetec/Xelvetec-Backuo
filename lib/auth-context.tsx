@@ -61,8 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const linkExistingSubscriptions = async (email: string) => {
     try {
-      const { data: user } = await supabase.auth.getUser()
-      if (!user?.user) return
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) return
 
       // Find subscriptions with matching email
       const { data: subscriptions, error } = await supabase
@@ -80,14 +80,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Link all matching subscriptions to this user
         const { error: updateError } = await supabase
           .from('subscriptions')
-          .update({ user_id: user.user.id })
+          .update({ user_id: authUser.id })
           .eq('customer_email', email)
           .is('user_id', null)
 
         if (updateError) {
           console.error('[v0] Error linking subscriptions:', updateError)
         } else {
-          console.log(`[v0] Linked ${subscriptions.length} subscription(s) to user ${user.user.id}`)
+          console.log(`[v0] Linked ${subscriptions.length} subscription(s) to user ${authUser.id}`)
         }
       }
     } catch (error) {
@@ -110,7 +110,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within AuthProvider')
+    console.error('[v0] useAuth must be used within AuthProvider')
+    // Return a safe default instead of throwing
+    return {
+      user: null,
+      loading: false,
+      signIn: async () => { throw new Error('Auth not available') },
+      signUp: async () => { throw new Error('Auth not available') },
+      signOut: async () => { throw new Error('Auth not available') }
+    }
   }
   return context
 }
