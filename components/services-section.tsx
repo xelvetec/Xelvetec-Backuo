@@ -81,7 +81,7 @@ function PricingCard({
   const animatedSub = useAnimatedCounter(parseInt(subNum), 1500, isVisible)
   
   // For Turkish prices (whole numbers), don't divide by 100
-  const isTurkishPrice = subscriptionPrice.length > 3 && !subscriptionPrice.includes('.')
+  const isTurkishPrice = !subscriptionPrice.includes('.')
   const subFormatted = isTurkishPrice 
     ? `${animatedSub.toLocaleString("de-DE")}${currency}`
     : `${(animatedSub / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${currency}`
