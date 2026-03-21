@@ -30,8 +30,6 @@ export async function POST(request: NextRequest) {
       payment_method_types: [
         'card',        // Kreditkarte
         'paypal',      // PayPal
-        'apple_pay',   // Apple Pay
-        'google_pay',  // Google Pay
       ],
       line_items: [
         {
