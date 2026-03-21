@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const currency = country === 'CH' ? 'chf' : country === 'DE' ? 'eur' : country === 'AT' ? 'eur' : country === 'TR' ? 'try' : 'chf'
 
     const session = await stripe.checkout.sessions.create({
-      ui_mode: 'embedded',
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
@@ -35,11 +35,11 @@ export async function POST(request: NextRequest) {
         }
       ],
       mode: 'subscription',
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/cancel`,
     })
 
-    return NextResponse.json({ clientSecret: session.client_secret })
+    return NextResponse.json({ url: session.url })
   } catch (error) {
     console.error('Stripe error:', error)
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 })

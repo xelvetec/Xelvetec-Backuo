@@ -1,55 +1,66 @@
 'use client'
 
-import { CreditCard, CheckCircle, AlertCircle } from 'lucide-react'
+import { CheckCircle, AlertCircle, Loader } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/js'
 import { useLanguage } from '@/lib/language-context'
 import { useState, useEffect } from 'react'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-
 interface SubscriptionCheckoutProps {
   tier: 'basic' | 'business' | 'ecommerce'
-  onClose?: () => void
 }
 
-export function SubscriptionCheckout({ tier, onClose }: SubscriptionCheckoutProps) {
+export function SubscriptionCheckout({ tier }: SubscriptionCheckoutProps) {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const { country, t } = useLanguage()
-  const [clientSecret, setClientSecret] = useState<string>('')
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string>('')
 
   useEffect(() => {
-    if (!sessionId && clientSecret === '') {
-      fetch('/api/stripe/subscription-checkout', {
+    // Wenn session_id vorhanden, war checkout erfolgreich
+    if (sessionId) {
+      setIsLoading(false)
+      return
+    }
+
+    // Checkout starten
+    handleCheckout()
+  }, [])
+
+  async function handleCheckout() {
+    try {
+      const response = await fetch('/api/stripe/subscription-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tier, country })
       })
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            setError(data.error)
-          } else {
-            setClientSecret(data.clientSecret)
-          }
-        })
-        .catch(err => {
-          console.error('Error creating checkout session:', err)
-          setError('Failed to create checkout session')
-        })
+
+      const data = await response.json()
+
+      if (data.error) {
+        setError(data.error)
+        setIsLoading(false)
+      } else if (data.url) {
+        // Redirect zu Stripe Checkout
+        window.location.href = data.url
+      }
+    } catch (err) {
+      console.error('Checkout error:', err)
+      setError('Failed to create checkout session')
+      setIsLoading(false)
     }
-  }, [tier, country, sessionId, clientSecret])
+  }
 
   if (sessionId) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center glass rounded-3xl p-8 max-w-md">
           <CheckCircle className="w-16 h-16 text-[#00D4FF] mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2 text-foreground">{t('subscription_success_title')}</h1>
-          <p className="text-foreground/60">{t('subscription_success_desc')}</p>
+          <p className="text-foreground/60 mb-6">{t('subscription_success_desc')}</p>
+          <a href="/" className="inline-block py-2 px-6 rounded-lg bg-gradient-to-r from-[#A020F0] to-[#00D4FF] text-white text-sm font-semibold hover:shadow-lg transition-shadow">
+            {t('back_to_home')}
+          </a>
         </div>
       </div>
     )
@@ -57,33 +68,32 @@ export function SubscriptionCheckout({ tier, onClose }: SubscriptionCheckoutProp
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center glass rounded-3xl p-8 max-w-md">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2 text-foreground">Error</h1>
-          <p className="text-foreground/60">{error}</p>
+          <p className="text-foreground/60 mb-6">{error}</p>
+          <button 
+            onClick={() => window.location.href = '/'}
+            className="inline-block py-2 px-6 rounded-lg bg-gradient-to-r from-[#A020F0] to-[#00D4FF] text-white text-sm font-semibold hover:shadow-lg transition-shadow"
+          >
+            {t('back_to_home')}
+          </button>
         </div>
       </div>
     )
   }
 
-  if (!clientSecret) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#A020F0]"></div>
-          <p className="mt-4 text-foreground/60">{t('contact_sending') || 'Loading...'}</p>
+          <Loader className="w-12 h-12 text-[#A020F0] mx-auto mb-4 animate-spin" />
+          <p className="text-foreground/60">Redirecting to payment...</p>
         </div>
       </div>
     )
   }
 
-  return (
-    <div className="py-12 md:py-24">
-      <EmbeddedCheckoutProvider stripe={stripePromise} options={{ clientSecret }}>
-        <EmbeddedCheckout />
-      </EmbeddedCheckoutProvider>
-    </div>
-  )
+  return null
 }
-
