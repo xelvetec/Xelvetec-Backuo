@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react"
 import { Check, Sparkles, Globe, Lock, Zap, Headphones } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/lib/auth-context"
-import { useRouter } from "next/navigation"
 import { prices } from "@/lib/translations"
 import Link from "next/link"
 
@@ -242,10 +241,10 @@ export function ServicesSection() {
     if (!user) {
       // Redirect to login with return URL
       const redirectUrl = `/subscription/checkout?tier=${tier}`
-      router.push(`/auth?redirect=${encodeURIComponent(redirectUrl)}`)
+      window.location.href = `/auth?redirect=${encodeURIComponent(redirectUrl)}`
     } else {
       // User is authenticated, proceed to checkout
-      router.push(`/subscription/checkout?tier=${tier}`)
+      window.location.href = `/subscription/checkout?tier=${tier}`
     }
   }
 
