@@ -74,12 +74,17 @@ function PricingCard({
   const currency = priceString.includes("CHF") ? " CHF" : priceString.includes("€") ? "€" : " ₺"
   const formattedPrice = `${animatedPrice.toLocaleString("de-DE")}${currency}`
 
-  // Parse subscription price correctly (handles decimals like "29.90")
+  // Parse subscription price correctly (handles decimals like "29.90" and whole numbers like "999")
   const subPriceMatch = subscriptionPrice.match(/(\d+)[.,]?(\d{0,2})/)
   const subNum = subPriceMatch ? (subPriceMatch[1] + (subPriceMatch[2] || "")) : 0
   const subDecimal = subPriceMatch ? subPriceMatch[2] : "00"
   const animatedSub = useAnimatedCounter(parseInt(subNum), 1500, isVisible)
-  const subFormatted = `${(animatedSub / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${currency}`
+  
+  // For Turkish prices (whole numbers), don't divide by 100
+  const isTurkishPrice = subscriptionPrice.length > 3 && !subscriptionPrice.includes('.')
+  const subFormatted = isTurkishPrice 
+    ? `${animatedSub.toLocaleString("de-DE")}${currency}`
+    : `${(animatedSub / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${currency}`
 
   return (
     <div
