@@ -1,11 +1,15 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useLanguage } from "@/lib/language-context"
+import { useAuth } from "@/lib/auth-context"
+import { Button } from "@/components/ui/button"
 
 export function Navbar() {
   const { country } = useLanguage()
+  const { user } = useAuth()
   const [scrollProgress, setScrollProgress] = useState(0)
   const [mounted, setMounted] = useState(false)
 
@@ -27,8 +31,8 @@ export function Navbar() {
   const logoScale = mounted ? 1 + easedProgress * 0.4 : 1
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 animate-float-subtle pt-4 px-4 flex justify-center">
-      {/* Logo only - minimal and clean - centered */}
+    <nav className="fixed top-0 left-0 right-0 z-50 animate-float-subtle pt-4 px-4 flex justify-between items-center">
+      {/* Logo - left side */}
       <a href="#home" className="inline-flex items-center group">
         <div 
           className="relative animate-breathing transition-transform duration-75 ease-out"
@@ -49,6 +53,24 @@ export function Navbar() {
           />
         </div>
       </a>
+      
+      {/* Auth buttons - right side */}
+      <div className="flex items-center gap-3">
+        {user ? (
+          <Link href="/dashboard">
+            <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+              Mein Konto
+            </Button>
+          </Link>
+        ) : (
+          <Link href="/auth">
+            <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+              Anmelden
+            </Button>
+          </Link>
+        )}
+      </div>
+
       {/* Hidden glow element that applies only on group hover */}
       <style>{`
         .group:hover > div > img {
