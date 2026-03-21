@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabaseClient } from '@/lib/supabase-client'
+import { supabase } from '@/lib/supabase-client'
 import { useLanguage } from '@/lib/language-context'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -20,7 +20,7 @@ export default function AdminDashboard() {
 
   async function loadCustomers() {
     try {
-      const { data, error } = await supabaseClient
+      const { data, error } = await supabase
         .from('users_profile')
         .select(`
           user_id,

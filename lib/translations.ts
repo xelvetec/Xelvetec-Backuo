@@ -678,3 +678,4 @@ export const translations: Record<Language, Record<string, string>> = {
     paused: "Paused",
     cancelled: "Cancelled",
   },
+}
