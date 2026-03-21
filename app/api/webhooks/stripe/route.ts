@@ -1,0 +1,204 @@
+import { NextRequest, NextResponse } from 'next/server'
+import Stripe from 'stripe'
+import { supabaseAdmin } from '@/lib/supabase-admin'
+import { 
+  sendSubscriptionActivatedEmail, 
+  sendSubscriptionCancelledEmail, 
+  sendInvoiceReadyEmail,
+  sendPaymentFailedEmail 
+} from '@/lib/email-service'
+import { countryToLanguage, type Country } from '@/lib/translations'
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
+
+export async function POST(request: NextRequest) {
+  const body = await request.text()
+  const signature = request.headers.get('stripe-signature')!
+
+  try {
+    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
+
+    console.log(`[v0] Stripe webhook received: ${event.type}`)
+
+    switch (event.type) {
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription
+        await handleSubscriptionUpdate(subscription)
+        break
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription
+        await handleSubscriptionDeleted(subscription)
+        break
+      }
+
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object as Stripe.Invoice
+        await handleInvoicePaid(invoice)
+        break
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        await handleInvoiceFailed(invoice)
+        break
+      }
+
+      default:
+        console.log(`[v0] Unhandled webhook event type: ${event.type}`)
+    }
+
+    return NextResponse.json({ received: true })
+  } catch (error) {
+    console.error('[v0] Webhook error:', error)
+    return NextResponse.json(
+      { error: 'Webhook signature verification failed' },
+      { status: 400 }
+    )
+  }
+}
+
+async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
+  const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id
+  
+  // Find user by Stripe customer ID
+  const { data: subscriptionData, error: fetchError } = await supabaseAdmin
+    .from('subscriptions')
+    .select('user_id, status')
+    .eq('stripe_customer_id', customerId)
+    .single()
+
+  if (fetchError) {
+    console.error('[v0] Failed to fetch subscription:', fetchError)
+    return
+  }
+
+  const status = subscription.status === 'active' ? 'active' : subscription.status === 'paused' ? 'paused' : 'cancelled'
+
+  const { error: updateError } = await supabaseAdmin
+    .from('subscriptions')
+    .update({
+      status,
+      stripe_subscription_id: subscription.id,
+      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('stripe_customer_id', customerId)
+
+  if (updateError) {
+    console.error('[v0] Failed to update subscription:', updateError)
+    return
+  }
+
+  // Send email notification
+  const { data: userProfile } = await supabaseAdmin
+    .from('users_profile')
+    .select('country')
+    .eq('user_id', subscriptionData.user_id)
+    .single()
+
+  const userCountry = (userProfile?.country || 'de') as Country
+  const userLanguage = countryToLanguage[userCountry]
+
+  if (subscription.status === 'active' && subscriptionData.status !== 'active') {
+    await sendSubscriptionActivatedEmail(subscriptionData.user_id, userLanguage)
+  }
+
+  console.log(`[v0] Subscription ${subscription.id} updated to status: ${status}`)
+}
+
+async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+  const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id
+
+  const { data: subscriptionData } = await supabaseAdmin
+    .from('subscriptions')
+    .select('user_id')
+    .eq('stripe_customer_id', customerId)
+    .single()
+
+  const { error } = await supabaseAdmin
+    .from('subscriptions')
+    .update({
+      status: 'cancelled',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('stripe_customer_id', customerId)
+
+  if (error) {
+    console.error('[v0] Failed to mark subscription as cancelled:', error)
+    return
+  }
+
+  // Send cancellation email
+  if (subscriptionData) {
+    const { data: userProfile } = await supabaseAdmin
+      .from('users_profile')
+      .select('country')
+      .eq('user_id', subscriptionData.user_id)
+      .single()
+
+    const userCountry = (userProfile?.country || 'de') as Country
+    const userLanguage = countryToLanguage[userCountry]
+    await sendSubscriptionCancelledEmail(subscriptionData.user_id, userLanguage)
+  }
+
+  console.log(`[v0] Subscription ${subscription.id} marked as cancelled`)
+}
+
+async function handleInvoicePaid(invoice: Stripe.Invoice) {
+  const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
+
+  if (!customerId || !invoice.id) return
+
+  const { error } = await supabaseAdmin
+    .from('invoices')
+    .upsert(
+      {
+        stripe_invoice_id: invoice.id,
+        stripe_customer_id: customerId,
+        amount: invoice.amount_paid,
+        currency: invoice.currency,
+        status: 'paid',
+        pdf_url: invoice.pdf,
+        paid_date: new Date(invoice.paid_at! * 1000).toISOString(),
+      },
+      { onConflict: 'stripe_invoice_id' }
+    )
+
+  if (error) {
+    console.error('[v0] Failed to save invoice:', error)
+    return
+  }
+
+  console.log(`[v0] Invoice ${invoice.id} recorded as paid`)
+}
+
+async function handleInvoiceFailed(invoice: Stripe.Invoice) {
+  const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
+
+  if (!customerId || !invoice.id) return
+
+  const { error } = await supabaseAdmin
+    .from('invoices')
+    .upsert(
+      {
+        stripe_invoice_id: invoice.id,
+        stripe_customer_id: customerId,
+        amount: invoice.amount_due,
+        currency: invoice.currency,
+        status: 'failed',
+      },
+      { onConflict: 'stripe_invoice_id' }
+    )
+
+  if (error) {
+    console.error('[v0] Failed to save failed invoice:', error)
+    return
+  }
+
+  console.log(`[v0] Invoice ${invoice.id} recorded as failed`)
+}
