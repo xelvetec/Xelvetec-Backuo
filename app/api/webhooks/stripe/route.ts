@@ -5,8 +5,7 @@ import {
   sendSubscriptionActivatedEmail, 
   sendSubscriptionCancelledEmail, 
   sendInvoiceReadyEmail,
-  sendPaymentFailedEmail,
-  sendNewAboNotificationToOwner  // ← NEU!
+  sendPaymentFailedEmail 
 } from '@/lib/email-service'
 import { countryToLanguage, type Country } from '@/lib/translations'
 
@@ -23,19 +22,6 @@ export async function POST(request: NextRequest) {
     console.log(`[v0] Stripe webhook received: ${event.type}`)
 
     switch (event.type) {
-      case 'checkout.session.completed': {  // ← NEU! E-MAIL AN DICH
-        const session = event.data.object as Stripe.Checkout.Session
-        const telefon = session.custom_fields?.find(f => f.key === 'telefon_whatsapp')?.text?.value
-        const tier = session.metadata?.tier || 'Unknown'
-        const country = session.metadata?.country || 'Unknown'
-        const customerEmail = session.customer_details?.email
-        
-        // E-MAIL AN info@xelvetec.ch
-        await sendNewAboNotificationToOwner(tier, country, telefon || 'Kein', customerEmail)
-        console.log(`🔔 Neues Abo-Mail an info@xelvetec.ch: ${tier} ${telefon}`)
-        break
-      }
-
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
