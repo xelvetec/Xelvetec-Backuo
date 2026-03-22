@@ -113,23 +113,28 @@ export default function DashboardPage() {
                     {subscription.status === 'active' ? 'Aktiv' : subscription.status}
                   </p>
                 </div>
-                <div>
-                  <label className="text-sm text-foreground/60">Betrag</label>
-                  <p className="text-lg font-medium">
-                    {(subscription.amount / 100).toFixed(2)} {subscription.currency.toUpperCase()}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm text-foreground/60">Nächste Abrechnung</label>
-                  <p className="text-lg font-medium">
-                    {new Date(subscription.current_period_end).toLocaleDateString('de-DE')}
-                  </p>
-                </div>
+                {subscription.current_period_end && (
+                  <div>
+                    <label className="text-sm text-foreground/60">Nächste Abrechnung</label>
+                    <p className="text-lg font-medium">
+                      {new Date(subscription.current_period_end).toLocaleDateString('de-DE')}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex gap-4 pt-4">
                 <button
                   className="flex-1 px-4 py-2 border border-foreground/20 rounded-lg hover:bg-foreground/5 text-foreground text-sm font-medium transition-colors"
-                  onClick={() => window.location.href = '/api/stripe/billing-portal'}
+                  onClick={async () => {
+                    // Get session ID from checkout and open billing portal
+                    const response = await fetch('/api/stripe/billing-portal', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ sessionId: subscription.stripe_subscription_id })
+                    })
+                    const data = await response.json()
+                    if (data.url) window.location.href = data.url
+                  }}
                 >
                   {t('dashboard_manage_payment_method')}
                 </button>
@@ -149,14 +154,13 @@ export default function DashboardPage() {
         {/* Invoices Section */}
         <div className="p-6 border border-foreground/10 rounded-lg bg-background/50">
           <h2 className="text-xl font-bold mb-4">{t('dashboard_invoices_title')}</h2>
-          {invoices.length > 0 ? (
+          {invoices && invoices.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-foreground/10">
                     <th className="text-left py-3 px-2 text-sm font-medium">{t('dashboard_invoice_date')}</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium">{t('dashboard_invoice_amount')}</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium">{t('dashboard_invoice_status')}</th>
+                    <th className="text-left py-3 px-2 text-sm font-medium">Status</th>
                     <th className="text-left py-3 px-2 text-sm font-medium">{t('dashboard_invoice_action')}</th>
                   </tr>
                 </thead>
@@ -164,12 +168,9 @@ export default function DashboardPage() {
                   {invoices.map((invoice) => (
                     <tr key={invoice.id} className="border-b border-foreground/5 hover:bg-foreground/5">
                       <td className="py-3 px-2 text-sm">
-                        {new Date(invoice.created_at).toLocaleDateString()}
+                        {new Date(invoice.created_at).toLocaleDateString('de-DE')}
                       </td>
-                      <td className="py-3 px-2 text-sm font-medium">
-                        {(invoice.amount / 100).toFixed(2)} {invoice.currency.toUpperCase()}
-                      </td>
-                      <td className="py-3 px-2 text-sm capitalize">{invoice.status}</td>
+                      <td className="py-3 px-2 text-sm capitalize">{invoice.status || 'open'}</td>
                       <td className="py-3 px-2 text-sm">
                         {invoice.pdf_url && (
                           <a
@@ -178,7 +179,7 @@ export default function DashboardPage() {
                             rel="noopener noreferrer"
                             className="text-purple-500 hover:text-purple-400"
                           >
-                            {t('dashboard_download_pdf')}
+                            PDF herunterladen
                           </a>
                         )}
                       </td>
