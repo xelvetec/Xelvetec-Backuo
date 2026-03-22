@@ -21,8 +21,16 @@ export async function POST(request: NextRequest) {
     }
     
     const countryKey = countryCodeMap[country.toLowerCase()] || 'CHF'
-    
     const stripePriceId = product.stripePrices[countryKey]
+
+    // AUTOMATISCHE ÜBERSETZUNG Telefon-Feld
+    const phoneLabels = {
+      'ch': 'Telefon oder Whatsapp',
+      'de': 'Telefon oder Whatsapp', 
+      'at': 'Telefon oder Whatsapp',
+      'tr': 'Telefon veya WhatsApp'
+    }
+    const phoneLabel = phoneLabels[country.toLowerCase()] || 'Telefon oder Whatsapp'
 
     const session = await stripe.checkout.sessions.create({
       payment_method_collection: 'always',
@@ -35,10 +43,10 @@ export async function POST(request: NextRequest) {
       ],
       mode: 'subscription',
       custom_fields: [{
-        key: 'website_wuensche',
-        label: { type: 'custom', custom: 'Website Wünsche (optional)' },
+        key: 'telefon_whatsapp',
+        label: { type: 'custom', custom: phoneLabel },
         type: 'text',
-        optional: true
+        optional: false
       }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/cancel`,
