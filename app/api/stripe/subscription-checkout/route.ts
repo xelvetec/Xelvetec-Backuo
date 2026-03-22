@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       mode: 'subscription',
       custom_fields: [{
         key: 'telefon_whatsapp',
-        label: { type: 'custom', custom: 'Telefon oder Whatsapp' },
+        label: { type: 'custom', custom: 'Telefon | Whatsapp' },
         type: 'text',
         optional: false
       }],
