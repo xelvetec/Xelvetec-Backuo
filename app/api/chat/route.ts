@@ -1,125 +1,117 @@
 import { streamText, convertToModelMessages } from 'ai'
 import { openai } from '@ai-sdk/openai'
-import { getRelevantContext } from '@/lib/chatbot/vector-utils'
+import { createClient } from '@supabase/supabase-js'
 
-const SYSTEM_PROMPTS = {
-  de: `Du bist ein hilfreicher AI-Assistent für xelvetec.ch. Du sprichst perfekt Deutsch und hilfst Kunden mit allen Fragen zu unseren Dienstleistungen.
-
-Unsere Services:
-- Moderne Webentwicklung und Design
-- SEO-Optimierung
-- Hosting und technische Unterstützung
-- E-Commerce Lösungen
-- App-Entwicklung
-
-Regeln:
-- Antworte immer auf Deutsch, es sei denn der Nutzer bittet ausdrücklich um eine andere Sprache
-- Sei freundlich, professionell und hilfsbereit
-- Zitiere spezifische Informationen aus der Wissensdatenbank wenn relevant
-- Wenn du keine Antwort findest, sage ehrlich Bescheid und biete an, den Support zu kontaktieren
-- Beende deine Antworten mit einem klaren Call-to-Action wenn angemessen`,
-
-  tr: `Sen xelvetec.ch için yardımcı bir yapay zeka asistanısın. Türkçeyi kusursuz şekilde konuşur ve müşterilerin hizmetlerimizle ilgili tüm sorularında yardım edersin.
-
-Hizmetlerimiz:
-- Modern web geliştirme ve tasarım
-- SEO optimizasyonu
-- Hosting ve teknik destek
-- E-ticaret çözümleri
-- Uygulama geliştirme
-
-Kurallar:
-- Kullanıcı açıkça başka bir dil istememedikçe her zaman Türkçe yanıt ver
-- Dost canlı, profesyonel ve yardımcı ol
-- Bilgi tabanından ilgili belirli bilgileri alıntıla
-- Cevap bulamazsan açık sözlü ol ve desteğe başvurmayı öner
-- Uygunsa yanıtını açık bir harekete geçir çağrısıyla bitir`,
-
-  en: `You are a helpful AI assistant for xelvetec.ch. You speak perfect English and help customers with all questions about our services.
-
-Our Services:
-- Modern web development and design
-- SEO optimization
-- Hosting and technical support
-- E-commerce solutions
-- App development
-
-Rules:
-- Always respond in English unless the user explicitly asks for another language
-- Be friendly, professional, and helpful
-- Quote specific information from the knowledge base when relevant
-- If you can't find an answer, be honest and offer to contact support
-- End your responses with a clear call-to-action when appropriate`,
-}
-
-function detectLanguage(message: string): 'de' | 'tr' | 'en' {
-  // Simple language detection based on common words
-  const germanWords = ['wie', 'was', 'wo', 'wann', 'warum', 'ich', 'mein', 'der', 'die', 'das']
-  const turkishWords = ['nasıl', 'ne', 'nerde', 'ne zaman', 'niye', 'ben', 'benim', 'bir', 'bu']
-
-  const lowerMessage = message.toLowerCase()
-  const germanCount = germanWords.filter((w) => lowerMessage.includes(w)).length
-  const turkishCount = turkishWords.filter((w) => lowerMessage.includes(w)).length
-
-  if (germanCount > turkishCount && germanCount > 0) return 'de'
-  if (turkishCount > 0) return 'tr'
-  return 'en'
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(req: Request) {
+  console.log('[v0] Chat API called')
+  
   try {
-    const { messages } = await req.json()
+    const body = await req.json()
+    console.log('[v0] Request body:', JSON.stringify(body).substring(0, 100))
+    
+    const { messages } = body
 
-    if (!messages || !Array.isArray(messages)) {
-      return new Response('Invalid messages format', { status: 400 })
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      console.log('[v0] Invalid messages:', messages)
+      return new Response(JSON.stringify({ error: 'Invalid messages' }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      })
     }
 
     // Get the last user message
     const lastMessage = messages[messages.length - 1]
-    if (!lastMessage || lastMessage.role !== 'user') {
-      return new Response('Invalid message format', { status: 400 })
-    }
-
-    const userMessage =
-      typeof lastMessage.content === 'string'
-        ? lastMessage.content
-        : lastMessage.content?.[0]?.text || ''
-
-    if (!userMessage.trim()) {
-      return new Response('Empty message', { status: 400 })
-    }
-
-    // Detect language from user message
-    const language = detectLanguage(userMessage)
-
-    // Get relevant context from knowledge base
-    const relevantContext = await getRelevantContext(userMessage, language)
-
-    // Build system prompt with context
-    const contextSection = relevantContext 
-      ? `\n\nRelevante Informationen aus unserer Wissensdatenbank:\n${relevantContext}`
-      : ''
+    console.log('[v0] Last message:', lastMessage)
     
-    const systemPrompt = `${SYSTEM_PROMPTS[language]}${contextSection}`
+    if (!lastMessage || lastMessage.role !== 'user') {
+      console.log('[v0] Invalid message role')
+      return new Response(JSON.stringify({ error: 'Invalid message' }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
 
-    // Convert messages to model format
+    let userText = ''
+    if (typeof lastMessage.content === 'string') {
+      userText = lastMessage.content
+    } else if (Array.isArray(lastMessage.content)) {
+      const textPart = lastMessage.content.find((p: any) => p.type === 'text')
+      if (textPart) {
+        userText = textPart.text
+      }
+    } else if (lastMessage.content && typeof lastMessage.content === 'object') {
+      userText = (lastMessage.content as any).text || ''
+    }
+
+    console.log('[v0] User text:', userText)
+
+    if (!userText.trim()) {
+      console.log('[v0] Empty message text')
+      return new Response(JSON.stringify({ error: 'Empty message' }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
+
+    // Get knowledge base context
+    let contextText = ''
+    try {
+      const { data: kbData } = await supabase
+        .from('knowledge_base')
+        .select('title, content')
+        .limit(5)
+      
+      if (kbData && kbData.length > 0) {
+        contextText = kbData
+          .map((item: any) => `${item.title}: ${item.content}`)
+          .join('\n\n')
+        console.log('[v0] KB context retrieved:', contextText.substring(0, 100))
+      } else {
+        console.log('[v0] No KB data found')
+      }
+    } catch (error) {
+      console.log('[v0] KB search error:', error)
+    }
+
+    const systemPrompt = `Du bist ein hilfreicher AI-Assistent für xelvetec.ch. Du sprichst perfekt Deutsch, Türkisch und Englisch.
+
+Du hilfst Kunden mit Fragen zu unseren Services wie Webentwicklung, SEO, Hosting, E-Commerce und App-Entwicklung.
+
+Sei freundlich, professionell und hilfsbereit. Wenn du etwas nicht weißt, sage ehrlich Bescheid.
+
+${contextText ? `\nVerfügbare Informationen:\n${contextText}` : ''}`
+
+    console.log('[v0] System prompt length:', systemPrompt.length)
+
+    // Convert messages for the model
+    console.log('[v0] Converting messages...')
     const modelMessages = await convertToModelMessages(messages)
+    console.log('[v0] Converted messages count:', modelMessages.length)
 
-    // Stream the response
+    // Stream response
+    console.log('[v0] Starting stream with model: openai/gpt-4o')
     const result = streamText({
-      model: openai('gpt-4-turbo'),
+      model: openai('gpt-4o'),
       system: systemPrompt,
       messages: modelMessages,
       temperature: 0.7,
       maxTokens: 1024,
     })
 
+    console.log('[v0] Streaming response...')
+    
     return result.toUIMessageStreamResponse({
       originalMessages: messages,
     })
   } catch (error) {
     console.error('[v0] Chat API error:', error)
-    return new Response(JSON.stringify({ error: 'Internal server error' }), { 
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    return new Response(JSON.stringify({ error: 'Internal server error', details: errorMsg }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })

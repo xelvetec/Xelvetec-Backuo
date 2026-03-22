@@ -3,20 +3,10 @@
 import { useState } from 'react'
 import { Loader } from 'lucide-react'
 
-interface PopulateResponse {
-  success: boolean
-  message: string
-  inserted: number
-  errors: number
-  total: number
-  errorDetails?: string[]
-}
-
 export default function ChatbotSetupPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
-  const [result, setResult] = useState<PopulateResponse | null>(null)
 
   const handlePopulateKB = async () => {
     setLoading(true)
@@ -28,17 +18,15 @@ export default function ChatbotSetupPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer demo`,
         },
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || data.details || 'Failed to populate knowledge base')
+        throw new Error(data.error || 'Failed to populate knowledge base')
       }
 
-      setResult(data)
       setSuccess(true)
       console.log('[v0] KB populated:', data)
     } catch (err) {
@@ -77,16 +65,9 @@ export default function ChatbotSetupPage() {
 
             {success && (
               <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-green-400 font-semibold mb-2">
-                  ✓ Knowledge base successfully populated!
+                <p className="text-green-400 font-semibold">
+                  Success! Knowledge base populated! The chatbot is now ready to answer questions.
                 </p>
-                {result && (
-                  <div className="text-sm text-green-300 space-y-1">
-                    <p>Inserted: {result.inserted}/{result.total} items</p>
-                    {result.errors > 0 && <p>Errors: {result.errors}</p>}
-                    <p className="mt-2 text-green-400">The chatbot is now ready to answer questions.</p>
-                  </div>
-                )}
               </div>
             )}
 
@@ -99,10 +80,10 @@ export default function ChatbotSetupPage() {
             <div className="p-4 bg-foreground/5 rounded-lg">
               <h3 className="font-semibold mb-2">What happens:</h3>
               <ul className="text-sm text-foreground/70 space-y-1">
-                <li>✓ Your xelvetec content is extracted and indexed</li>
-                <li>✓ AI embeddings are generated for semantic search</li>
-                <li>✓ Content is stored in Supabase vector database</li>
-                <li>✓ Chatbot can now retrieve relevant information for answers</li>
+                <li>Your xelvetec content is extracted and indexed</li>
+                <li>AI embeddings are generated for semantic search</li>
+                <li>Content is stored in Supabase vector database</li>
+                <li>Chatbot can now retrieve relevant information for answers</li>
               </ul>
             </div>
           </div>
