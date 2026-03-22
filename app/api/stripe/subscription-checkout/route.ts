@@ -21,16 +21,8 @@ export async function POST(request: NextRequest) {
     }
     
     const countryKey = countryCodeMap[country.toLowerCase()] || 'CHF'
+    
     const stripePriceId = product.stripePrices[countryKey]
-
-    // AUTOMATISCHE ÜBERSETZUNG Telefon-Feld
-    const phoneLabels = {
-      'ch': 'Telefon oder Whatsapp',
-      'de': 'Telefon oder Whatsapp', 
-      'at': 'Telefon oder Whatsapp',
-      'tr': 'Telefon veya WhatsApp'
-    }
-    const phoneLabel = phoneLabels[country.toLowerCase()] || 'Telefon oder Whatsapp'
 
     const session = await stripe.checkout.sessions.create({
       payment_method_collection: 'always',
@@ -44,7 +36,7 @@ export async function POST(request: NextRequest) {
       mode: 'subscription',
       custom_fields: [{
         key: 'telefon_whatsapp',
-        label: { type: 'custom', custom: phoneLabel },
+        label: { type: 'custom', custom: 'Telefon oder Whatsapp' },
         type: 'text',
         optional: false
       }],
