@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
+import { getStripe } from '@/lib/stripe'
 import { SUBSCRIPTION_PRODUCTS } from '@/lib/products'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripe()
     const { tier, country, userId } = await request.json()
 
     console.log('[v0] Creating checkout session for user:', userId, 'tier:', tier)

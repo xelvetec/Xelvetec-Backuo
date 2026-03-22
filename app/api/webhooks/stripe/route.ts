@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
+import { getStripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { 
   sendSubscriptionActivatedEmail, 
@@ -9,7 +9,6 @@ import {
 } from '@/lib/email-service'
 import { countryToLanguage, type Country } from '@/lib/translations'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
 export async function POST(request: NextRequest) {
@@ -17,6 +16,7 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature')!
 
   try {
+    const stripe = getStripe()
     const event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
 
     console.log(`[v0] Stripe webhook received: ${event.type}`)

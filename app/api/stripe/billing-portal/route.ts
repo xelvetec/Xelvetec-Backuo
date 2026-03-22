@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20',
-})
-
 export async function POST(request: NextRequest) {
   try {
+    // Only initialize Stripe when the route is called (runtime)
+    const apiKey = process.env.STRIPE_SECRET_KEY
+    if (!apiKey) {
+      console.error('[v0] STRIPE_SECRET_KEY not configured')
+      return NextResponse.json(
+        { error: 'Stripe configuration missing' },
+        { status: 500 }
+      )
+    }
+
+    const stripe = new Stripe(apiKey, {
+      apiVersion: '2024-11-20',
+    })
+
     const { sessionId } = await request.json()
 
     if (!sessionId) {
@@ -33,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: portalSession.url })
   } catch (error: any) {
-    console.error('Error creating billing portal session:', error)
+    console.error('[v0] Error creating billing portal session:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to create billing portal session' },
       { status: 500 }
