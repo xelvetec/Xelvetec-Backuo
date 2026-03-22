@@ -5,7 +5,8 @@ import {
   sendSubscriptionActivatedEmail, 
   sendSubscriptionCancelledEmail, 
   sendInvoiceReadyEmail,
-  sendPaymentFailedEmail 
+  sendPaymentFailedEmail,
+  sendAdminNewSubscriptionEmail // ✅ NEU
 } from '@/lib/email-service'
 import { countryToLanguage, type Country } from '@/lib/translations'
 
@@ -62,8 +63,11 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
-  const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id
-  
+  const customerId =
+    typeof subscription.customer === 'string'
+      ? subscription.customer
+      : subscription.customer.id
+
   // Find user by Stripe customer ID
   const { data: subscriptionData, error: fetchError } = await supabaseAdmin
     .from('subscriptions')
@@ -71,12 +75,17 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     .eq('stripe_customer_id', customerId)
     .single()
 
-  if (fetchError) {
+  if (fetchError || !subscriptionData) {
     console.error('[v0] Failed to fetch subscription:', fetchError)
     return
   }
 
-  const status = subscription.status === 'active' ? 'active' : subscription.status === 'paused' ? 'paused' : 'cancelled'
+  const status =
+    subscription.status === 'active'
+      ? 'active'
+      : subscription.status === 'paused'
+      ? 'paused'
+      : 'cancelled'
 
   const { error: updateError } = await supabaseAdmin
     .from('subscriptions')
@@ -94,7 +103,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     return
   }
 
-  // Send email notification
+  // Get user language
   const { data: userProfile } = await supabaseAdmin
     .from('users_profile')
     .select('country')
@@ -104,15 +113,22 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const userCountry = (userProfile?.country || 'de') as Country
   const userLanguage = countryToLanguage[userCountry]
 
+  // ✅ WICHTIG: Nur wenn neu aktiv
   if (subscription.status === 'active' && subscriptionData.status !== 'active') {
     await sendSubscriptionActivatedEmail(subscriptionData.user_id, userLanguage)
+
+    // 🔥 ADMIN EMAIL
+    await sendAdminNewSubscriptionEmail(subscriptionData.user_id)
   }
 
   console.log(`[v0] Subscription ${subscription.id} updated to status: ${status}`)
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id
+  const customerId =
+    typeof subscription.customer === 'string'
+      ? subscription.customer
+      : subscription.customer.id
 
   const { data: subscriptionData } = await supabaseAdmin
     .from('subscriptions')
@@ -133,7 +149,6 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     return
   }
 
-  // Send cancellation email
   if (subscriptionData) {
     const { data: userProfile } = await supabaseAdmin
       .from('users_profile')
@@ -143,6 +158,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
     const userCountry = (userProfile?.country || 'de') as Country
     const userLanguage = countryToLanguage[userCountry]
+
     await sendSubscriptionCancelledEmail(subscriptionData.user_id, userLanguage)
   }
 
@@ -150,7 +166,10 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
-  const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
+  const customerId =
+    typeof invoice.customer === 'string'
+      ? invoice.customer
+      : invoice.customer?.id
 
   if (!customerId || !invoice.id) return
 
@@ -178,7 +197,10 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
 }
 
 async function handleInvoiceFailed(invoice: Stripe.Invoice) {
-  const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
+  const customerId =
+    typeof invoice.customer === 'string'
+      ? invoice.customer
+      : invoice.customer?.id
 
   if (!customerId || !invoice.id) return
 
