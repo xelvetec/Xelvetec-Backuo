@@ -66,7 +66,11 @@ export async function sendPaymentFailedEmail(userId: string, language: Language)
   return sendEmail(user.email, language, 'paymentFailed')
 }
 
-export async function sendCancellationOfferEmail(userId: string, language: Language, offer: 'discount20' | 'custom' | 'pause') {
+export async function sendCancellationOfferEmail(
+  userId: string,
+  language: Language,
+  offer: 'discount20' | 'custom' | 'pause'
+) {
   const { data: user, error } = await supabaseAdmin
     .from('users_profile')
     .select('email')
@@ -96,7 +100,47 @@ export async function sendCancellationOfferEmail(userId: string, language: Langu
     }
   }
 
-  return sendEmail(user.email, language, 'subscriptionActivated', { 
-    offer: offerMessages[language][offer] 
+  return sendEmail(user.email, language, 'subscriptionActivated', {
+    offer: offerMessages[language][offer]
   })
+}
+
+//
+// ✅ ADMIN EMAIL BEI NEUEM ABO
+//
+export async function sendAdminNewSubscriptionEmail(userId: string) {
+  const adminEmail = 'info@xelvetec.ch'
+
+  const { data: user, error } = await supabaseAdmin
+    .from('users_profile')
+    .select('email, country')
+    .eq('user_id', userId)
+    .single()
+
+  if (error) {
+    console.error('[v0] Failed to get user for admin email:', error)
+  }
+
+  console.log('🔥 NEW SUBSCRIPTION:')
+  console.log('User ID:', userId)
+  console.log('Email:', user?.email)
+  console.log('Country:', user?.country)
+
+  await sendEmail(
+    adminEmail,
+    'en',
+    'welcome', // kannst du später durch eigenes Template ersetzen
+    {
+      customText: `
+New Subscription 🎉
+
+User ID: ${userId}
+Email: ${user?.email || 'Unknown'}
+Country: ${user?.country || 'Unknown'}
+Time: ${new Date().toISOString()}
+      `
+    }
+  )
+
+  return true
 }

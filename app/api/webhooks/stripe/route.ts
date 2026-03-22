@@ -5,7 +5,8 @@ import {
   sendSubscriptionActivatedEmail, 
   sendSubscriptionCancelledEmail, 
   sendInvoiceReadyEmail,
-  sendPaymentFailedEmail 
+  sendPaymentFailedEmail,
+  sendAdminNewSubscriptionEmail
 } from '@/lib/email-service'
 import { countryToLanguage, type Country } from '@/lib/translations'
 
@@ -63,20 +64,28 @@ export async function POST(request: NextRequest) {
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id
-  
+
   console.log('[v0] Handling subscription update for customer:', customerId)
-  
-  // Find user by Stripe customer ID
+
+  // Find subscription by Stripe customer ID
   const { data: subscriptionData, error: fetchError } = await supabaseAdmin
     .from('subscriptions')
     .select('user_id, status')
     .eq('stripe_customer_id', customerId)
     .single()
 
-  if (fetchError) {
+  // Status mapping
+  const status =
+    subscription.status === 'active'
+      ? 'active'
+      : subscription.status === 'paused'
+      ? 'paused'
+      : 'cancelled'
+
+  if (fetchError || !subscriptionData) {
     console.log('[v0] No existing subscription found, checking users by stripe_customer_id...')
-    
-    // Check if this is a new customer - find user with this stripe_customer_id
+
+    // Find user by Stripe customer ID
     const { data: userData, error: userError } = await supabaseAdmin
       .from('users_profile')
       .select('user_id')
@@ -90,8 +99,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
     // Create new subscription
     console.log('[v0] Creating new subscription for user:', userData.user_id)
-    const status = subscription.status === 'active' ? 'active' : subscription.status === 'paused' ? 'paused' : 'cancelled'
-    
+
     const { error: createError } = await supabaseAdmin
       .from('subscriptions')
       .insert({
@@ -111,7 +119,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       return
     }
 
-    // Send email notification
+    // Send email notifications
     const { data: userProfile } = await supabaseAdmin
       .from('users_profile')
       .select('country')
@@ -120,15 +128,15 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
     const userCountry = (userProfile?.country || 'de') as Country
     const userLanguage = countryToLanguage[userCountry]
+
     await sendSubscriptionActivatedEmail(userData.user_id, userLanguage)
+    await sendAdminNewSubscriptionEmail(userData.user_id)
 
     console.log('[v0] New subscription created for user:', userData.user_id)
     return
   }
 
   // Update existing subscription
-  const status = subscription.status === 'active' ? 'active' : subscription.status === 'paused' ? 'paused' : 'cancelled'
-
   const { error: updateError } = await supabaseAdmin
     .from('subscriptions')
     .update({
@@ -145,7 +153,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     return
   }
 
-  // Send email notification
+  // Get user language
   const { data: userProfile } = await supabaseAdmin
     .from('users_profile')
     .select('country')
@@ -155,8 +163,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const userCountry = (userProfile?.country || 'de') as Country
   const userLanguage = countryToLanguage[userCountry]
 
+  // Send email only if subscription became active
   if (subscription.status === 'active' && subscriptionData.status !== 'active') {
     await sendSubscriptionActivatedEmail(subscriptionData.user_id, userLanguage)
+    await sendAdminNewSubscriptionEmail(subscriptionData.user_id)
   }
 
   console.log(`[v0] Subscription ${subscription.id} updated to status: ${status}`)
@@ -184,7 +194,6 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     return
   }
 
-  // Send cancellation email
   if (subscriptionData) {
     const { data: userProfile } = await supabaseAdmin
       .from('users_profile')
@@ -194,6 +203,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
     const userCountry = (userProfile?.country || 'de') as Country
     const userLanguage = countryToLanguage[userCountry]
+
     await sendSubscriptionCancelledEmail(subscriptionData.user_id, userLanguage)
   }
 
@@ -202,8 +212,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
   const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
-
-  if (!customerId || !invoice.id) return
+  if (!customerId || !invoice.id || !invoice.paid_at) return
 
   const { error } = await supabaseAdmin
     .from('invoices')
@@ -214,8 +223,8 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
         amount: invoice.amount_paid,
         currency: invoice.currency,
         status: 'paid',
-        pdf_url: invoice.pdf,
-        paid_date: new Date(invoice.paid_at! * 1000).toISOString(),
+        pdf_url: invoice.invoice_pdf,
+        paid_date: new Date(invoice.paid_at * 1000).toISOString(),
       },
       { onConflict: 'stripe_invoice_id' }
     )
@@ -230,7 +239,6 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
 
 async function handleInvoiceFailed(invoice: Stripe.Invoice) {
   const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
-
   if (!customerId || !invoice.id) return
 
   const { error } = await supabaseAdmin
@@ -239,7 +247,7 @@ async function handleInvoiceFailed(invoice: Stripe.Invoice) {
       {
         stripe_invoice_id: invoice.id,
         stripe_customer_id: customerId,
-        amount: invoice.amount_due,
+        amount: invoice.amount_due || 0,
         currency: invoice.currency,
         status: 'failed',
       },

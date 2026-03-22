@@ -10,30 +10,28 @@ export async function POST(request: NextRequest) {
 
     console.log('[v0] Creating checkout session for user:', userId, 'tier:', tier)
 
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID required' }, { status: 400 })
+    }
+
     const product = SUBSCRIPTION_PRODUCTS.find(p => p.tier === tier)
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 })
-    }
-
-    // Map country codes from context (lowercase) to uppercase for products
+    // Map country codes to currencies
     const countryCodeMap: { [key: string]: 'CHF' | 'EUR' | 'TRY' } = {
       'ch': 'CHF',
       'de': 'EUR',
       'at': 'EUR',
       'tr': 'TRY'
     }
-    
+
     const countryKey = countryCodeMap[country.toLowerCase()] || 'CHF'
-    
-    // Use predefined Stripe Price ID (multi-currency, no conversion)
     const stripePriceId = product.stripePrices[countryKey]
 
     // Create a Stripe customer associated with the user
-    let stripeCustomer = await stripe.customers.create({
+    const stripeCustomer = await stripe.customers.create({
       metadata: {
         userId: userId,
         tier: tier,
@@ -61,9 +59,9 @@ export async function POST(request: NextRequest) {
       console.log('[v0] Pre-created subscription record for user:', userId)
     }
 
+    // Create the Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_collection: 'always',
-      payment_method_configuration: 'pmc_1TDV192Uie3LBmwR6uI9pa7n',
       customer: stripeCustomer.id,
       line_items: [
         {
@@ -72,7 +70,15 @@ export async function POST(request: NextRequest) {
         }
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/checkout?session_id={CHECKOUT_SESSION_ID}&tier=${tier}`,
+      custom_fields: [
+        {
+          key: 'telefon_whatsapp',
+          label: { type: 'custom', custom: 'Telefon | Whatsapp' },
+          type: 'text',
+          optional: false
+        }
+      ],
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/success?session_id={CHECKOUT_SESSION_ID}&tier=${tier}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/cancel`,
       metadata: {
         userId: userId,

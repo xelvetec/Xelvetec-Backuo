@@ -7,7 +7,7 @@ Dieses System verwendet **vordefinierte Stripe Price IDs**, um Währungsumrechnu
 - 🇩🇪 Deutschland/EU: **29.90 EUR, 79.90 EUR, 199.90 EUR**
 - 🇹🇷 Türkei: **999 TRY, 2599 TRY, 6499 TRY**
 
-## Warum vordefinierte Price IDs?
+## Warum vordefinierte Price IDs?dfd
 - ✅ **Keine automatische Umrechnung** durch Stripe
 - ✅ **Exakte Preise** bleiben immer gleich
 - ✅ **Vorhersehbar** für Kunden und Abrechnungen
