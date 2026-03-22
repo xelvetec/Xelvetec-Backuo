@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useLanguage } from '@/lib/language-context'
-import { getUserSubscription, getUserInvoices } from '@/lib/auth'
+import { getUserSubscription, getUserInvoices, getSubscriptionHistory } from '@/lib/auth'
 import { CancellationFlow } from '@/components/cancellation-flow'
 
 export default function DashboardPage() {
   const { user, loading: authLoading, signOut } = useAuth()
   const { t } = useLanguage()
   const [subscription, setSubscription] = useState<any>(null)
+  const [subscriptionHistory, setSubscriptionHistory] = useState<any[]>([])
   const [invoices, setInvoices] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showCancellation, setShowCancellation] = useState(false)
@@ -22,15 +23,19 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user) {
+      console.log('[v0] Loading subscriptions for user:', user.id)
       Promise.all([
         getUserSubscription(user.id),
-        getUserInvoices(user.id)
-      ]).then(([sub, invoices]) => {
+        getUserInvoices(user.id),
+        getSubscriptionHistory(user.id)
+      ]).then(([sub, invoices, history]) => {
+        console.log('[v0] Subscriptions loaded:', { sub, history })
         setSubscription(sub)
         setInvoices(invoices)
+        setSubscriptionHistory(history)
         setLoading(false)
       }).catch((err) => {
-        console.error(err)
+        console.error('[v0] Error loading subscriptions:', err)
         setLoading(false)
       })
     }
@@ -195,6 +200,46 @@ export default function DashboardPage() {
             onConfirmCancel={handleCancellationConfirm}
             onAcceptOffer={handleCancellationAccept}
           />
+        )}
+
+        {/* Subscription History */}
+        {subscriptionHistory.length > 0 && (
+          <div className="p-6 mt-6 border border-foreground/10 rounded-lg bg-background/50">
+            <h2 className="text-xl font-bold mb-4">Abonnement-Verlauf ({subscriptionHistory.length})</h2>
+            <div className="space-y-3">
+              {subscriptionHistory.map((sub) => (
+                <div
+                  key={sub.id}
+                  className={`p-4 rounded-lg border ${
+                    sub.status === 'active'
+                      ? 'border-green-500/30 bg-green-500/5'
+                      : sub.status === 'cancelled'
+                      ? 'border-red-500/30 bg-red-500/5'
+                      : 'border-foreground/10 bg-foreground/5'
+                  }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium capitalize">
+                        {sub.tier} Plan - {sub.status === 'active' ? 'Aktiv' : sub.status === 'cancelled' ? 'Storniert' : sub.status}
+                      </p>
+                      <p className="text-sm text-foreground/60">
+                        Gestartet: {new Date(sub.created_at).toLocaleDateString('de-DE')}
+                      </p>
+                    </div>
+                    {sub.status === 'cancelled' && (
+                      <div className="text-right">
+                        <p className="text-sm text-red-400 font-medium">Storniert</p>
+                        <p className="text-xs text-foreground/60">
+                          {new Date(sub.updated_at).toLocaleDateString('de-DE')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
