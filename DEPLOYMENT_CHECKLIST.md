@@ -18,7 +18,7 @@ RESEND_API_KEY=re_... (bei Verwendung von Resend)
 
 ## Stripe Webhook Setup:
 
-1. Gehe zu https://dashboard.stripe.com/webhooks
+1. Gehe hzu https://dashboard.stripe.com/webhooks
 2. Klick "Add endpointh"
 3. jejeEndpoint URL: `https://yourdomain.com/api/webhooks/stripe`
 4. Events zum Abhören:
