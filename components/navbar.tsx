@@ -42,13 +42,13 @@ export function Navbar() {
           }}
         >
           <Image
-            src="/images/xelvetec-logo.png"
-            alt="XelveTec"
+            src="/logo.png"
+            alt="XelveTec Logo"
             width={48}
             height={48}
             className="w-12 h-12 md:w-14 md:h-14 transition-all duration-300 group-hover:scale-110"
             style={{
-              filter: "drop-shadow(0 0 0px rgba(160, 32, 240, 0)) drop-shadow(0 0 0px rgba(0, 212, 255, 0))",
+              filter: "drop-shadow(0 0 8px rgba(160, 32, 240, 0.3))",
               transition: "filter 0.3s ease",
             }}
           />

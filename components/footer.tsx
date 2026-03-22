@@ -52,10 +52,11 @@ export function Footer() {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <Image
-              src="/images/xelvetec-logo.png"
-              alt="XelveTec"
-              width={32}
-              height={32}
+              src="/logo.png"
+              alt="XelveTec Logo"
+              width={40}
+              height={40}
+              className="w-10 h-10"
             />
             <span
               className="text-lg font-bold"
