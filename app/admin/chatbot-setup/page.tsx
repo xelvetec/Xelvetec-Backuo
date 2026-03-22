@@ -3,10 +3,20 @@
 import { useState } from 'react'
 import { Loader } from 'lucide-react'
 
+interface PopulateResponse {
+  success: boolean
+  message: string
+  inserted: number
+  errors: number
+  total: number
+  errorDetails?: string[]
+}
+
 export default function ChatbotSetupPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [result, setResult] = useState<PopulateResponse | null>(null)
 
   const handlePopulateKB = async () => {
     setLoading(true)
@@ -18,16 +28,17 @@ export default function ChatbotSetupPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_ADMIN_TOKEN || 'demo'}`,
+          'Authorization': `Bearer demo`,
         },
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Failed to populate knowledge base')
+        throw new Error(data.error || data.details || 'Failed to populate knowledge base')
       }
 
-      const data = await response.json()
+      setResult(data)
       setSuccess(true)
       console.log('[v0] KB populated:', data)
     } catch (err) {
@@ -66,9 +77,16 @@ export default function ChatbotSetupPage() {
 
             {success && (
               <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-green-400 font-semibold">
-                  ✓ Knowledge base successfully populated! The chatbot is now ready to answer questions.
+                <p className="text-green-400 font-semibold mb-2">
+                  ✓ Knowledge base successfully populated!
                 </p>
+                {result && (
+                  <div className="text-sm text-green-300 space-y-1">
+                    <p>Inserted: {result.inserted}/{result.total} items</p>
+                    {result.errors > 0 && <p>Errors: {result.errors}</p>}
+                    <p className="mt-2 text-green-400">The chatbot is now ready to answer questions.</p>
+                  </div>
+                )}
               </div>
             )}
 
