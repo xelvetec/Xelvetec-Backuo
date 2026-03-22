@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    // Map country codes from context (lowercase) to uppercase for products
     const countryCodeMap: { [key: string]: 'CHF' | 'EUR' | 'TRY' } = {
       'ch': 'CHF',
       'de': 'EUR',
@@ -23,7 +22,6 @@ export async function POST(request: NextRequest) {
     
     const countryKey = countryCodeMap[country.toLowerCase()] || 'CHF'
     
-    // Use predefined Stripe Price ID (multi-currency, no conversion)
     const stripePriceId = product.stripePrices[countryKey]
 
     const session = await stripe.checkout.sessions.create({
@@ -36,6 +34,12 @@ export async function POST(request: NextRequest) {
         }
       ],
       mode: 'subscription',
+      custom_fields: [{
+        key: 'website_wuensche',
+        label: { type: 'custom', custom: 'Website Wünsche (optional)' },
+        type: 'text',
+        optional: true
+      }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/subscription/cancel`,
     })
