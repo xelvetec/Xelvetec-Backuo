@@ -1,13 +1,33 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+let supabaseInstance: any = null
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error('[v0] Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
+export function getSupabaseClient() {
+  if (!supabaseInstance) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('[v0] Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
+      // Return a dummy client for type safety during build
+      return createClient('', '')
+    }
+
+    supabaseInstance = createClient(supabaseUrl, supabaseKey)
+  }
+
+  return supabaseInstance
 }
 
-export const supabase = createClient(supabaseUrl || '', supabaseKey || '')
+// Keep for backwards compatibility
+export const supabase = new Proxy(
+  {},
+  {
+    get(target, prop) {
+      return getSupabaseClient()[prop as string]
+    },
+  }
+) as any
 
 export type Database = {
   public: {
