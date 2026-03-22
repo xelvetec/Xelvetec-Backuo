@@ -20,7 +20,7 @@ RESEND_API_KEY=re_... (bei Verwendung von Resend)
 
 1. Gehe zu https://dashboard.stripe.com/webhooks
 2. Klick "Add endpointh"
-3. Endpoint URL: `https://yourdomain.com/api/webhooks/stripe`
+3. jejeEndpoint URL: `https://yourdomain.com/api/webhooks/stripe`
 4. Events zum Abhören:
    - `customer.subscription.created`
    - `customer.subscription.updated`
