@@ -83,10 +83,10 @@ export function ChatWidget() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-full sm:w-96 h-[600px] sm:h-[600px] bg-background border border-foreground/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-4 right-4 z-50 w-[calc(100vw-32px)] sm:w-96 max-h-[80vh] sm:h-[600px] bg-background border border-foreground/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
           {/* Header */}
-          <div className="px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white flex items-center justify-between">
-            <h2 className="font-bold text-lg">{labels.title}</h2>
+          <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white flex items-center justify-between flex-shrink-0">
+            <h2 className="font-bold text-base sm:text-lg">{labels.title}</h2>
             <button
               onClick={() => setIsOpen(false)}
               className="p-1 hover:bg-white/20 rounded-lg transition-colors"
@@ -99,7 +99,7 @@ export function ChatWidget() {
           {/* Messages Container */}
           <div
             ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto p-4 space-y-4 bg-background/50"
+            className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-background/50"
           >
             {messages.length === 0 && (
               <div className="flex items-center justify-center h-full">
@@ -156,7 +156,7 @@ export function ChatWidget() {
           {/* Input Form */}
           <form
             onSubmit={handleSubmit}
-            className="border-t border-foreground/10 p-4 bg-background flex gap-2"
+            className="border-t border-foreground/10 p-3 sm:p-4 bg-background flex gap-2 flex-shrink-0"
           >
             <input
               type="text"
@@ -164,7 +164,7 @@ export function ChatWidget() {
               onChange={(e) => setInput(e.target.value)}
               placeholder={labels.placeholder}
               disabled={isLoading}
-              className="flex-1 px-4 py-2 rounded-lg border border-foreground/20 bg-background/50 focus:outline-none focus:border-purple-500 transition-colors text-sm disabled:opacity-50"
+              className="flex-1 px-4 py-2 rounded-lg border border-foreground/20 bg-background/50 focus:outline-none focus:border-purple-500 transition-colors text-base disabled:opacity-50"
             />
             <button
               type="submit"

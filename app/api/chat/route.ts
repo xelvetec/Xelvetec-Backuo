@@ -85,6 +85,10 @@ export async function POST(req: Request) {
         ? lastMessage.content
         : lastMessage.content?.[0]?.text || ''
 
+    if (!userMessage.trim()) {
+      return new Response('Empty message', { status: 400 })
+    }
+
     // Detect language from user message
     const language = detectLanguage(userMessage)
 
@@ -92,9 +96,11 @@ export async function POST(req: Request) {
     const relevantContext = await getRelevantContext(userMessage, language)
 
     // Build system prompt with context
-    const systemPrompt = `${SYSTEM_PROMPTS[language]}
-
-${relevantContext ? `\nRelevante Informationen aus unserer Wissensdatenbank:\n${relevantContext}` : ''}`
+    const contextSection = relevantContext 
+      ? `\n\nRelevante Informationen aus unserer Wissensdatenbank:\n${relevantContext}`
+      : ''
+    
+    const systemPrompt = `${SYSTEM_PROMPTS[language]}${contextSection}`
 
     // Convert messages to model format
     const modelMessages = await convertToModelMessages(messages)
@@ -108,9 +114,14 @@ ${relevantContext ? `\nRelevante Informationen aus unserer Wissensdatenbank:\n${
       maxTokens: 1024,
     })
 
-    return result.toUIMessageStreamResponse()
+    return result.toUIMessageStreamResponse({
+      originalMessages: messages,
+    })
   } catch (error) {
     console.error('[v0] Chat API error:', error)
-    return new Response('Internal server error', { status: 500 })
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
 }
