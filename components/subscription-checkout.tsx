@@ -3,6 +3,7 @@
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useLanguage } from '@/lib/language-context'
+import { useAuth } from '@/lib/auth-context'
 import { useState, useEffect } from 'react'
 
 interface SubscriptionCheckoutProps {
@@ -13,6 +14,7 @@ export function SubscriptionCheckout({ tier }: SubscriptionCheckoutProps) {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const { country, t } = useLanguage()
+  const { user, loading: authLoading } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string>('')
 
@@ -23,16 +25,37 @@ export function SubscriptionCheckout({ tier }: SubscriptionCheckoutProps) {
       return
     }
 
-    // Checkout starten
+    // Wenn noch nicht authentifiziert, warten
+    if (authLoading) {
+      setIsLoading(true)
+      return
+    }
+
+    // Wenn nicht angemeldet, zu Login redirecten
+    if (!user) {
+      console.log('[v0] User not authenticated, redirecting to auth')
+      window.location.href = '/auth?redirect=/subscription/checkout?tier=' + tier
+      return
+    }
+
+    // Checkout starten mit user_id
     handleCheckout()
-  }, [])
+  }, [authLoading, user, sessionId, tier])
 
   async function handleCheckout() {
     try {
+      if (!user) {
+        setError('Please log in to continue')
+        setIsLoading(false)
+        return
+      }
+
+      console.log('[v0] Creating checkout session for user:', user.id)
+
       const response = await fetch('/api/stripe/subscription-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier, country })
+        body: JSON.stringify({ tier, country, userId: user.id })
       })
 
       const data = await response.json()
@@ -42,10 +65,11 @@ export function SubscriptionCheckout({ tier }: SubscriptionCheckoutProps) {
         setIsLoading(false)
       } else if (data.url) {
         // Redirect zu Stripe Checkout
+        console.log('[v0] Redirecting to Stripe checkout')
         window.location.href = data.url
       }
     } catch (err) {
-      console.error('Checkout error:', err)
+      console.error('[v0] Checkout error:', err)
       setError('Failed to create checkout session')
       setIsLoading(false)
     }
