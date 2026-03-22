@@ -64,10 +64,23 @@ export async function getUserSubscription(userId: string) {
     .from('subscriptions')
     .select('*')
     .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle()
 
   if (error) throw error
   return data
+}
+
+export async function getSubscriptionHistory(userId: string) {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
 }
 
 export async function getUserInvoices(userId: string) {

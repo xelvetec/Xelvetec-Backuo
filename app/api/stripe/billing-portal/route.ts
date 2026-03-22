@@ -1,22 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
+import { getStripe } from '@/lib/stripe'
 
 export async function POST(request: NextRequest) {
   try {
-    // Only initialize Stripe when the route is called (runtime)
-    const apiKey = process.env.STRIPE_SECRET_KEY
-    if (!apiKey) {
-      console.error('[v0] STRIPE_SECRET_KEY not configured')
-      return NextResponse.json(
-        { error: 'Stripe configuration missing' },
-        { status: 500 }
-      )
-    }
-
-    const stripe = new Stripe(apiKey, {
-      apiVersion: '2024-11-20',
-    })
-
+    const stripe = getStripe()
     const { sessionId } = await request.json()
 
     if (!sessionId) {
@@ -38,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: session.customer as string,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://xelvetec.com'}/dashboard`,
     })
 
     return NextResponse.json({ url: portalSession.url })
